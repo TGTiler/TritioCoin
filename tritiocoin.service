@@ -1,0 +1,24 @@
+[Unit]
+Description=TritioCoin Node
+After=network.target
+
+[Service]
+Type=simple
+User=tritiocoin
+Group=tritiocoin
+WorkingDirectory=/opt/tritiocoin
+Environment=TRC_PASSWORD=your_password_here
+ExecStart=/usr/bin/python3 main.py --mode miner --port 8333 --network mainnet --become-seed --api-port 8080
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/tritiocoin/data
+
+[Install]
+WantedBy=multi-user.target

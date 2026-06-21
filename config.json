@@ -1,0 +1,19 @@
+{
+    "network": {
+        "host": "0.0.0.0",
+        "port": 8333,
+        "seeds": []
+    },
+    "consensus": {
+        "difficulty": 4,
+        "block_time": 30,
+        "reward": 50.0,
+        "halving_interval": 210000
+    },
+    "wallet": {
+        "quantum_mode": false
+    },
+    "mining": {
+        "enabled": false
+    }
+}

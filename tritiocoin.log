@@ -1,0 +1,102 @@
+2026-06-21 11:40:08 [INFO] Tritio: New wallet created: T1CUzJERSzWjby59y7bozgkftvhPthDTQJL
+2026-06-21 11:40:08 [INFO] Blockchain: Genesis block created [testnet]
+2026-06-21 11:40:08 [INFO] Tritio: Node started | Network: testnet | Mode: miner | Quantum: OFF | Role: peer | Address: T1CUzJERSzWjby59y7bozgkftvhPthDTQJL
+2026-06-21 11:40:08 [INFO] Tritio: Selected random seed: 192.168.0.112:8333
+2026-06-21 11:40:08 [INFO] P2P: P2P listening on 0.0.0.0:8333 (TLS enabled)
+2026-06-21 11:40:35 [INFO] Miner: Mined block #1 nonce=339 hash=da00eea6de4362e1... rate=12 H/s
+2026-06-21 11:40:35 [INFO] API: API listening on http://0.0.0.0:8080
+2026-06-21 11:40:35 [INFO] Tritio: Node running on port 8333 | API on port 8080
+2026-06-21 11:40:36 [INFO] Blockchain: Block #1 added | Supply: 50.00/21000000 TRC
+2026-06-21 11:40:38 [INFO] Miner: Mined block #2 nonce=26 hash=78d55e53db993a0e... rate=12 H/s
+2026-06-21 11:40:39 [INFO] Blockchain: Block #2 added | Supply: 100.00/21000000 TRC
+2026-06-21 11:41:04 [INFO] Miner: Mined block #3 nonce=288 hash=a02f8962a961ed5a... rate=11 H/s
+2026-06-21 11:41:04 [INFO] Blockchain: Block #3 added | Supply: 150.00/21000000 TRC
+2026-06-21 11:41:06 [INFO] Miner: Mined block #4 nonce=20 hash=143c911a4bfbd490... rate=12 H/s
+2026-06-21 11:41:06 [INFO] Blockchain: Block #4 added | Supply: 200.00/21000000 TRC
+2026-06-21 11:42:12 [INFO] Miner: Mined block #5 nonce=812 hash=f27113f172740bb2... rate=12 H/s
+2026-06-21 11:42:12 [INFO] Blockchain: Block #5 added | Supply: 250.00/21000000 TRC
+2026-06-21 11:42:45 [INFO] Miner: Mined block #6 nonce=334 hash=68e5a7576cff461d... rate=10 H/s
+2026-06-21 11:42:46 [INFO] Blockchain: Block #6 added | Supply: 300.00/21000000 TRC
+2026-06-21 11:43:11 [INFO] Miner: Mined block #7 nonce=283 hash=b909ef82e7b17385... rate=11 H/s
+2026-06-21 11:43:11 [INFO] Blockchain: Block #7 added | Supply: 350.00/21000000 TRC
+2026-06-21 11:43:24 [INFO] Miner: Mined block #8 nonce=155 hash=794d68a96e0f1ef0... rate=12 H/s
+2026-06-21 11:43:25 [INFO] Blockchain: Block #8 added | Supply: 400.00/21000000 TRC
+2026-06-21 11:43:29 [INFO] Miner: Mined block #9 nonce=50 hash=8fed8881738c3eed... rate=12 H/s
+2026-06-21 11:43:29 [INFO] Blockchain: Block #9 added | Supply: 450.00/21000000 TRC
+2026-06-21 11:44:18 [INFO] Miner: Mined block #10 nonce=579 hash=a68a658bb0a7c917... rate=12 H/s
+2026-06-21 11:44:19 [INFO] Blockchain: Block #10 added | Supply: 500.00/21000000 TRC
+2026-06-21 11:44:31 [INFO] Miner: Mined block #11 nonce=148 hash=c6f4683f620dd801... rate=12 H/s
+2026-06-21 11:44:32 [INFO] Blockchain: Block #11 added | Supply: 550.00/21000000 TRC
+2026-06-21 11:44:45 [INFO] Miner: Mined block #12 nonce=163 hash=5e2692566968c92e... rate=12 H/s
+2026-06-21 11:44:46 [INFO] Blockchain: Block #12 added | Supply: 600.00/21000000 TRC
+2026-06-21 11:45:14 [INFO] Miner: Mined block #13 nonce=359 hash=ac553ad25d14d93d... rate=13 H/s
+2026-06-21 11:45:14 [INFO] Blockchain: Block #13 added | Supply: 650.00/21000000 TRC
+2026-06-21 11:45:24 [INFO] Miner: Mined block #14 nonce=124 hash=10109eac595b95df... rate=13 H/s
+2026-06-21 11:45:25 [INFO] Blockchain: Block #14 added | Supply: 700.00/21000000 TRC
+2026-06-21 11:45:27 [INFO] Miner: Mined block #15 nonce=28 hash=479c887337fa2705... rate=12 H/s
+2026-06-21 11:45:28 [INFO] Blockchain: Block #15 added | Supply: 750.00/21000000 TRC
+2026-06-21 11:46:40 [INFO] Miner: Mined block #16 nonce=892 hash=d8990b912c64a807... rate=12 H/s
+2026-06-21 11:46:40 [INFO] Blockchain: Block #16 added | Supply: 800.00/21000000 TRC
+2026-06-21 11:46:43 [INFO] Miner: Mined block #17 nonce=40 hash=2f35c5a900cf65af... rate=12 H/s
+2026-06-21 11:46:44 [INFO] Blockchain: Block #17 added | Supply: 850.00/21000000 TRC
+2026-06-21 11:46:46 [INFO] Miner: Mined block #18 nonce=26 hash=b75ab44b95bec6d3... rate=11 H/s
+2026-06-21 11:46:47 [INFO] Blockchain: Block #18 added | Supply: 900.00/21000000 TRC
+2026-06-21 11:46:57 [INFO] Miner: Mined block #19 nonce=113 hash=8669657b9dcb3ca1... rate=12 H/s
+2026-06-21 11:46:57 [INFO] Blockchain: Block #19 added | Supply: 950.00/21000000 TRC
+2026-06-21 11:47:02 [INFO] Miner: Mined block #20 nonce=59 hash=beca059ffc21b9d8... rate=12 H/s
+2026-06-21 11:47:03 [INFO] Blockchain: Block #20 added | Supply: 1000.00/21000000 TRC
+2026-06-21 11:47:59 [INFO] Miner: Mined block #21 nonce=691 hash=97a5cf66cc9ded6f... rate=12 H/s
+2026-06-21 11:48:00 [INFO] Blockchain: Block #21 added | Supply: 1050.00/21000000 TRC
+2026-06-21 11:48:20 [INFO] Miner: Mined block #22 nonce=254 hash=4b43ed46e6dcbe39... rate=12 H/s
+2026-06-21 11:48:21 [INFO] Blockchain: Block #22 added | Supply: 1100.00/21000000 TRC
+2026-06-21 11:48:26 [INFO] Miner: Mined block #23 nonce=68 hash=93ba63fe5e14c3b3... rate=13 H/s
+2026-06-21 11:48:27 [INFO] Blockchain: Block #23 added | Supply: 1150.00/21000000 TRC
+2026-06-21 11:48:28 [INFO] Miner: Mined block #24 nonce=18 hash=7c9498b246c0db64... rate=13 H/s
+2026-06-21 11:48:29 [INFO] Blockchain: Block #24 added | Supply: 1200.00/21000000 TRC
+2026-06-21 11:48:31 [INFO] Miner: Mined block #25 nonce=28 hash=c25565d205b62c6a... rate=13 H/s
+2026-06-21 11:48:32 [INFO] Blockchain: Block #25 added | Supply: 1250.00/21000000 TRC
+2026-06-21 11:48:42 [INFO] Miner: Mined block #26 nonce=135 hash=bb363028f4528a6e... rate=13 H/s
+2026-06-21 11:48:43 [INFO] Blockchain: Block #26 added | Supply: 1300.00/21000000 TRC
+2026-06-21 11:49:01 [INFO] Miner: Mined block #27 nonce=229 hash=0ea2540e101a2aed... rate=13 H/s
+2026-06-21 11:49:02 [INFO] Blockchain: Block #27 added | Supply: 1350.00/21000000 TRC
+2026-06-21 11:49:04 [INFO] Miner: Mined block #28 nonce=30 hash=627e2d252f460a68... rate=11 H/s
+2026-06-21 11:49:05 [INFO] Blockchain: Block #28 added | Supply: 1400.00/21000000 TRC
+2026-06-21 11:49:14 [INFO] Miner: Mined block #29 nonce=113 hash=2223b3b6a7d82808... rate=13 H/s
+2026-06-21 11:49:14 [INFO] Blockchain: Block #29 added | Supply: 1450.00/21000000 TRC
+2026-06-21 11:49:43 [INFO] Miner: Mined block #30 nonce=359 hash=97df34a977bcc84e... rate=13 H/s
+2026-06-21 11:49:44 [INFO] Blockchain: Block #30 added | Supply: 1500.00/21000000 TRC
+2026-06-21 11:49:50 [INFO] Miner: Mined block #31 nonce=77 hash=2117e42515e90496... rate=13 H/s
+2026-06-21 11:49:50 [INFO] Blockchain: Block #31 added | Supply: 1550.00/21000000 TRC
+2026-06-21 11:50:16 [INFO] Miner: Mined block #32 nonce=323 hash=41d51946e8c1f559... rate=13 H/s
+2026-06-21 11:50:17 [INFO] Blockchain: Block #32 added | Supply: 1600.00/21000000 TRC
+2026-06-21 11:51:12 [INFO] Miner: Mined block #33 nonce=708 hash=ef8289622cf6f115... rate=13 H/s
+2026-06-21 11:51:13 [INFO] Blockchain: Block #33 added | Supply: 1650.00/21000000 TRC
+2026-06-21 11:52:00 [INFO] Miner: Mined block #34 nonce=606 hash=ea906bbde8293f44... rate=13 H/s
+2026-06-21 11:52:01 [INFO] Blockchain: Block #34 added | Supply: 1700.00/21000000 TRC
+2026-06-21 11:52:38 [INFO] Miner: Mined block #35 nonce=470 hash=2529a6543df4b22f... rate=13 H/s
+2026-06-21 11:52:39 [INFO] Blockchain: Block #35 added | Supply: 1750.00/21000000 TRC
+2026-06-21 11:52:39 [INFO] Miner: Mined block #36 nonce=0 hash=c7391d69ae34581a... rate=0 H/s
+2026-06-21 11:52:39 [INFO] Blockchain: Block #36 added | Supply: 1800.00/21000000 TRC
+2026-06-21 11:52:40 [INFO] Miner: Mined block #37 nonce=5 hash=1ca706ae0a7162c4... rate=11 H/s
+2026-06-21 11:52:40 [INFO] Blockchain: Block #37 added | Supply: 1850.00/21000000 TRC
+2026-06-21 11:52:41 [INFO] Miner: Mined block #38 nonce=8 hash=032e649c80d2189e... rate=12 H/s
+2026-06-21 11:52:42 [INFO] Blockchain: Block #38 added | Supply: 1900.00/21000000 TRC
+2026-06-21 11:52:43 [INFO] Miner: Mined block #39 nonce=11 hash=5764309118e3dce2... rate=12 H/s
+2026-06-21 11:52:43 [INFO] Blockchain: Block #39 added | Supply: 1950.00/21000000 TRC
+2026-06-21 11:52:44 [INFO] Miner: Mined block #40 nonce=13 hash=91b6d68c2f378bd8... rate=12 H/s
+2026-06-21 11:52:45 [INFO] Blockchain: Block #40 added | Supply: 2000.00/21000000 TRC
+2026-06-21 11:52:46 [INFO] Miner: Mined block #41 nonce=15 hash=c145d05eb53bb49e... rate=12 H/s
+2026-06-21 11:52:47 [INFO] Blockchain: Block #41 added | Supply: 2050.00/21000000 TRC
+2026-06-21 11:52:47 [INFO] Miner: Mined block #42 nonce=2 hash=2f9f8c7b3ca79ad0... rate=9 H/s
+2026-06-21 11:52:48 [INFO] Blockchain: Block #42 added | Supply: 2100.00/21000000 TRC
+2026-06-21 11:52:49 [INFO] Miner: Mined block #43 nonce=10 hash=c4ae29d98e078b7e... rate=12 H/s
+2026-06-21 11:52:49 [INFO] Blockchain: Block #43 added | Supply: 2150.00/21000000 TRC
+2026-06-21 11:52:50 [INFO] Miner: Mined block #44 nonce=8 hash=b013d1f0040bde06... rate=11 H/s
+2026-06-21 11:52:51 [INFO] Blockchain: Block #44 added | Supply: 2200.00/21000000 TRC
+2026-06-21 11:54:15 [INFO] Miner: Mined block #45 nonce=1068 hash=76d4a829e085d191... rate=13 H/s
+2026-06-21 11:54:16 [INFO] Blockchain: Block #45 added | Supply: 2250.00/21000000 TRC
+2026-06-21 12:50:22 [INFO] Tritio: New wallet created: T1GQtw1Qm4KzWpNPrhskVnFWwYGV1Aqk1Mi
+2026-06-21 12:50:22 [INFO] Blockchain: Chain loaded: 46 blocks from database
+2026-06-21 12:50:22 [INFO] P2P: Self-signed TLS certificate generated
+2026-06-21 12:50:22 [INFO] Tritio: Node started | Network: testnet | Mode: miner | Quantum: OFF | Role: peer | Address: T1GQtw1Qm4KzWpNPrhskVnFWwYGV1Aqk1Mi
+2026-06-21 12:50:22 [INFO] Tritio: Selected random seed: 192.168.0.112:8333

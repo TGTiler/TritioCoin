@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  tritiocoin:
+    build: .
+    container_name: tritiocoin
+    restart: unless-stopped
+    ports:
+      - "${TRC_PORT:-8333}:${TRC_PORT:-8333}"
+      - "${TRC_API_PORT:-8080}:${TRC_API_PORT:-8080}"
+    volumes:
+      - ./data:/data
+    environment:
+      - TRC_PASSWORD=${TRC_PASSWORD}
+      - TRC_NETWORK=${TRC_NETWORK:-mainnet}
+      - TRC_MODE=${TRC_MODE:-miner}
+      - TRC_PORT=${TRC_PORT:-8333}
+    command: >
+      python main.py
+      --mode ${TRC_MODE:-miner}
+      --port ${TRC_PORT:-8333}
+      --network ${TRC_NETWORK:-mainnet}
+      --become-seed
+      --api-port ${TRC_API_PORT:-8080}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
