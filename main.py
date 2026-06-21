@@ -20,7 +20,7 @@ from core.consensus import ConsensusEngine
 from network.p2p_node import P2PNode
 from network.api import TritioAPI
 from network.dht import DHT, get_dht
-from network.discovery import PeerDiscovery, load_local_seeds, save_local_seed
+from network.discovery import PeerDiscovery
 
 logging.basicConfig(
     level=logging.INFO,
@@ -45,13 +45,13 @@ def atomic_write(path: Path, data):
     os.replace(str(tmp), str(path))
 
 
-def load_seeds_config() -> dict:
+def load_seeds_config() -> list:
     """Load optional seed nodes (fallback for DHT bootstrap)."""
     if SEEDS_FILE.exists():
         try:
             with open(SEEDS_FILE) as f:
                 data = json.load(f)
-                return data.get("seeds", [])
+                return data.get("seeds", []) if isinstance(data, dict) else data
         except Exception:
             pass
     return []
@@ -85,7 +85,7 @@ class TritioNode:
         self.seeds_config = load_seeds_config()
         self.wallet = self._load_wallet()
         self.blockchain = Blockchain(self.net_config, self.db)
-        self.mempool = Mempool(self.db, self.net_config.mempool_max, self.net_config.min_fee)
+        self.mempool = Mempool(self.db, self.net_config.mempool_max, self.net_config.min_fee_satoshis)
         self.miner = Miner(self.blockchain, self.mempool)
         self.consensus = ConsensusEngine(self.blockchain)
         self.p2p = P2PNode(config['host'], config['port'])
@@ -97,10 +97,7 @@ class TritioNode:
         self.dht.on_peer_found = self._on_peer_found
 
         # Peer discovery (GitHub seeds + local + bootstrap)
-        self.discovery = PeerDiscovery(
-            seed_url=config.get('seed_url'),
-            local_seeds=load_local_seeds()
-        )
+        self.discovery = PeerDiscovery()
 
         self.mining_task = None
         self.is_seed = config.get('become_seed', False)
@@ -124,17 +121,25 @@ class TritioNode:
         path = self._wallet_path()
         if path.exists():
             try:
-                import getpass
-                password = os.environ.get("TRC_PASSWORD") or getpass.getpass("Wallet password: ")
-                return Wallet.load(str(path), password)
+                password = os.environ.get("TRC_PASSWORD", "")
+                if not password:
+                    # Try to load without password (unencrypted)
+                    try:
+                        return Wallet.load(str(path))
+                    except:
+                        logger.warning("Wallet requires password. Set TRC_PASSWORD env var.")
+                        # Create new wallet if can't load
+                        pass
+                else:
+                    return Wallet.load(str(path), password)
             except Exception as e:
                 logger.warning(f"Wallet load error: {e}")
         w = Wallet.create(self.quantum)
         DATA_DIR.mkdir(exist_ok=True)
-        import getpass
-        password = os.environ.get("TRC_PASSWORD") or getpass.getpass("Set wallet password: ")
+        password = os.environ.get("TRC_PASSWORD", "tritiocoin123")
         w.save(str(path), password)
         logger.info(f"New wallet created: {w.address}")
+        return w
         return w
 
     def _load_chain(self) -> Blockchain:
@@ -523,13 +528,12 @@ class TritioNode:
         from network.dht import NodeInfo
         known_nodes = []
 
-        # Add seeds from seeds.json
-        for seed_addr in self.seeds_config.get("seeds", []):
+        # Add seeds from seeds_config (already a list)
+        for seed_addr in self.seeds_config:
             try:
                 parts = seed_addr.split(':')
                 if len(parts) == 2:
                     host, port = parts[0], int(parts[1])
-                    # Generate a deterministic node ID from address
                     node_id = hashlib.sha1(seed_addr.encode()).digest()
                     known_nodes.append(NodeInfo(node_id, host, port))
             except Exception:
@@ -577,7 +581,7 @@ class TritioNode:
         status = {
             "port": self.config['port'],
             "mode": self.mode,
-            "role": self.seeds_config.get("my_role", "peer"),
+            "role": "seed" if self.is_seed else "peer",
             "address": self.wallet.address,
             "height": self.blockchain.height(),
             "difficulty": self.blockchain.difficulty,
