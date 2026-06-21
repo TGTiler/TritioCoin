@@ -1,10 +1,3 @@
-"""
-TritioCoin Peer Discovery
-Busca automatica de peers via:
-1. GitHub (lista atualizada)
-2. seeds.json local
-3. Conexoes existentes
-"""
 import asyncio
 import json
 import logging
@@ -15,7 +8,7 @@ from pathlib import Path
 logger = logging.getLogger("Discovery")
 
 # URL da lista de seeds no GitHub (atualizada automaticamente)
-SEED_URL = "https://raw.githubusercontent.com/TritioCoin/seeds/main/seeds.json"
+SEED_URL = "https://raw.githubusercontent.com/TGTiler/TritioCoin/refs/heads/main/seeds.json"
 
 # Seeds fixas como fallback
 FALLBACK_SEEDS = []
