@@ -1,7 +1,6 @@
 {
     "seeds": [
-        "192.168.0.112:8333",
-        "10.66.38.195:8333"
+        "100.98.80.88:8333"
     ],
     "last_updated": "2026-06-22",
     "description": "TritioCoin seed nodes"
