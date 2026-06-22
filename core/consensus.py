@@ -81,28 +81,29 @@ class ConsensusEngine:
 
     def select_validators_for_block(self, block_index: int) -> List[str]:
         """
-        Seleciona validadores para assinar um bloco usando seleção ponderada por stake.
-        Algoritmo determinístico baseado no índice do bloco.
+        Seleciona validadores para assinar um bloco usando selecao ponderada por stake.
         """
         active_validators = [v for v in self.validators.values() if v.is_active]
         if not active_validators:
-            logger.warning("Nenhum validador ativo disponível")
             return []
 
         total_stake = sum(v.stake for v in active_validators)
         if total_stake == 0:
             return []
 
-        # Seleciona 3-5 validadores por bloco
         num_select = min(5, max(3, len(active_validators)))
         selected = []
 
-        # Seed determinística baseada no índice do bloco
+        # Seed unica para todas as iteracoes
         seed = hashlib.sha256(str(block_index).encode()).digest()
 
         for i in range(num_select):
-            # Seleção ponderada: maior stake = maior probabilidade
-            rng = int.from_bytes(seed[i:i+4], 'big') if i+4 <= len(seed) else 0
+            # Usa bytes diferentes para cada selecao
+            offset = (i * 4) % len(seed)
+            chunk = seed[offset:offset+4]
+            if len(chunk) < 4:
+                chunk = chunk + seed[:4-len(chunk)]
+            rng = int.from_bytes(chunk, 'big')
             weighted = rng % int(total_stake * 1000)
 
             cumulative = 0
@@ -197,11 +198,17 @@ class ConsensusEngine:
         if not block.validator_signatures:
             return
 
-        reward_per_validator = self.blockchain.reward_at() * 0.3  # 30% para validadores
+        from core.constants import trc_to_satoshis
+
+        reward_per_validator = self.blockchain.reward_at() * 0.3
         share = reward_per_validator / len(block.validator_signatures)
+        share_sat = trc_to_satoshis(share)
 
         for sig_data in block.validator_signatures:
             addr = sig_data["address"]
             if addr in self.validators:
                 self.validators[addr].stake += share
-                logger.debug(f"Recompensa distribuída: {share} TRC para {addr[:16]}...")
+                # Persist in database
+                current = self.blockchain.db.get_balance(addr)
+                self.blockchain.db.set_balance(addr, current + share_sat)
+                logger.debug(f"Recompensa distribuida: {share:.8f} TRC para {addr[:16]}...")
