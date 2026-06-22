@@ -145,18 +145,28 @@ class TritioNode(GossipNode):
                     try:
                         return Wallet.load(str(path))
                     except:
-                        logger.warning("Wallet requires password. Set TRC_PASSWORD env var.")
-                        # Create new wallet if can't load
-                        pass
+                        logger.error("Carteira existe mas precisa de senha. "
+                                    "Defina a variavel de ambiente TRC_PASSWORD.")
+                        logger.error(f"Arquivo: {path}")
+                        logger.error("Exemplo: set TRC_PASSWORD=sua_senha")
+                        sys.exit(1)
                 else:
                     return Wallet.load(str(path), password)
             except Exception as e:
-                logger.warning(f"Wallet load error: {e}")
+                logger.error(f"Erro ao carregar carteira: {e}")
+                logger.error("A carteira NAO sera substituida. "
+                            "Verifique a senha em TRC_PASSWORD.")
+                sys.exit(1)
+
+        # Only create new wallet if file doesn't exist
+        logger.info("Nenhuma carteira encontrada. Criando nova carteira...")
         w = Wallet.create(self.quantum)
         DATA_DIR.mkdir(exist_ok=True)
         password = os.environ.get("TRC_PASSWORD", "tritiocoin123")
         w.save(str(path), password)
-        logger.info(f"New wallet created: {w.address}")
+        logger.info(f"Nova carteira criada: {w.address}")
+        logger.info(f"Arquivo: {path}")
+        logger.info(f"IMPORTANTE: Anote as 24 palavras de recuperacao!")
         return w
 
     def _load_chain(self) -> Blockchain:
