@@ -100,3 +100,1328 @@
 2026-06-21 12:50:22 [INFO] P2P: Self-signed TLS certificate generated
 2026-06-21 12:50:22 [INFO] Tritio: Node started | Network: testnet | Mode: miner | Quantum: OFF | Role: peer | Address: T1GQtw1Qm4KzWpNPrhskVnFWwYGV1Aqk1Mi
 2026-06-21 12:50:22 [INFO] Tritio: Selected random seed: 192.168.0.112:8333
+2026-06-21 19:49:16 [INFO] Tritio: New wallet created: T1JMuYJU4kHbuiv29jwKAJ4ZacVfvCUK8nQ
+2026-06-21 19:49:16 [INFO] Blockchain: Genesis block created [mainnet]
+2026-06-21 19:50:15 [INFO] Tritio: New wallet created: T197Q8cucSesKG3EvJGNWt3MfnU8f7pWfC9
+2026-06-21 19:50:15 [INFO] Blockchain: Genesis block created [mainnet]
+2026-06-21 19:50:15 [INFO] Tritio: Node started | Network: mainnet | Mode: passive | Quantum: OFF | Address: T197Q8cucSesKG3EvJGNWt3MfnU8f7pWfC9 | DHT port: 8334
+2026-06-21 19:50:15 [INFO] Tritio: This node is now a SEED: 0.0.0.0:8333
+2026-06-21 19:50:15 [INFO] Tritio: DHT started on port 8334
+2026-06-21 19:51:58 [INFO] Tritio: New wallet created: T1E8UvWZmAbypMUudoME7PibpjpE87MsR85
+2026-06-21 19:51:58 [INFO] Blockchain: Genesis block created [mainnet]
+2026-06-21 19:51:58 [INFO] Tritio: Node started | Network: mainnet | Mode: passive | Quantum: OFF | Address: T1E8UvWZmAbypMUudoME7PibpjpE87MsR85 | DHT port: 8334
+2026-06-21 19:51:58 [INFO] Tritio: This node is now a SEED: 0.0.0.0:8333
+2026-06-21 19:51:58 [INFO] Tritio: DHT started on port 8334
+2026-06-21 19:51:58 [INFO] Tritio: Starting peer discovery...
+2026-06-21 19:51:58 [INFO] DHT: DHT started on port 8334
+2026-06-21 19:51:58 [INFO] P2P: External IP discovered: 190.89.162.131
+2026-06-21 19:51:59 [INFO] Discovery: Usando seeds fixas
+2026-06-21 19:51:59 [INFO] Tritio: No peers found. Running standalone
+2026-06-21 19:51:59 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='Task-7' coro=<TritioNode._status_loop() done, defined at C:\Users\Pichau\Downloads\Automações\TritioCoin\main.py:595> exception=AttributeError("'list' object has no attribute 'get'")>
+Traceback (most recent call last):
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\main.py", line 598, in _status_loop
+    self._save_status()
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\main.py", line 584, in _save_status
+    "role": self.seeds_config.get("my_role", "peer"),
+            ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+2026-06-21 19:51:59 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='Task-2' coro=<P2PNode.start() done, defined at C:\Users\Pichau\Downloads\Automações\TritioCoin\network\p2p_node.py:211> exception=OSError(10048, "error while attempting to bind on address ('0.0.0.0', 8333): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)")>
+Traceback (most recent call last):
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\network\p2p_node.py", line 217, in start
+    self.server = await asyncio.start_server(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\streams.py", line 84, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 1584, in create_server
+    raise OSError(err.errno, msg) from None
+OSError: [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8333): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)
+2026-06-21 19:54:21 [INFO] Tritio: New wallet created: T13PSuDV5ESNy9iNXVvriWXhGxaV1cqJaWE
+2026-06-21 19:54:21 [INFO] Blockchain: Genesis block created [mainnet]
+2026-06-21 19:54:21 [INFO] Tritio: Node started | Network: mainnet | Mode: passive | Quantum: OFF | Address: T13PSuDV5ESNy9iNXVvriWXhGxaV1cqJaWE | DHT port: 8334
+2026-06-21 19:54:21 [INFO] Tritio: This node is now a SEED: 0.0.0.0:8333
+2026-06-21 19:54:21 [INFO] Tritio: DHT started on port 8334
+2026-06-21 19:54:21 [INFO] Tritio: Starting peer discovery...
+2026-06-21 19:54:21 [INFO] DHT: DHT started on port 8334
+2026-06-21 19:54:22 [INFO] P2P: External IP discovered: 190.89.162.131
+2026-06-21 19:54:22 [INFO] Discovery: Usando seeds fixas
+2026-06-21 19:54:22 [INFO] Tritio: No peers found. Running standalone
+2026-06-21 19:54:22 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='Task-2' coro=<P2PNode.start() done, defined at C:\Users\Pichau\Downloads\Automações\TritioCoin\network\p2p_node.py:211> exception=OSError(10048, "error while attempting to bind on address ('0.0.0.0', 8333): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)")>
+Traceback (most recent call last):
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\network\p2p_node.py", line 217, in start
+    self.server = await asyncio.start_server(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\streams.py", line 84, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 1584, in create_server
+    raise OSError(err.errno, msg) from None
+OSError: [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8333): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)
+2026-06-21 19:55:30 [INFO] Tritio: New wallet created: T1AkMwsfKMT6Cfj7c6wJ3Z3jPrHTpcPD1ph
+2026-06-21 19:55:30 [INFO] Blockchain: Genesis block created [mainnet]
+2026-06-21 19:55:30 [INFO] Tritio: Node started | Network: mainnet | Mode: passive | Quantum: OFF | Address: T1AkMwsfKMT6Cfj7c6wJ3Z3jPrHTpcPD1ph | DHT port: 8334
+2026-06-21 19:55:30 [INFO] Tritio: This node is now a SEED: 0.0.0.0:8333
+2026-06-21 19:55:30 [INFO] Tritio: DHT started on port 8334
+2026-06-21 19:55:30 [INFO] Tritio: Starting peer discovery...
+2026-06-21 19:55:30 [INFO] DHT: DHT started on port 8334
+2026-06-21 19:55:30 [INFO] Discovery: Usando seeds fixas
+2026-06-21 19:55:30 [INFO] Tritio: No peers found. Running standalone
+2026-06-21 19:55:30 [INFO] API: API listening on http://0.0.0.0:8080
+2026-06-21 19:55:30 [INFO] Tritio: Node running on port 8333 | API on port 8080
+2026-06-21 19:55:30 [INFO] P2P: External IP discovered: 190.89.162.131
+2026-06-21 19:55:30 [INFO] P2P: P2P listening on 0.0.0.0:8333 (TLS)
+2026-06-21 20:24:34 [WARNING] Tritio: Wallet requires password. Set TRC_PASSWORD env var.
+2026-06-21 20:24:34 [INFO] Tritio: New wallet created: T1EvSZPdgPLDyJHSNY8RvrenwUjdvao9vQN
+2026-06-21 20:24:34 [INFO] Blockchain: Chain loaded: 1 blocks from database
+2026-06-21 20:24:34 [INFO] Tritio: Node started | Network: mainnet | Mode: passive | Quantum: OFF | Address: T1EvSZPdgPLDyJHSNY8RvrenwUjdvao9vQN | DHT port: 8334
+2026-06-21 20:24:34 [INFO] Tritio: DHT started on port 8334
+2026-06-21 20:24:34 [INFO] Tritio: Starting peer discovery...
+2026-06-21 20:24:35 [INFO] P2P: External IP discovered: 190.89.162.131
+2026-06-21 20:24:35 [INFO] Discovery: Usando seeds fixas
+2026-06-21 20:24:35 [INFO] Tritio: No peers found. Running standalone
+2026-06-21 20:24:35 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='Task-3' coro=<DHT.start() done, defined at C:\Users\Pichau\Downloads\Automações\TritioCoin\network\dht.py:186> exception=OSError(10048, "error while attempting to bind on address ('0.0.0.0', 8334): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)")>
+Traceback (most recent call last):
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\network\dht.py", line 189, in start
+    self.server = await asyncio.start_server(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\streams.py", line 84, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 1584, in create_server
+    raise OSError(err.errno, msg) from None
+OSError: [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8334): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)
+2026-06-21 20:24:35 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='Task-2' coro=<P2PNode.start() done, defined at C:\Users\Pichau\Downloads\Automações\TritioCoin\network\p2p_node.py:211> exception=OSError(10048, "error while attempting to bind on address ('0.0.0.0', 8333): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)")>
+Traceback (most recent call last):
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\network\p2p_node.py", line 217, in start
+    self.server = await asyncio.start_server(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\streams.py", line 84, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 1584, in create_server
+    raise OSError(err.errno, msg) from None
+OSError: [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8333): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)
+2026-06-21 20:26:34 [WARNING] Tritio: Wallet requires password. Set TRC_PASSWORD env var.
+2026-06-21 20:26:35 [INFO] Tritio: New wallet created: T1LwDf5FyWJrU2PvUrzb3SMrfr7Fh6A68DM
+2026-06-21 20:26:35 [INFO] Blockchain: Chain loaded: 1 blocks from database
+2026-06-21 20:26:35 [INFO] Tritio: Node started | Network: mainnet | Mode: passive | Quantum: OFF | Address: T1LwDf5FyWJrU2PvUrzb3SMrfr7Fh6A68DM | DHT port: 8334
+2026-06-21 20:26:35 [INFO] Tritio: DHT started on port 8334
+2026-06-21 20:26:35 [INFO] Tritio: Starting peer discovery...
+2026-06-21 20:26:35 [INFO] Discovery: Usando seeds fixas
+2026-06-21 20:26:35 [INFO] Tritio: No peers found. Running standalone
+2026-06-21 20:26:35 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='Task-3' coro=<DHT.start() done, defined at C:\Users\Pichau\Downloads\Automações\TritioCoin\network\dht.py:186> exception=OSError(10048, "error while attempting to bind on address ('0.0.0.0', 8334): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)")>
+Traceback (most recent call last):
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\network\dht.py", line 189, in start
+    self.server = await asyncio.start_server(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\streams.py", line 84, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 1584, in create_server
+    raise OSError(err.errno, msg) from None
+OSError: [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8334): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)
+2026-06-21 20:29:19 [INFO] Tritio: New wallet created: T1HbX5wRPpgoU1PVCQaFn4TdM7zTUQKx9cG
+2026-06-21 20:29:19 [INFO] Blockchain: Chain loaded: 1 blocks from database
+2026-06-21 20:29:19 [INFO] Tritio: Node started | Network: mainnet | Mode: passive | Quantum: OFF | Address: T1HbX5wRPpgoU1PVCQaFn4TdM7zTUQKx9cG | DHT port: 8334
+2026-06-21 20:29:19 [INFO] Tritio: This node is now a SEED: 0.0.0.0:8333
+2026-06-21 20:29:19 [INFO] Tritio: DHT started on port 8334
+2026-06-21 20:29:19 [INFO] Tritio: Starting peer discovery...
+2026-06-21 20:29:19 [INFO] P2P: External IP discovered: 190.89.162.131
+2026-06-21 20:29:20 [INFO] Discovery: Usando seeds fixas
+2026-06-21 20:29:20 [INFO] Tritio: No peers found. Running standalone
+2026-06-21 20:29:20 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='Task-3' coro=<DHT.start() done, defined at C:\Users\Pichau\Downloads\Automações\TritioCoin\network\dht.py:186> exception=OSError(10048, "error while attempting to bind on address ('0.0.0.0', 8334): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)")>
+Traceback (most recent call last):
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\network\dht.py", line 189, in start
+    self.server = await asyncio.start_server(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\streams.py", line 84, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 1584, in create_server
+    raise OSError(err.errno, msg) from None
+OSError: [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8334): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)
+2026-06-21 20:29:20 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='Task-2' coro=<P2PNode.start() done, defined at C:\Users\Pichau\Downloads\Automações\TritioCoin\network\p2p_node.py:211> exception=OSError(10048, "error while attempting to bind on address ('0.0.0.0', 8333): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)")>
+Traceback (most recent call last):
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\network\p2p_node.py", line 217, in start
+    self.server = await asyncio.start_server(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\streams.py", line 84, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 1584, in create_server
+    raise OSError(err.errno, msg) from None
+OSError: [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8333): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)
+2026-06-21 20:30:35 [INFO] Tritio: New wallet created: T1HCSvjzRecPt16RgturJawkQ6oHZJhbNUF
+2026-06-21 20:30:35 [INFO] Blockchain: Genesis block created [mainnet]
+2026-06-21 20:30:35 [INFO] Tritio: Node started | Network: mainnet | Mode: passive | Quantum: OFF | Address: T1HCSvjzRecPt16RgturJawkQ6oHZJhbNUF | DHT port: 8334
+2026-06-21 20:30:35 [INFO] Tritio: This node is now a SEED: 0.0.0.0:8333
+2026-06-21 20:30:35 [INFO] Tritio: DHT started on port 8334
+2026-06-21 20:30:35 [INFO] Tritio: Starting peer discovery...
+2026-06-21 20:30:35 [INFO] DHT: DHT started on port 8334
+2026-06-21 20:30:35 [INFO] Discovery: Usando seeds fixas
+2026-06-21 20:30:35 [INFO] Tritio: No peers found. Running standalone
+2026-06-21 20:30:35 [INFO] API: API listening on http://0.0.0.0:8080
+2026-06-21 20:30:35 [INFO] Tritio: Node running on port 8333 | API on port 8080
+2026-06-21 20:30:36 [INFO] P2P: External IP discovered: 190.89.162.131
+2026-06-21 20:30:36 [INFO] P2P: P2P listening on 0.0.0.0:8333 (TLS)
+2026-06-21 21:01:05 [INFO] Tritio: New wallet created: T14g1bN4VnLiANsKLRvEkwt1QYeszg6XQNR
+2026-06-21 21:01:05 [INFO] Blockchain: Chain loaded: 1 blocks from database
+2026-06-21 21:01:05 [INFO] Tritio: Node started | Network: mainnet | Mode: passive | Quantum: OFF | Address: T14g1bN4VnLiANsKLRvEkwt1QYeszg6XQNR | DHT port: 8334
+2026-06-21 21:01:05 [INFO] Tritio: This node is now a SEED: 0.0.0.0:8333
+2026-06-21 21:01:05 [INFO] Tritio: DHT started on port 8334
+2026-06-21 21:01:05 [INFO] P2P: External IP discovered: 190.89.162.131
+2026-06-21 21:01:48 [INFO] DHT: DHT bootstrapped with 1 nodes
+2026-06-21 21:01:48 [INFO] Tritio: DHT bootstrapped with 1 nodes
+2026-06-21 21:01:48 [INFO] Tritio: Starting peer discovery...
+2026-06-21 21:01:48 [INFO] Discovery: Local: 1 seeds
+2026-06-21 21:02:10 [INFO] Tritio: Connected to 0 peers
+2026-06-21 21:02:10 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='Task-3' coro=<DHT.start() done, defined at C:\Users\Pichau\Downloads\Automações\TritioCoin\network\dht.py:186> exception=OSError(10048, "error while attempting to bind on address ('0.0.0.0', 8334): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)")>
+Traceback (most recent call last):
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\network\dht.py", line 189, in start
+    self.server = await asyncio.start_server(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\streams.py", line 84, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 1584, in create_server
+    raise OSError(err.errno, msg) from None
+OSError: [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8334): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)
+2026-06-21 21:02:10 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='Task-2' coro=<P2PNode.start() done, defined at C:\Users\Pichau\Downloads\Automações\TritioCoin\network\p2p_node.py:211> exception=OSError(10048, "error while attempting to bind on address ('0.0.0.0', 8333): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)")>
+Traceback (most recent call last):
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\network\p2p_node.py", line 217, in start
+    self.server = await asyncio.start_server(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\streams.py", line 84, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 1584, in create_server
+    raise OSError(err.errno, msg) from None
+OSError: [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8333): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)
+2026-06-21 21:02:54 [INFO] Tritio: New wallet created: T1n7cXKs9YbMCBo2QgqZo2NY71zVeCEGPh
+2026-06-21 21:02:54 [INFO] Blockchain: Genesis block created [mainnet]
+2026-06-21 21:02:54 [INFO] Tritio: Node started | Network: mainnet | Mode: passive | Quantum: OFF | Address: T1n7cXKs9YbMCBo2QgqZo2NY71zVeCEGPh | DHT port: 8334
+2026-06-21 21:02:54 [INFO] Tritio: This node is now a SEED: 0.0.0.0:8333
+2026-06-21 21:02:54 [INFO] Tritio: DHT started on port 8334
+2026-06-21 21:02:54 [INFO] DHT: DHT started on port 8334
+2026-06-21 21:02:54 [INFO] P2P: External IP discovered: 190.89.162.131
+2026-06-21 21:02:54 [INFO] P2P: P2P listening on 0.0.0.0:8333 (TLS)
+2026-06-21 21:03:36 [INFO] DHT: DHT bootstrapped with 1 nodes
+2026-06-21 21:03:36 [INFO] Tritio: DHT bootstrapped with 1 nodes
+2026-06-21 21:03:36 [INFO] Tritio: Starting peer discovery...
+2026-06-21 21:03:36 [INFO] Discovery: Local: 1 seeds
+2026-06-21 21:03:57 [INFO] Tritio: Connected to 0 peers
+2026-06-21 21:03:57 [INFO] API: API listening on http://0.0.0.0:8080
+2026-06-21 21:03:57 [INFO] Tritio: Node running on port 8333 | API on port 8080
+2026-06-21 21:10:39 [INFO] aiohttp.access: 127.0.0.1 [21/Jun/2026:21:10:39 -0300] "GET / HTTP/1.1" 200 472 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+2026-06-21 21:10:39 [INFO] aiohttp.access: 127.0.0.1 [21/Jun/2026:21:10:39 -0300] "GET /favicon.ico HTTP/1.1" 404 174 "http://localhost:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+2026-06-21 21:25:36 [WARNING] Tritio: Wallet requires password. Set TRC_PASSWORD env var.
+2026-06-21 21:25:37 [INFO] Tritio: New wallet created: T1AgCTfE8V2qoWig6DR8BTJ6rGsK5DreJbt
+2026-06-21 21:25:37 [INFO] Blockchain: Chain loaded: 1 blocks from database
+2026-06-21 21:25:37 [INFO] Tritio: Node started | Network: mainnet | Mode: passive | Quantum: OFF | Address: T1AgCTfE8V2qoWig6DR8BTJ6rGsK5DreJbt | DHT port: 8334
+2026-06-21 21:25:37 [INFO] Tritio: DHT started on port 8334
+2026-06-21 21:25:37 [INFO] DHT: DHT bootstrapped with 1 nodes
+2026-06-21 21:25:37 [INFO] Tritio: DHT bootstrapped with 1 nodes
+2026-06-21 21:25:37 [INFO] Tritio: Starting peer discovery...
+2026-06-21 21:25:37 [INFO] Discovery: GitHub: 1 seeds encontrados
+2026-06-21 21:25:37 [INFO] Discovery: Local: 1 seeds
+2026-06-21 21:25:37 [INFO] P2P: External IP discovered: 190.89.162.131
+2026-06-21 21:25:37 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:25:37 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:25:37 [ERROR] P2P: Read error from 192.168.0.108:55622: 'list' object has no attribute 'get'
+2026-06-21 21:25:37 [INFO] Tritio: Connected to 1 peers
+2026-06-21 21:25:37 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='Task-3' coro=<DHT.start() done, defined at C:\Users\Pichau\Downloads\Automações\TritioCoin\network\dht.py:186> exception=OSError(10048, "error while attempting to bind on address ('0.0.0.0', 8334): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)")>
+Traceback (most recent call last):
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\network\dht.py", line 189, in start
+    self.server = await asyncio.start_server(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\streams.py", line 84, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 1584, in create_server
+    raise OSError(err.errno, msg) from None
+OSError: [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8334): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)
+2026-06-21 21:25:37 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='Task-2' coro=<P2PNode.start() done, defined at C:\Users\Pichau\Downloads\Automações\TritioCoin\network\p2p_node.py:211> exception=OSError(10048, "error while attempting to bind on address ('0.0.0.0', 8333): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)")>
+Traceback (most recent call last):
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\network\p2p_node.py", line 217, in start
+    self.server = await asyncio.start_server(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\streams.py", line 84, in start_server
+    return await loop.create_server(factory, host, port, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 1584, in create_server
+    raise OSError(err.errno, msg) from None
+OSError: [Errno 10048] error while attempting to bind on address ('0.0.0.0', 8333): [winerror 10048] normalmente é permitida apenas uma utilização de cada endereço de soquete (protocolo/endereço de rede/porta)
+2026-06-21 21:32:32 [INFO] Tritio: New wallet created: T1Aax3cJVs3y1xmK5vcce2Zj4RV1sPfVLKL
+2026-06-21 21:32:32 [INFO] Blockchain: Chain loaded: 1 blocks from database
+2026-06-21 21:32:32 [INFO] Tritio: Node started | Network: mainnet | Mode: passive | Quantum: OFF | Address: T1Aax3cJVs3y1xmK5vcce2Zj4RV1sPfVLKL | DHT port: 8334
+2026-06-21 21:32:32 [INFO] Tritio: This node is now a SEED: 0.0.0.0:8333
+2026-06-21 21:32:32 [INFO] Tritio: DHT started on port 8334
+2026-06-21 21:32:32 [WARNING] DHT: Porta DHT 8334 ja esta em uso. DHT desabilitado.
+2026-06-21 21:32:32 [INFO] DHT: DHT bootstrapped with 1 nodes
+2026-06-21 21:32:32 [INFO] Tritio: DHT bootstrapped with 1 nodes
+2026-06-21 21:32:32 [INFO] Tritio: Starting peer discovery...
+2026-06-21 21:32:33 [INFO] Discovery: GitHub: 1 seeds encontrados
+2026-06-21 21:32:33 [INFO] Discovery: Local: 1 seeds
+2026-06-21 21:32:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:32:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:32:33 [INFO] Tritio: Connected to 1 peers
+2026-06-21 21:32:33 [ERROR] P2P: Read error from 192.168.0.108:55664: 'list' object has no attribute 'get'
+2026-06-21 21:32:33 [WARNING] API: Porta 8080 ja esta em uso. API desabilitada.
+2026-06-21 21:32:33 [INFO] Tritio: Node running on port 8333 | API on port 8080
+2026-06-21 21:32:33 [INFO] P2P: External IP discovered: 190.89.162.131
+2026-06-21 21:32:33 [WARNING] P2P: Porta P2P 8333 ja esta em uso. P2P desabilitado.
+2026-06-21 21:33:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:33:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:33:03 [ERROR] P2P: Read error from 192.168.0.108:55667: 'list' object has no attribute 'get'
+2026-06-21 21:33:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:33:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:33:33 [ERROR] P2P: Read error from 192.168.0.108:55670: 'list' object has no attribute 'get'
+2026-06-21 21:34:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:34:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:34:03 [ERROR] P2P: Read error from 192.168.0.108:55675: 'list' object has no attribute 'get'
+2026-06-21 21:34:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:34:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:34:33 [ERROR] P2P: Read error from 192.168.0.108:55679: 'list' object has no attribute 'get'
+2026-06-21 21:35:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:35:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:35:03 [ERROR] P2P: Read error from 192.168.0.108:55683: 'list' object has no attribute 'get'
+2026-06-21 21:35:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:35:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:35:33 [ERROR] P2P: Read error from 192.168.0.108:55686: 'list' object has no attribute 'get'
+2026-06-21 21:36:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:36:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:36:03 [ERROR] P2P: Read error from 192.168.0.108:55689: 'list' object has no attribute 'get'
+2026-06-21 21:36:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:36:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:36:33 [ERROR] P2P: Read error from 192.168.0.108:55694: 'list' object has no attribute 'get'
+2026-06-21 21:37:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:37:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:37:03 [ERROR] P2P: Read error from 192.168.0.108:55695: 'list' object has no attribute 'get'
+2026-06-21 21:37:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:37:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:37:33 [ERROR] P2P: Read error from 192.168.0.108:55700: 'list' object has no attribute 'get'
+2026-06-21 21:38:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:38:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:38:03 [ERROR] P2P: Read error from 192.168.0.108:55702: 'list' object has no attribute 'get'
+2026-06-21 21:38:05 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:38:05 [ERROR] P2P: Read error from 192.168.0.112:55398: 'list' object has no attribute 'get'
+2026-06-21 21:38:05 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:38:05 [ERROR] P2P: Read error from 192.168.0.112:55410: 'list' object has no attribute 'get'
+2026-06-21 21:38:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:38:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:38:33 [ERROR] P2P: Read error from 192.168.0.108:55707: 'list' object has no attribute 'get'
+2026-06-21 21:38:35 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:38:35 [ERROR] P2P: Read error from 192.168.0.112:45276: 'list' object has no attribute 'get'
+2026-06-21 21:39:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:39:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:39:03 [ERROR] P2P: Read error from 192.168.0.108:55709: 'list' object has no attribute 'get'
+2026-06-21 21:39:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:39:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:39:33 [ERROR] P2P: Read error from 192.168.0.108:55714: 'list' object has no attribute 'get'
+2026-06-21 21:40:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:40:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:40:03 [ERROR] P2P: Read error from 192.168.0.108:55718: 'list' object has no attribute 'get'
+2026-06-21 21:40:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:40:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:40:33 [ERROR] P2P: Read error from 192.168.0.108:55721: 'list' object has no attribute 'get'
+2026-06-21 21:40:39 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:40:39 [ERROR] P2P: Read error from 192.168.0.112:58912: 'list' object has no attribute 'get'
+2026-06-21 21:41:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:41:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:41:03 [ERROR] P2P: Read error from 192.168.0.108:55724: 'list' object has no attribute 'get'
+2026-06-21 21:41:09 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:41:09 [ERROR] P2P: Read error from 192.168.0.112:58426: 'list' object has no attribute 'get'
+2026-06-21 21:41:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:41:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:41:33 [ERROR] P2P: Read error from 192.168.0.108:55730: 'list' object has no attribute 'get'
+2026-06-21 21:41:39 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:41:39 [ERROR] P2P: Read error from 192.168.0.112:45734: 'list' object has no attribute 'get'
+2026-06-21 21:42:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:42:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:42:03 [ERROR] P2P: Read error from 192.168.0.108:55731: 'list' object has no attribute 'get'
+2026-06-21 21:42:09 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:42:09 [ERROR] P2P: Read error from 192.168.0.112:39512: 'list' object has no attribute 'get'
+2026-06-21 21:42:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:42:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:42:33 [ERROR] P2P: Read error from 192.168.0.108:55740: 'list' object has no attribute 'get'
+2026-06-21 21:42:39 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:42:39 [ERROR] P2P: Read error from 192.168.0.112:38894: 'list' object has no attribute 'get'
+2026-06-21 21:43:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:43:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:43:03 [ERROR] P2P: Read error from 192.168.0.108:55742: 'list' object has no attribute 'get'
+2026-06-21 21:43:08 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:43:08 [ERROR] P2P: Read error from 192.168.0.112:53842: 'list' object has no attribute 'get'
+2026-06-21 21:43:09 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:43:09 [ERROR] P2P: Read error from 192.168.0.112:53856: 'list' object has no attribute 'get'
+2026-06-21 21:43:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:43:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:43:33 [ERROR] P2P: Read error from 192.168.0.108:55746: 'list' object has no attribute 'get'
+2026-06-21 21:43:39 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:43:39 [ERROR] P2P: Read error from 192.168.0.112:39162: 'list' object has no attribute 'get'
+2026-06-21 21:44:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:44:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:44:03 [ERROR] P2P: Read error from 192.168.0.108:55748: 'list' object has no attribute 'get'
+2026-06-21 21:44:09 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:44:09 [ERROR] P2P: Read error from 192.168.0.112:36434: 'list' object has no attribute 'get'
+2026-06-21 21:44:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:44:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:44:33 [ERROR] P2P: Read error from 192.168.0.108:55757: 'list' object has no attribute 'get'
+2026-06-21 21:44:40 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:44:40 [ERROR] P2P: Read error from 192.168.0.112:59554: 'list' object has no attribute 'get'
+2026-06-21 21:44:42 [WARNING] Tritio: Wallet requires password. Set TRC_PASSWORD env var.
+2026-06-21 21:44:42 [INFO] Tritio: New wallet created: T1ASEArkyaDPEkCUFFJxeZ6Uefr5L8PbJYG
+2026-06-21 21:44:42 [INFO] Blockchain: Chain loaded: 1 blocks from database
+2026-06-21 21:44:43 [INFO] Tritio: Node started | Network: mainnet | Mode: miner | Quantum: OFF | Address: T1ASEArkyaDPEkCUFFJxeZ6Uefr5L8PbJYG | DHT port: 8334
+2026-06-21 21:44:43 [INFO] Tritio: DHT started on port 8334
+2026-06-21 21:44:43 [WARNING] DHT: Porta DHT 8334 ja esta em uso. DHT desabilitado.
+2026-06-21 21:44:43 [INFO] DHT: DHT bootstrapped with 1 nodes
+2026-06-21 21:44:43 [INFO] Tritio: DHT bootstrapped with 1 nodes
+2026-06-21 21:44:43 [INFO] Tritio: Starting peer discovery...
+2026-06-21 21:44:43 [INFO] Discovery: GitHub: 1 seeds encontrados
+2026-06-21 21:44:43 [INFO] Discovery: Local: 1 seeds
+2026-06-21 21:44:43 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:44:43 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:44:43 [INFO] Tritio: Connected to 1 peers
+0.108:55764: 'list' object has no attribute 'get'
+2026-06-21 21:44:43 [INFO] Miner: Mining block #1 (difficulty=4)
+2026-06-21 21:45:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:45:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:45:03 [ERROR] P2P: Read error from 192.168.0.108:55767: 'list' object has no attribute 'get'
+2026-06-21 21:45:10 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:45:10 [ERROR] P2P: Read error from 192.168.0.112:47264: 'list' object has no attribute 'get'
+2026-06-21 21:45:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:45:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:45:33 [ERROR] P2P: Read error from 192.168.0.108:55774: 'list' object has no attribute 'get'
+2026-06-21 21:45:40 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:45:40 [ERROR] P2P: Read error from 192.168.0.112:49276: 'list' object has no attribute 'get'
+2026-06-21 21:46:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:46:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:46:03 [ERROR] P2P: Read error from 192.168.0.108:55777: 'list' object has no attribute 'get'
+2026-06-21 21:46:10 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:46:10 [ERROR] P2P: Read error from 192.168.0.112:60218: 'list' object has no attribute 'get'
+2026-06-21 21:46:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:46:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:46:33 [ERROR] P2P: Read error from 192.168.0.108:55781: 'list' object has no attribute 'get'
+2026-06-21 21:46:40 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:46:40 [ERROR] P2P: Read error from 192.168.0.112:35924: 'list' object has no attribute 'get'
+2026-06-21 21:47:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:47:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:47:03 [ERROR] P2P: Read error from 192.168.0.108:55785: 'list' object has no attribute 'get'
+2026-06-21 21:47:10 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:47:10 [ERROR] P2P: Read error from 192.168.0.112:52350: 'list' object has no attribute 'get'
+2026-06-21 21:47:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:47:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:47:33 [ERROR] P2P: Read error from 192.168.0.108:55792: 'list' object has no attribute 'get'
+2026-06-21 21:47:40 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:47:40 [ERROR] P2P: Read error from 192.168.0.112:43852: 'list' object has no attribute 'get'
+2026-06-21 21:48:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:48:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:48:03 [ERROR] P2P: Read error from 192.168.0.108:55796: 'list' object has no attribute 'get'
+2026-06-21 21:48:10 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:48:10 [ERROR] P2P: Read error from 192.168.0.112:60600: 'list' object has no attribute 'get'
+2026-06-21 21:48:32 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='Task-8' coro=<TritioNode._mining_loop() done, defined at C:\Users\Pichau\Downloads\Automações\TritioCoin\main.py:601> exception=KeyboardInterrupt()>
+Traceback (most recent call last):
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\main.py", line 766, in <module>
+    asyncio.run(main())
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 678, in run_until_complete
+    self.run_forever()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 645, in run_forever
+    self._run_once()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 1999, in _run_once
+    handle._run()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\main.py", line 604, in _mining_loop
+    block = self.miner.mine(self.wallet.pubkey_hex())
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\core\miner.py", line 157, in mine
+    pow_hash = self._pow_hash(self.current_block.pow_data())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\core\miner.py", line 109, in _pow_hash
+    return hash_secret_raw(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\Pichau\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\argon2\low_level.py", line 142, in hash_secret_raw
+    rv = lib.argon2_hash(
+         ^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\runners.py", line 157, in _on_sigint
+    raise KeyboardInterrupt()
+KeyboardInterrupt
+2026-06-21 21:48:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:48:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:48:33 [ERROR] P2P: Read error from 192.168.0.108:55800: 'list' object has no attribute 'get'
+2026-06-21 21:48:40 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:48:40 [ERROR] P2P: Read error from 192.168.0.112:46652: 'list' object has no attribute 'get'
+2026-06-21 21:49:02 [WARNING] Tritio: Wallet requires password. Set TRC_PASSWORD env var.
+2026-06-21 21:49:02 [INFO] Tritio: New wallet created: T1EGEsJ8cQtaBX8uu6voa5z2QxkNdGWhr6J
+2026-06-21 21:49:02 [INFO] Blockchain: Chain loaded: 1 blocks from database
+2026-06-21 21:49:02 [INFO] Tritio: Node started | Network: mainnet | Mode: passive | Quantum: OFF | Address: T1EGEsJ8cQtaBX8uu6voa5z2QxkNdGWhr6J | DHT port: 8334
+2026-06-21 21:49:02 [INFO] Tritio: DHT started on port 8334
+2026-06-21 21:49:02 [WARNING] DHT: Porta DHT 8334 ja esta em uso. DHT desabilitado.
+2026-06-21 21:49:02 [INFO] DHT: DHT bootstrapped with 1 nodes
+2026-06-21 21:49:02 [INFO] Tritio: DHT bootstrapped with 1 nodes
+2026-06-21 21:49:02 [INFO] Tritio: Starting peer discovery...
+2026-06-21 21:49:03 [INFO] Discovery: GitHub: 1 seeds encontrados
+2026-06-21 21:49:03 [INFO] Discovery: Local: 1 seeds
+2026-06-21 21:49:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:49:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:49:03 [INFO] Tritio: Connected to 1 peers
+2026-06-21 21:49:03 [ERROR] P2P: Read error from 192.168.0.108:55809: 'list' object has no attribute 'get'
+2026-06-21 21:49:03 [WARNING] API: Porta 8080 ja esta em uso. API desabilitada.
+2026-06-21 21:49:03 [INFO] Tritio: Node running on port 8333 | API on port 8080
+2026-06-21 21:49:03 [INFO] P2P: External IP discovered: 190.89.162.131
+2026-06-21 21:49:03 [WARNING] P2P: Porta P2P 8333 ja esta em uso. P2P desabilitado.
+2026-06-21 21:49:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:49:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:49:03 [ERROR] P2P: Read error from 192.168.0.108:55810: 'list' object has no attribute 'get'
+2026-06-21 21:49:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:49:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:49:33 [ERROR] P2P: Read error from 192.168.0.108:55815: 'list' object has no attribute 'get'
+2026-06-21 21:50:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:50:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:50:03 [ERROR] P2P: Read error from 192.168.0.108:55820: 'list' object has no attribute 'get'
+2026-06-21 21:50:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:50:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:50:33 [ERROR] P2P: Read error from 192.168.0.108:55824: 'list' object has no attribute 'get'
+2026-06-21 21:51:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:51:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:51:03 [ERROR] P2P: Read error from 192.168.0.108:55830: 'list' object has no attribute 'get'
+2026-06-21 21:51:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:51:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:51:33 [ERROR] P2P: Read error from 192.168.0.108:55846: 'list' object has no attribute 'get'
+2026-06-21 21:52:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:52:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:52:03 [ERROR] P2P: Read error from 192.168.0.108:55848: 'list' object has no attribute 'get'
+2026-06-21 21:52:10 [INFO] Tritio: New wallet created: T1HFbAspySDKxbpSjRx7FUDn7jWForqfCw9
+2026-06-21 21:52:10 [INFO] Blockchain: Chain loaded: 1 blocks from database
+2026-06-21 21:52:11 [INFO] Tritio: Node started | Network: mainnet | Mode: passive | Quantum: OFF | Address: T1HFbAspySDKxbpSjRx7FUDn7jWForqfCw9 | DHT port: 8334
+2026-06-21 21:52:11 [INFO] Tritio: This node is now a SEED: 0.0.0.0:8333
+2026-06-21 21:52:11 [INFO] Tritio: DHT started on port 8334
+2026-06-21 21:52:11 [WARNING] DHT: Porta DHT 8334 ja esta em uso. DHT desabilitado.
+2026-06-21 21:52:11 [INFO] DHT: DHT bootstrapped with 1 nodes
+2026-06-21 21:52:11 [INFO] Tritio: DHT bootstrapped with 1 nodes
+2026-06-21 21:52:11 [INFO] Tritio: Starting peer discovery...
+2026-06-21 21:52:11 [INFO] Discovery: GitHub: 1 seeds encontrados
+2026-06-21 21:52:11 [INFO] Discovery: Local: 1 seeds
+2026-06-21 21:52:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:52:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:52:11 [INFO] Tritio: Connected to 1 peers
+2026-06-21 21:52:11 [ERROR] P2P: Read error from 192.168.0.108:55855: 'list' object has no attribute 'get'
+2026-06-21 21:52:11 [WARNING] API: Porta 8080 ja esta em uso. API desabilitada.
+2026-06-21 21:52:11 [INFO] Tritio: Node running on port 8333 | API on port 8080
+2026-06-21 21:52:11 [INFO] P2P: External IP discovered: 190.89.162.131
+2026-06-21 21:52:11 [WARNING] P2P: Porta P2P 8333 ja esta em uso. P2P desabilitado.
+2026-06-21 21:52:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:52:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:52:33 [ERROR] P2P: Read error from 192.168.0.108:55858: 'list' object has no attribute 'get'
+2026-06-21 21:52:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:52:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:52:41 [ERROR] P2P: Read error from 192.168.0.108:55861: 'list' object has no attribute 'get'
+2026-06-21 21:53:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:53:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:53:03 [ERROR] P2P: Read error from 192.168.0.108:55863: 'list' object has no attribute 'get'
+2026-06-21 21:53:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:53:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:53:11 [ERROR] P2P: Read error from 192.168.0.108:55866: 'list' object has no attribute 'get'
+2026-06-21 21:53:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:53:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:53:33 [ERROR] P2P: Read error from 192.168.0.108:55871: 'list' object has no attribute 'get'
+2026-06-21 21:53:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:53:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:53:41 [ERROR] P2P: Read error from 192.168.0.108:55872: 'list' object has no attribute 'get'
+2026-06-21 21:54:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:54:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:54:03 [ERROR] P2P: Read error from 192.168.0.108:55874: 'list' object has no attribute 'get'
+2026-06-21 21:54:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:54:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:54:11 [ERROR] P2P: Read error from 192.168.0.108:55876: 'list' object has no attribute 'get'
+2026-06-21 21:54:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:54:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:54:33 [ERROR] P2P: Read error from 192.168.0.108:55888: 'list' object has no attribute 'get'
+2026-06-21 21:54:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:54:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:54:41 [ERROR] P2P: Read error from 192.168.0.108:55889: 'list' object has no attribute 'get'
+2026-06-21 21:55:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:55:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:55:03 [ERROR] P2P: Read error from 192.168.0.108:55897: 'list' object has no attribute 'get'
+2026-06-21 21:55:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:55:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:55:11 [ERROR] P2P: Read error from 192.168.0.108:55899: 'list' object has no attribute 'get'
+2026-06-21 21:55:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:55:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:55:33 [ERROR] P2P: Read error from 192.168.0.108:55905: 'list' object has no attribute 'get'
+2026-06-21 21:55:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:55:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:55:41 [ERROR] P2P: Read error from 192.168.0.108:55906: 'list' object has no attribute 'get'
+2026-06-21 21:56:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:56:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:56:03 [ERROR] P2P: Read error from 192.168.0.108:55907: 'list' object has no attribute 'get'
+2026-06-21 21:56:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:56:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:56:11 [ERROR] P2P: Read error from 192.168.0.108:55911: 'list' object has no attribute 'get'
+2026-06-21 21:56:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:56:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:56:33 [ERROR] P2P: Read error from 192.168.0.108:55918: 'list' object has no attribute 'get'
+2026-06-21 21:56:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:56:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:56:41 [ERROR] P2P: Read error from 192.168.0.108:55919: 'list' object has no attribute 'get'
+2026-06-21 21:57:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:57:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:57:03 [ERROR] P2P: Read error from 192.168.0.108:55921: 'list' object has no attribute 'get'
+2026-06-21 21:57:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:57:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:57:11 [ERROR] P2P: Read error from 192.168.0.108:55928: 'list' object has no attribute 'get'
+2026-06-21 21:57:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:57:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:57:33 [ERROR] P2P: Read error from 192.168.0.108:55932: 'list' object has no attribute 'get'
+2026-06-21 21:57:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:57:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:57:41 [ERROR] P2P: Read error from 192.168.0.108:55933: 'list' object has no attribute 'get'
+2026-06-21 21:57:57 [WARNING] Tritio: Wallet requires password. Set TRC_PASSWORD env var.
+2026-06-21 21:57:58 [INFO] Tritio: New wallet created: T17XCtWbTgtjoyhLaBgJLCns3isQQy8dfZR
+2026-06-21 21:57:58 [INFO] Blockchain: Chain loaded: 1 blocks from database
+2026-06-21 21:57:58 [INFO] Tritio: Node started | Network: mainnet | Mode: passive | Quantum: OFF | Address: T17XCtWbTgtjoyhLaBgJLCns3isQQy8dfZR | DHT port: 8334
+2026-06-21 21:57:58 [INFO] Tritio: DHT started on port 8334
+2026-06-21 21:57:58 [WARNING] DHT: Porta DHT 8334 ja esta em uso. DHT desabilitado.
+2026-06-21 21:57:58 [INFO] DHT: DHT bootstrapped with 1 nodes
+2026-06-21 21:57:58 [INFO] Tritio: DHT bootstrapped with 1 nodes
+2026-06-21 21:57:58 [INFO] Tritio: Starting peer discovery...
+2026-06-21 21:57:58 [INFO] P2P: External IP discovered: 190.89.162.131
+2026-06-21 21:57:58 [WARNING] P2P: Porta P2P 8333 ja esta em uso. P2P desabilitado.
+2026-06-21 21:57:59 [INFO] Discovery: GitHub: 6 seeds encontrados
+2026-06-21 21:57:59 [INFO] Discovery: Local: 1 seeds
+2026-06-21 21:57:59 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:58:01 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:58:01 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:58:01 [ERROR] P2P: Read error from 192.168.0.108:55946: 'list' object has no attribute 'get'
+2026-06-21 21:58:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:58:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:58:03 [ERROR] P2P: Read error from 192.168.0.108:55948: 'list' object has no attribute 'get'
+2026-06-21 21:58:04 [INFO] Tritio: Connected to 2 peers
+2026-06-21 21:58:04 [WARNING] API: Porta 8080 ja esta em uso. API desabilitada.
+2026-06-21 21:58:04 [INFO] Tritio: Node running on port 8333 | API on port 8080
+2026-06-21 21:58:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:58:06 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:58:06 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:58:06 [ERROR] P2P: Read error from 192.168.0.108:55953: 'list' object has no attribute 'get'
+2026-06-21 21:58:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:58:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:58:11 [ERROR] P2P: Read error from 192.168.0.108:55956: 'list' object has no attribute 'get'
+2026-06-21 21:58:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:58:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:58:33 [ERROR] P2P: Read error from 192.168.0.108:55963: 'list' object has no attribute 'get'
+2026-06-21 21:58:38 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:58:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:58:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:58:41 [ERROR] P2P: Read error from 192.168.0.108:55981: 'list' object has no attribute 'get'
+2026-06-21 21:58:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:58:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:58:41 [ERROR] P2P: Read error from 192.168.0.108:55983: 'list' object has no attribute 'get'
+2026-06-21 21:58:50 [INFO] aiohttp.access: 127.0.0.1 [21/Jun/2026:21:58:50 -0300] "GET / HTTP/1.1" 200 472 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+2026-06-21 21:59:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:59:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:59:03 [ERROR] P2P: Read error from 192.168.0.108:55996: 'list' object has no attribute 'get'
+2026-06-21 21:59:04 [INFO] aiohttp.access: 127.0.0.1 [21/Jun/2026:21:59:04 -0300] "GET /explorer HTTP/1.1" 200 239 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+2026-06-21 21:59:04 [INFO] aiohttp.access: 127.0.0.1 [21/Jun/2026:21:59:04 -0300] "GET /api/status HTTP/1.1" 200 865 "http://localhost:8080/explorer" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+2026-06-21 21:59:04 [INFO] aiohttp.access: 127.0.0.1 [21/Jun/2026:21:59:04 -0300] "GET /api/blocks?limit=10 HTTP/1.1" 200 597 "http://localhost:8080/explorer" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+2026-06-21 21:59:04 [INFO] aiohttp.access: 127.0.0.1 [21/Jun/2026:21:59:04 -0300] "GET /api/blocks?limit=5 HTTP/1.1" 200 597 "http://localhost:8080/explorer" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+2026-06-21 21:59:04 [INFO] API: WebSocket client connected: 2054343067360
+2026-06-21 21:59:08 [INFO] aiohttp.access: 127.0.0.1 [21/Jun/2026:21:59:08 -0300] "GET /api/block/0 HTTP/1.1" 200 571 "http://localhost:8080/explorer" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+2026-06-21 21:59:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:59:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:59:11 [ERROR] P2P: Read error from 192.168.0.108:56002: 'list' object has no attribute 'get'
+2026-06-21 21:59:13 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:59:16 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:59:16 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:59:16 [ERROR] P2P: Read error from 192.168.0.108:56008: 'list' object has no attribute 'get'
+2026-06-21 21:59:24 [INFO] aiohttp.access: 127.0.0.1 [21/Jun/2026:21:59:24 -0300] "GET /api/address/T17XCtWbTgtjoyhLaBgJLCns3isQQy8dfZR HTTP/1.1" 200 245 "http://localhost:8080/explorer" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+2026-06-21 21:59:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:59:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:59:33 [ERROR] P2P: Read error from 192.168.0.108:56015: 'list' object has no attribute 'get'
+2026-06-21 21:59:34 [INFO] aiohttp.access: 127.0.0.1 [21/Jun/2026:21:59:34 -0300] "GET /api/status HTTP/1.1" 200 865 "http://localhost:8080/explorer" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+2026-06-21 21:59:34 [INFO] aiohttp.access: 127.0.0.1 [21/Jun/2026:21:59:34 -0300] "GET /api/blocks?limit=10 HTTP/1.1" 200 597 "http://localhost:8080/explorer" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+2026-06-21 21:59:34 [INFO] aiohttp.access: 127.0.0.1 [21/Jun/2026:21:59:34 -0300] "GET /api/blocks?limit=5 HTTP/1.1" 200 597 "http://localhost:8080/explorer" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+2026-06-21 21:59:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:59:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:59:41 [ERROR] P2P: Read error from 192.168.0.108:56020: 'list' object has no attribute 'get'
+2026-06-21 21:59:48 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:59:49 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:59:49 [ERROR] P2P: Read error from 192.168.0.112:49694: 'list' object has no attribute 'get'
+2026-06-21 21:59:50 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 21:59:50 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 21:59:50 [ERROR] P2P: Read error from 192.168.0.108:56028: 'list' object has no attribute 'get'
+2026-06-21 22:00:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:00:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:00:03 [ERROR] P2P: Read error from 192.168.0.108:56031: 'list' object has no attribute 'get'
+2026-06-21 22:00:05 [INFO] aiohttp.access: 127.0.0.1 [21/Jun/2026:22:00:05 -0300] "GET /api/status HTTP/1.1" 200 865 "http://localhost:8080/explorer" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+2026-06-21 22:00:05 [INFO] aiohttp.access: 127.0.0.1 [21/Jun/2026:22:00:05 -0300] "GET /api/blocks?limit=10 HTTP/1.1" 200 597 "http://localhost:8080/explorer" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+2026-06-21 22:00:05 [INFO] aiohttp.access: 127.0.0.1 [21/Jun/2026:22:00:05 -0300] "GET /api/blocks?limit=5 HTTP/1.1" 200 597 "http://localhost:8080/explorer" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+2026-06-21 22:00:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:00:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:00:11 [ERROR] P2P: Read error from 192.168.0.108:56035: 'list' object has no attribute 'get'
+2026-06-21 22:00:23 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:00:25 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:00:25 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:00:25 [ERROR] P2P: Read error from 192.168.0.108:56043: 'list' object has no attribute 'get'
+2026-06-21 22:00:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:00:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:00:33 [ERROR] P2P: Read error from 192.168.0.108:56048: 'list' object has no attribute 'get'
+2026-06-21 22:00:34 [INFO] aiohttp.access: 127.0.0.1 [21/Jun/2026:22:00:34 -0300] "GET /api/status HTTP/1.1" 200 865 "http://localhost:8080/explorer" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+2026-06-21 22:00:34 [INFO] aiohttp.access: 127.0.0.1 [21/Jun/2026:22:00:34 -0300] "GET /api/blocks?limit=10 HTTP/1.1" 200 597 "http://localhost:8080/explorer" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+2026-06-21 22:00:34 [INFO] aiohttp.access: 127.0.0.1 [21/Jun/2026:22:00:34 -0300] "GET /api/blocks?limit=5 HTTP/1.1" 200 597 "http://localhost:8080/explorer" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+2026-06-21 22:00:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:00:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:00:41 [ERROR] P2P: Read error from 192.168.0.108:56050: 'list' object has no attribute 'get'
+2026-06-21 22:00:47 [INFO] API: WebSocket client disconnected: 2054343067360
+2026-06-21 22:00:47 [INFO] aiohttp.access: 127.0.0.1 [21/Jun/2026:21:59:04 -0300] "GET /ws HTTP/1.1" 101 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+2026-06-21 22:00:57 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:00:59 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:00:59 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:00:59 [ERROR] P2P: Read error from 192.168.0.108:56056: 'list' object has no attribute 'get'
+2026-06-21 22:01:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:01:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:01:03 [ERROR] P2P: Read error from 192.168.0.108:56058: 'list' object has no attribute 'get'
+2026-06-21 22:01:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:01:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:01:11 [ERROR] P2P: Read error from 192.168.0.108:56060: 'list' object has no attribute 'get'
+2026-06-21 22:01:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:01:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:01:33 [ERROR] P2P: Read error from 192.168.0.108:56071: 'list' object has no attribute 'get'
+2026-06-21 22:01:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:01:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:01:41 [ERROR] P2P: Read error from 192.168.0.108:56073: 'list' object has no attribute 'get'
+2026-06-21 22:02:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:02:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:02:03 [ERROR] P2P: Read error from 192.168.0.108:56084: 'list' object has no attribute 'get'
+2026-06-21 22:02:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:02:04 [ERROR] P2P: Read error from 192.168.0.112:52402: 'list' object has no attribute 'get'
+2026-06-21 22:02:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:02:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:02:11 [ERROR] P2P: Read error from 192.168.0.108:56086: 'list' object has no attribute 'get'
+2026-06-21 22:02:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:02:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:02:33 [ERROR] P2P: Read error from 192.168.0.108:56105: 'list' object has no attribute 'get'
+2026-06-21 22:02:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:02:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:02:41 [ERROR] P2P: Read error from 192.168.0.108:56114: 'list' object has no attribute 'get'
+2026-06-21 22:03:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:03:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:03:03 [ERROR] P2P: Read error from 192.168.0.108:56148: 'list' object has no attribute 'get'
+2026-06-21 22:03:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:03:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:03:11 [ERROR] P2P: Read error from 192.168.0.108:56156: 'list' object has no attribute 'get'
+2026-06-21 22:03:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:03:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:03:33 [ERROR] P2P: Read error from 192.168.0.108:56164: 'list' object has no attribute 'get'
+2026-06-21 22:03:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:03:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:03:41 [ERROR] P2P: Read error from 192.168.0.108:56193: 'list' object has no attribute 'get'
+2026-06-21 22:04:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:04:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:04:03 [ERROR] P2P: Read error from 192.168.0.108:56207: 'list' object has no attribute 'get'
+2026-06-21 22:04:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:04:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:04:11 [ERROR] P2P: Read error from 192.168.0.108:56210: 'list' object has no attribute 'get'
+2026-06-21 22:04:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:04:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:04:33 [ERROR] P2P: Read error from 192.168.0.108:56216: 'list' object has no attribute 'get'
+2026-06-21 22:04:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:04:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:04:41 [ERROR] P2P: Read error from 192.168.0.108:56218: 'list' object has no attribute 'get'
+2026-06-21 22:04:48 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:04:48 [ERROR] P2P: Read error from 192.168.0.112:34814: 'list' object has no attribute 'get'
+2026-06-21 22:05:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:05:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:05:03 [ERROR] P2P: Read error from 192.168.0.108:56232: 'list' object has no attribute 'get'
+2026-06-21 22:05:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:05:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:05:11 [ERROR] P2P: Read error from 192.168.0.108:56243: 'list' object has no attribute 'get'
+2026-06-21 22:05:33 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:05:33 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:05:33 [ERROR] P2P: Read error from 192.168.0.108:56248: 'list' object has no attribute 'get'
+2026-06-21 22:05:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:05:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:05:41 [ERROR] P2P: Read error from 192.168.0.108:56249: 'list' object has no attribute 'get'
+2026-06-21 22:06:03 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:06:03 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:06:03 [ERROR] P2P: Read error from 192.168.0.108:56250: 'list' object has no attribute 'get'
+2026-06-21 22:06:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:06:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:06:11 [ERROR] P2P: Read error from 192.168.0.108:56252: 'list' object has no attribute 'get'
+2026-06-21 22:06:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:06:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:06:34 [ERROR] P2P: Read error from 192.168.0.108:56258: 'list' object has no attribute 'get'
+2026-06-21 22:06:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:06:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:06:41 [ERROR] P2P: Read error from 192.168.0.108:56259: 'list' object has no attribute 'get'
+2026-06-21 22:07:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:07:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:07:04 [ERROR] P2P: Read error from 192.168.0.108:56262: 'list' object has no attribute 'get'
+2026-06-21 22:07:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:07:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:07:11 [ERROR] P2P: Read error from 192.168.0.108:56265: 'list' object has no attribute 'get'
+2026-06-21 22:07:32 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:07:32 [ERROR] P2P: Read error from 192.168.0.112:38150: 'list' object has no attribute 'get'
+2026-06-21 22:07:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:07:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:07:34 [ERROR] P2P: Read error from 192.168.0.108:56269: 'list' object has no attribute 'get'
+2026-06-21 22:07:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:07:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:07:41 [ERROR] P2P: Read error from 192.168.0.108:56270: 'list' object has no attribute 'get'
+2026-06-21 22:08:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:08:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:08:04 [ERROR] P2P: Read error from 192.168.0.108:56272: 'list' object has no attribute 'get'
+2026-06-21 22:08:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:08:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:08:11 [ERROR] P2P: Read error from 192.168.0.108:56275: 'list' object has no attribute 'get'
+2026-06-21 22:08:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:08:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:08:34 [ERROR] P2P: Read error from 192.168.0.108:56280: 'list' object has no attribute 'get'
+2026-06-21 22:08:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:08:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:08:41 [ERROR] P2P: Read error from 192.168.0.108:56281: 'list' object has no attribute 'get'
+2026-06-21 22:09:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:09:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:09:04 [ERROR] P2P: Read error from 192.168.0.108:56283: 'list' object has no attribute 'get'
+2026-06-21 22:09:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:09:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:09:11 [ERROR] P2P: Read error from 192.168.0.108:56285: 'list' object has no attribute 'get'
+2026-06-21 22:09:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:09:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:09:34 [ERROR] P2P: Read error from 192.168.0.108:56289: 'list' object has no attribute 'get'
+2026-06-21 22:09:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:09:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:09:41 [ERROR] P2P: Read error from 192.168.0.108:56290: 'list' object has no attribute 'get'
+2026-06-21 22:10:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:10:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:10:04 [ERROR] P2P: Read error from 192.168.0.108:56295: 'list' object has no attribute 'get'
+2026-06-21 22:10:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:10:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:10:11 [ERROR] P2P: Read error from 192.168.0.108:56297: 'list' object has no attribute 'get'
+2026-06-21 22:10:15 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:10:15 [ERROR] P2P: Read error from 192.168.0.112:35026: 'list' object has no attribute 'get'
+2026-06-21 22:10:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:10:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:10:34 [ERROR] P2P: Read error from 192.168.0.108:56302: 'list' object has no attribute 'get'
+2026-06-21 22:10:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:10:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:10:41 [ERROR] P2P: Read error from 192.168.0.108:56304: 'list' object has no attribute 'get'
+2026-06-21 22:11:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:11:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:11:04 [ERROR] P2P: Read error from 192.168.0.108:56305: 'list' object has no attribute 'get'
+2026-06-21 22:11:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:11:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:11:11 [ERROR] P2P: Read error from 192.168.0.108:56307: 'list' object has no attribute 'get'
+2026-06-21 22:11:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:11:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:11:34 [ERROR] P2P: Read error from 192.168.0.108:56312: 'list' object has no attribute 'get'
+2026-06-21 22:11:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:11:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:11:41 [ERROR] P2P: Read error from 192.168.0.108:56314: 'list' object has no attribute 'get'
+2026-06-21 22:12:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:12:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:12:04 [ERROR] P2P: Read error from 192.168.0.108:56316: 'list' object has no attribute 'get'
+2026-06-21 22:12:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:12:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:12:11 [ERROR] P2P: Read error from 192.168.0.108:56318: 'list' object has no attribute 'get'
+2026-06-21 22:12:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:12:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:12:34 [ERROR] P2P: Read error from 192.168.0.108:56323: 'list' object has no attribute 'get'
+2026-06-21 22:12:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:12:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:12:41 [ERROR] P2P: Read error from 192.168.0.108:56324: 'list' object has no attribute 'get'
+2026-06-21 22:12:59 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:12:59 [ERROR] P2P: Read error from 192.168.0.112:52014: 'list' object has no attribute 'get'
+2026-06-21 22:13:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:13:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:13:04 [ERROR] P2P: Read error from 192.168.0.108:56325: 'list' object has no attribute 'get'
+2026-06-21 22:13:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:13:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:13:11 [ERROR] P2P: Read error from 192.168.0.108:56328: 'list' object has no attribute 'get'
+2026-06-21 22:13:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:13:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:13:34 [ERROR] P2P: Read error from 192.168.0.108:56333: 'list' object has no attribute 'get'
+2026-06-21 22:13:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:13:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:13:41 [ERROR] P2P: Read error from 192.168.0.108:56335: 'list' object has no attribute 'get'
+2026-06-21 22:14:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:14:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:14:04 [ERROR] P2P: Read error from 192.168.0.108:56339: 'list' object has no attribute 'get'
+2026-06-21 22:14:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:14:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:14:11 [ERROR] P2P: Read error from 192.168.0.108:56341: 'list' object has no attribute 'get'
+2026-06-21 22:14:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:14:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:14:34 [ERROR] P2P: Read error from 192.168.0.108:56346: 'list' object has no attribute 'get'
+2026-06-21 22:14:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:14:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:14:41 [ERROR] P2P: Read error from 192.168.0.108:56347: 'list' object has no attribute 'get'
+2026-06-21 22:15:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:15:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:15:04 [ERROR] P2P: Read error from 192.168.0.108:56350: 'list' object has no attribute 'get'
+2026-06-21 22:15:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:15:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:15:11 [ERROR] P2P: Read error from 192.168.0.108:56353: 'list' object has no attribute 'get'
+2026-06-21 22:15:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:15:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:15:34 [ERROR] P2P: Read error from 192.168.0.108:56358: 'list' object has no attribute 'get'
+2026-06-21 22:15:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:15:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:15:41 [ERROR] P2P: Read error from 192.168.0.108:56359: 'list' object has no attribute 'get'
+2026-06-21 22:15:43 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:15:43 [ERROR] P2P: Read error from 192.168.0.112:37954: 'list' object has no attribute 'get'
+2026-06-21 22:16:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:16:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:16:04 [ERROR] P2P: Read error from 192.168.0.108:56361: 'list' object has no attribute 'get'
+2026-06-21 22:16:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:16:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:16:11 [ERROR] P2P: Read error from 192.168.0.108:56363: 'list' object has no attribute 'get'
+2026-06-21 22:16:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:16:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:16:34 [ERROR] P2P: Read error from 192.168.0.108:56368: 'list' object has no attribute 'get'
+2026-06-21 22:16:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:16:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:16:41 [ERROR] P2P: Read error from 192.168.0.108:56370: 'list' object has no attribute 'get'
+2026-06-21 22:17:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:17:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:17:04 [ERROR] P2P: Read error from 192.168.0.108:56373: 'list' object has no attribute 'get'
+2026-06-21 22:17:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:17:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:17:11 [ERROR] P2P: Read error from 192.168.0.108:56376: 'list' object has no attribute 'get'
+2026-06-21 22:17:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:17:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:17:34 [ERROR] P2P: Read error from 192.168.0.108:56381: 'list' object has no attribute 'get'
+2026-06-21 22:17:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:17:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:17:41 [ERROR] P2P: Read error from 192.168.0.108:56382: 'list' object has no attribute 'get'
+2026-06-21 22:18:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:18:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:18:04 [ERROR] P2P: Read error from 192.168.0.108:56384: 'list' object has no attribute 'get'
+2026-06-21 22:18:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:18:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:18:11 [ERROR] P2P: Read error from 192.168.0.108:56387: 'list' object has no attribute 'get'
+2026-06-21 22:18:27 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:18:27 [ERROR] P2P: Read error from 192.168.0.112:55994: 'list' object has no attribute 'get'
+2026-06-21 22:18:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:18:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:18:34 [ERROR] P2P: Read error from 192.168.0.108:56392: 'list' object has no attribute 'get'
+2026-06-21 22:18:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:18:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:18:41 [ERROR] P2P: Read error from 192.168.0.108:56393: 'list' object has no attribute 'get'
+2026-06-21 22:19:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:19:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:19:04 [ERROR] P2P: Read error from 192.168.0.108:56395: 'list' object has no attribute 'get'
+2026-06-21 22:19:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:19:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:19:11 [ERROR] P2P: Read error from 192.168.0.108:56399: 'list' object has no attribute 'get'
+2026-06-21 22:19:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:19:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:19:34 [ERROR] P2P: Read error from 192.168.0.108:56402: 'list' object has no attribute 'get'
+2026-06-21 22:19:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:19:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:19:41 [ERROR] P2P: Read error from 192.168.0.108:56403: 'list' object has no attribute 'get'
+2026-06-21 22:20:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:20:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:20:04 [ERROR] P2P: Read error from 192.168.0.108:56405: 'list' object has no attribute 'get'
+2026-06-21 22:20:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:20:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:20:11 [ERROR] P2P: Read error from 192.168.0.108:56409: 'list' object has no attribute 'get'
+2026-06-21 22:20:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:20:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:20:34 [ERROR] P2P: Read error from 192.168.0.108:56423: 'list' object has no attribute 'get'
+2026-06-21 22:20:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:20:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:20:41 [ERROR] P2P: Read error from 192.168.0.108:56424: 'list' object has no attribute 'get'
+2026-06-21 22:21:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:21:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:21:04 [ERROR] P2P: Read error from 192.168.0.108:56426: 'list' object has no attribute 'get'
+2026-06-21 22:21:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:21:11 [ERROR] P2P: Read error from 192.168.0.112:37076: 'list' object has no attribute 'get'
+2026-06-21 22:21:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:21:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:21:11 [ERROR] P2P: Read error from 192.168.0.108:56429: 'list' object has no attribute 'get'
+2026-06-21 22:21:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:21:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:21:34 [ERROR] P2P: Read error from 192.168.0.108:56437: 'list' object has no attribute 'get'
+2026-06-21 22:21:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:21:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:21:41 [ERROR] P2P: Read error from 192.168.0.108:56439: 'list' object has no attribute 'get'
+2026-06-21 22:22:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:22:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:22:04 [ERROR] P2P: Read error from 192.168.0.108:56441: 'list' object has no attribute 'get'
+2026-06-21 22:22:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:22:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:22:11 [ERROR] P2P: Read error from 192.168.0.108:56444: 'list' object has no attribute 'get'
+2026-06-21 22:22:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:22:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:22:34 [ERROR] P2P: Read error from 192.168.0.108:56450: 'list' object has no attribute 'get'
+2026-06-21 22:22:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:22:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:22:41 [ERROR] P2P: Read error from 192.168.0.108:56451: 'list' object has no attribute 'get'
+2026-06-21 22:23:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:23:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:23:04 [ERROR] P2P: Read error from 192.168.0.108:56452: 'list' object has no attribute 'get'
+2026-06-21 22:23:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:23:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:23:11 [ERROR] P2P: Read error from 192.168.0.108:56455: 'list' object has no attribute 'get'
+2026-06-21 22:23:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:23:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:23:34 [ERROR] P2P: Read error from 192.168.0.108:56460: 'list' object has no attribute 'get'
+2026-06-21 22:23:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:23:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:23:41 [ERROR] P2P: Read error from 192.168.0.108:56461: 'list' object has no attribute 'get'
+2026-06-21 22:23:55 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:23:55 [ERROR] P2P: Read error from 192.168.0.112:43094: 'list' object has no attribute 'get'
+2026-06-21 22:24:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:24:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:24:04 [ERROR] P2P: Read error from 192.168.0.108:56463: 'list' object has no attribute 'get'
+2026-06-21 22:24:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:24:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:24:11 [ERROR] P2P: Read error from 192.168.0.108:56466: 'list' object has no attribute 'get'
+2026-06-21 22:24:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:24:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:24:34 [ERROR] P2P: Read error from 192.168.0.108:56470: 'list' object has no attribute 'get'
+2026-06-21 22:24:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:24:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:24:41 [ERROR] P2P: Read error from 192.168.0.108:56471: 'list' object has no attribute 'get'
+2026-06-21 22:25:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:25:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:25:04 [ERROR] P2P: Read error from 192.168.0.108:56473: 'list' object has no attribute 'get'
+2026-06-21 22:25:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:25:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:25:11 [ERROR] P2P: Read error from 192.168.0.108:56477: 'list' object has no attribute 'get'
+2026-06-21 22:25:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:25:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:25:34 [ERROR] P2P: Read error from 192.168.0.108:56481: 'list' object has no attribute 'get'
+2026-06-21 22:25:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:25:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:25:41 [ERROR] P2P: Read error from 192.168.0.108:56483: 'list' object has no attribute 'get'
+2026-06-21 22:26:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:26:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:26:04 [ERROR] P2P: Read error from 192.168.0.108:56485: 'list' object has no attribute 'get'
+2026-06-21 22:26:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:26:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:26:11 [ERROR] P2P: Read error from 192.168.0.108:56488: 'list' object has no attribute 'get'
+2026-06-21 22:26:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:26:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:26:34 [ERROR] P2P: Read error from 192.168.0.108:56492: 'list' object has no attribute 'get'
+2026-06-21 22:26:38 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:26:38 [ERROR] P2P: Read error from 192.168.0.112:46890: 'list' object has no attribute 'get'
+2026-06-21 22:26:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:26:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:26:41 [ERROR] P2P: Read error from 192.168.0.108:56493: 'list' object has no attribute 'get'
+2026-06-21 22:27:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:27:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:27:04 [ERROR] P2P: Read error from 192.168.0.108:56496: 'list' object has no attribute 'get'
+2026-06-21 22:27:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:27:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:27:11 [ERROR] P2P: Read error from 192.168.0.108:56499: 'list' object has no attribute 'get'
+2026-06-21 22:27:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:27:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:27:34 [ERROR] P2P: Read error from 192.168.0.108:56503: 'list' object has no attribute 'get'
+2026-06-21 22:27:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:27:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:27:41 [ERROR] P2P: Read error from 192.168.0.108:56505: 'list' object has no attribute 'get'
+2026-06-21 22:28:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:28:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:28:04 [ERROR] P2P: Read error from 192.168.0.108:56506: 'list' object has no attribute 'get'
+2026-06-21 22:28:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:28:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:28:11 [ERROR] P2P: Read error from 192.168.0.108:56509: 'list' object has no attribute 'get'
+2026-06-21 22:28:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:28:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:28:34 [ERROR] P2P: Read error from 192.168.0.108:56513: 'list' object has no attribute 'get'
+2026-06-21 22:28:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:28:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:28:41 [ERROR] P2P: Read error from 192.168.0.108:56515: 'list' object has no attribute 'get'
+2026-06-21 22:29:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:29:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:29:04 [ERROR] P2P: Read error from 192.168.0.108:56518: 'list' object has no attribute 'get'
+2026-06-21 22:29:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:29:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:29:11 [ERROR] P2P: Read error from 192.168.0.108:56521: 'list' object has no attribute 'get'
+2026-06-21 22:29:22 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:29:22 [ERROR] P2P: Read error from 192.168.0.112:44408: 'list' object has no attribute 'get'
+2026-06-21 22:29:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:29:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:29:34 [ERROR] P2P: Read error from 192.168.0.108:56525: 'list' object has no attribute 'get'
+2026-06-21 22:29:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:29:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:29:41 [ERROR] P2P: Read error from 192.168.0.108:56527: 'list' object has no attribute 'get'
+2026-06-21 22:30:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:30:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:30:04 [ERROR] P2P: Read error from 192.168.0.108:56528: 'list' object has no attribute 'get'
+2026-06-21 22:30:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:30:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:30:11 [ERROR] P2P: Read error from 192.168.0.108:56531: 'list' object has no attribute 'get'
+2026-06-21 22:30:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:30:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:30:34 [ERROR] P2P: Read error from 192.168.0.108:56536: 'list' object has no attribute 'get'
+2026-06-21 22:30:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:30:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:30:41 [ERROR] P2P: Read error from 192.168.0.108:56537: 'list' object has no attribute 'get'
+2026-06-21 22:31:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:31:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:31:04 [ERROR] P2P: Read error from 192.168.0.108:56539: 'list' object has no attribute 'get'
+2026-06-21 22:31:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:31:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:31:11 [ERROR] P2P: Read error from 192.168.0.108:56544: 'list' object has no attribute 'get'
+2026-06-21 22:31:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:31:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:31:34 [ERROR] P2P: Read error from 192.168.0.108:56564: 'list' object has no attribute 'get'
+2026-06-21 22:31:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:31:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:31:41 [ERROR] P2P: Read error from 192.168.0.108:56565: 'list' object has no attribute 'get'
+2026-06-21 22:32:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:32:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:32:04 [ERROR] P2P: Read error from 192.168.0.108:56567: 'list' object has no attribute 'get'
+2026-06-21 22:32:06 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:32:06 [ERROR] P2P: Read error from 192.168.0.112:49830: 'list' object has no attribute 'get'
+2026-06-21 22:32:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:32:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:32:11 [ERROR] P2P: Read error from 192.168.0.108:56582: 'list' object has no attribute 'get'
+2026-06-21 22:32:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:32:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:32:34 [ERROR] P2P: Read error from 192.168.0.108:56602: 'list' object has no attribute 'get'
+2026-06-21 22:32:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:32:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:32:41 [ERROR] P2P: Read error from 192.168.0.108:56603: 'list' object has no attribute 'get'
+2026-06-21 22:33:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:33:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:33:04 [ERROR] P2P: Read error from 192.168.0.108:56607: 'list' object has no attribute 'get'
+2026-06-21 22:33:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:33:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:33:11 [ERROR] P2P: Read error from 192.168.0.108:56621: 'list' object has no attribute 'get'
+2026-06-21 22:33:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:33:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:33:34 [ERROR] P2P: Read error from 192.168.0.108:56625: 'list' object has no attribute 'get'
+2026-06-21 22:33:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:33:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:33:41 [ERROR] P2P: Read error from 192.168.0.108:56627: 'list' object has no attribute 'get'
+2026-06-21 22:34:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:34:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:34:04 [ERROR] P2P: Read error from 192.168.0.108:56645: 'list' object has no attribute 'get'
+2026-06-21 22:34:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:34:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:34:11 [ERROR] P2P: Read error from 192.168.0.108:56649: 'list' object has no attribute 'get'
+2026-06-21 22:34:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:34:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:34:34 [ERROR] P2P: Read error from 192.168.0.108:56653: 'list' object has no attribute 'get'
+2026-06-21 22:34:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:34:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:34:41 [ERROR] P2P: Read error from 192.168.0.108:56654: 'list' object has no attribute 'get'
+2026-06-21 22:34:50 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:34:50 [ERROR] P2P: Read error from 192.168.0.112:54826: 'list' object has no attribute 'get'
+2026-06-21 22:35:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:35:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:35:04 [ERROR] P2P: Read error from 192.168.0.108:56655: 'list' object has no attribute 'get'
+2026-06-21 22:35:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:35:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:35:11 [ERROR] P2P: Read error from 192.168.0.108:56658: 'list' object has no attribute 'get'
+2026-06-21 22:35:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:35:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:35:34 [ERROR] P2P: Read error from 192.168.0.108:56663: 'list' object has no attribute 'get'
+2026-06-21 22:35:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:35:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:35:41 [ERROR] P2P: Read error from 192.168.0.108:56664: 'list' object has no attribute 'get'
+2026-06-21 22:36:00 [WARNING] Tritio: Wallet requires password. Set TRC_PASSWORD env var.
+2026-06-21 22:36:01 [INFO] Tritio: New wallet created: T13djL9ACadh1jfjpwDMYTTRgUp3FGE8M5t
+2026-06-21 22:36:01 [INFO] Blockchain: Chain loaded: 1 blocks from database
+2026-06-21 22:36:01 [INFO] Tritio: Node started | Network: mainnet | Mode: miner | Quantum: OFF | Address: T13djL9ACadh1jfjpwDMYTTRgUp3FGE8M5t | DHT port: 8334
+2026-06-21 22:36:01 [INFO] Tritio: This node is now a SEED: 0.0.0.0:8333
+2026-06-21 22:36:01 [INFO] Tritio: DHT started on port 8334
+2026-06-21 22:36:01 [WARNING] DHT: Porta DHT 8334 ja esta em uso. DHT desabilitado.
+2026-06-21 22:36:01 [INFO] P2P: External IP discovered: 190.89.162.131
+2026-06-21 22:36:01 [WARNING] P2P: Porta P2P 8333 ja esta em uso. P2P desabilitado.
+2026-06-21 22:36:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:36:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:36:04 [ERROR] P2P: Read error from 192.168.0.108:56674: 'list' object has no attribute 'get'
+2026-06-21 22:36:05 [INFO] DHT: DHT bootstrapped with 2 nodes
+2026-06-21 22:36:05 [INFO] Tritio: DHT bootstrapped with 2 nodes
+2026-06-21 22:36:05 [INFO] Tritio: Starting peer discovery...
+2026-06-21 22:36:06 [INFO] Discovery: GitHub: 6 seeds encontrados
+2026-06-21 22:36:06 [INFO] Discovery: Local: 2 seeds
+2026-06-21 22:36:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:36:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:36:11 [ERROR] P2P: Read error from 192.168.0.108:56682: 'list' object has no attribute 'get'
+2026-06-21 22:36:15 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:36:15 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:36:15 [ERROR] P2P: Read error from 192.168.0.108:56685: 'list' object has no attribute 'get'
+2026-06-21 22:36:15 [INFO] Tritio: Connected to 1 peers
+2026-06-21 22:36:15 [INFO] Miner: Mining block #1 (difficulty=4)
+2026-06-21 22:36:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:36:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:36:34 [ERROR] P2P: Read error from 192.168.0.108:56689: 'list' object has no attribute 'get'
+2026-06-21 22:36:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:36:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:36:41 [ERROR] P2P: Read error from 192.168.0.108:56690: 'list' object has no attribute 'get'
+2026-06-21 22:37:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:37:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:37:04 [ERROR] P2P: Read error from 192.168.0.108:56691: 'list' object has no attribute 'get'
+2026-06-21 22:37:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:37:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:37:11 [ERROR] P2P: Read error from 192.168.0.108:56695: 'list' object has no attribute 'get'
+2026-06-21 22:37:21 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:37:21 [ERROR] P2P: Read error from 192.168.0.112:52676: 'list' object has no attribute 'get'
+2026-06-21 22:37:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:37:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:37:34 [ERROR] P2P: Read error from 192.168.0.108:56699: 'list' object has no attribute 'get'
+2026-06-21 22:37:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:37:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:37:41 [ERROR] P2P: Read error from 192.168.0.108:56701: 'list' object has no attribute 'get'
+2026-06-21 22:38:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:38:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:38:04 [ERROR] P2P: Read error from 192.168.0.108:56703: 'list' object has no attribute 'get'
+2026-06-21 22:38:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:38:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:38:11 [ERROR] P2P: Read error from 192.168.0.108:56706: 'list' object has no attribute 'get'
+2026-06-21 22:38:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:38:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:38:34 [ERROR] P2P: Read error from 192.168.0.108:56709: 'list' object has no attribute 'get'
+2026-06-21 22:38:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:38:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:38:41 [ERROR] P2P: Read error from 192.168.0.108:56710: 'list' object has no attribute 'get'
+2026-06-21 22:39:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:39:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:39:04 [ERROR] P2P: Read error from 192.168.0.108:56713: 'list' object has no attribute 'get'
+2026-06-21 22:39:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:39:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:39:11 [ERROR] P2P: Read error from 192.168.0.108:56720: 'list' object has no attribute 'get'
+2026-06-21 22:39:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:39:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:39:34 [ERROR] P2P: Read error from 192.168.0.108:56732: 'list' object has no attribute 'get'
+2026-06-21 22:39:37 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:39:37 [ERROR] P2P: Read error from 192.168.0.112:57362: 'list' object has no attribute 'get'
+2026-06-21 22:39:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:39:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:39:41 [ERROR] P2P: Read error from 192.168.0.108:56734: 'list' object has no attribute 'get'
+2026-06-21 22:39:58 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='Task-9' coro=<TritioNode._mining_loop() done, defined at C:\Users\Pichau\Downloads\Automações\TritioCoin\main.py:601> exception=KeyboardInterrupt()>
+Traceback (most recent call last):
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\main.py", line 766, in <module>
+    asyncio.run(main())
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 678, in run_until_complete
+    self.run_forever()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 645, in run_forever
+    self._run_once()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 1999, in _run_once
+    handle._run()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\main.py", line 604, in _mining_loop
+    block = self.miner.mine(self.wallet.pubkey_hex())
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\core\miner.py", line 157, in mine
+    pow_hash = self._pow_hash(self.current_block.pow_data())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Pichau\Downloads\Automações\TritioCoin\core\miner.py", line 109, in _pow_hash
+    return hash_secret_raw(
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\Pichau\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\argon2\low_level.py", line 142, in hash_secret_raw
+    rv = lib.argon2_hash(
+         ^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\asyncio\runners.py", line 157, in _on_sigint
+    raise KeyboardInterrupt()
+KeyboardInterrupt
+2026-06-21 22:40:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:40:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:40:04 [ERROR] P2P: Read error from 192.168.0.108:56735: 'list' object has no attribute 'get'
+2026-06-21 22:40:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:40:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:40:11 [ERROR] P2P: Read error from 192.168.0.108:56738: 'list' object has no attribute 'get'
+2026-06-21 22:40:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:40:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:40:34 [ERROR] P2P: Read error from 192.168.0.108:56742: 'list' object has no attribute 'get'
+2026-06-21 22:40:41 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:40:41 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:40:41 [ERROR] P2P: Read error from 192.168.0.108:56744: 'list' object has no attribute 'get'
+2026-06-21 22:41:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:41:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:41:04 [ERROR] P2P: Read error from 192.168.0.108:56746: 'list' object has no attribute 'get'
+2026-06-21 22:41:11 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:41:11 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:41:11 [ERROR] P2P: Read error from 192.168.0.108:56749: 'list' object has no attribute 'get'
+2026-06-21 22:41:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:41:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:41:34 [ERROR] P2P: Read error from 192.168.0.108:56753: 'list' object has no attribute 'get'
+2026-06-21 22:41:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:41:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:41:42 [ERROR] P2P: Read error from 192.168.0.108:56754: 'list' object has no attribute 'get'
+2026-06-21 22:42:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:42:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:42:04 [ERROR] P2P: Read error from 192.168.0.108:56755: 'list' object has no attribute 'get'
+2026-06-21 22:42:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:42:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:42:12 [ERROR] P2P: Read error from 192.168.0.108:56758: 'list' object has no attribute 'get'
+2026-06-21 22:42:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:42:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:42:34 [ERROR] P2P: Read error from 192.168.0.108:56763: 'list' object has no attribute 'get'
+2026-06-21 22:42:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:42:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:42:42 [ERROR] P2P: Read error from 192.168.0.108:56764: 'list' object has no attribute 'get'
+2026-06-21 22:43:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:43:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:43:04 [ERROR] P2P: Read error from 192.168.0.108:56767: 'list' object has no attribute 'get'
+2026-06-21 22:43:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:43:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:43:12 [ERROR] P2P: Read error from 192.168.0.108:56770: 'list' object has no attribute 'get'
+2026-06-21 22:43:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:43:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:43:34 [ERROR] P2P: Read error from 192.168.0.108:56774: 'list' object has no attribute 'get'
+2026-06-21 22:43:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:43:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:43:42 [ERROR] P2P: Read error from 192.168.0.108:56775: 'list' object has no attribute 'get'
+2026-06-21 22:44:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:44:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:44:04 [ERROR] P2P: Read error from 192.168.0.108:56778: 'list' object has no attribute 'get'
+2026-06-21 22:44:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:44:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:44:12 [ERROR] P2P: Read error from 192.168.0.108:56781: 'list' object has no attribute 'get'
+2026-06-21 22:44:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:44:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:44:34 [ERROR] P2P: Read error from 192.168.0.108:56785: 'list' object has no attribute 'get'
+2026-06-21 22:44:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:44:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:44:42 [ERROR] P2P: Read error from 192.168.0.108:56786: 'list' object has no attribute 'get'
+2026-06-21 22:45:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:45:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:45:04 [ERROR] P2P: Read error from 192.168.0.108:56823: 'list' object has no attribute 'get'
+2026-06-21 22:45:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:45:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:45:12 [ERROR] P2P: Read error from 192.168.0.108:56826: 'list' object has no attribute 'get'
+2026-06-21 22:45:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:45:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:45:34 [ERROR] P2P: Read error from 192.168.0.108:56845: 'list' object has no attribute 'get'
+2026-06-21 22:45:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:45:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:45:42 [ERROR] P2P: Read error from 192.168.0.108:56848: 'list' object has no attribute 'get'
+2026-06-21 22:46:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:46:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:46:04 [ERROR] P2P: Read error from 192.168.0.108:56866: 'list' object has no attribute 'get'
+2026-06-21 22:46:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:46:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:46:12 [ERROR] P2P: Read error from 192.168.0.108:56894: 'list' object has no attribute 'get'
