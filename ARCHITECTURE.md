@@ -1,30 +1,30 @@
-# TritioCoin Architecture
+# Arquitetura do TritioVisao Geral
 
-## Overview
+TritioCoin e uma criptomoeda descentralizada com arquitetura modular projetada para seguranca, desempenho e resistencia a computacao quantica.
 
-TritioCoin is a decentralized cryptocurrency with a modular architecture designed for security, performance, and quantum resistance.
+---
 
-## System Architecture
+## Arquitetura do Sistema
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      Application Layer                       │
+│                    Camada de Aplicacao                       │
 ├─────────────────────────────────────────────────────────────┤
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
-│  │  CLI Wallet  │  │   Web UI    │  │   REST API + WS     │ │
+│  │  CLI Wallet  │  │  Web UI     │  │   REST API + WS     │ │
 │  │  wallet.py   │  │  explorer   │  │   network/api.py    │ │
 │  └──────┬──────┘  └──────┬──────┘  └──────────┬──────────┘ │
 ├─────────┼────────────────┼────────────────────┼─────────────┤
-│         │         Core Logic Layer           │              │
+│         │     Camada de Logica Principal      │             │
 │  ┌──────┴────────────────────────────────────┴──────────┐  │
 │  │                                                       │  │
 │  │  ┌─────────────┐  ┌─────────────┐  ┌──────────────┐ │  │
-│  │  │  Blockchain  │  │    Miner    │  │   Consensus  │ │  │
+│  │  │  Blockchain  │  │    Miner    │  │   Consenso   │ │  │
 │  │  │  core/block  │  │  core/miner │  │  core/consen │ │  │
 │  │  └──────┬──────┘  └──────┬──────┘  └──────┬───────┘ │  │
 │  │         │                │                 │          │  │
 │  │  ┌──────┴────────────────┴─────────────────┴───────┐ │  │
-│  │  │              Transaction Engine                 │ │  │
+│  │  │              Motor de Transacoes                 │ │  │
 │  │  │  ┌─────────┐  ┌─────────┐  ┌─────────────────┐ │ │  │
 │  │  │  │  UTXO   │  │ Mempool │  │ Multi-Sig       │ │ │  │
 │  │  │  └─────────┘  └─────────┘  └─────────────────┘ │ │  │
@@ -37,120 +37,192 @@ TritioCoin is a decentralized cryptocurrency with a modular architecture designe
 │  │                                                       │  │
 │  └───────────────────────────────────────────────────────┘  │
 ├─────────────────────────────────────────────────────────────┤
-│                    Network Layer                             │
+│                    Camada de Rede                            │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
 │  │   P2P Node  │  │   TLS 1.3   │  │  Peer Reputation   │ │
-│  │  TCP/Gossip │  │  Encryption  │  │  Scoring/Banning   │ │
+│  │  TCP/Gossip │  │  Criptografia │  │  Score/Banning     │ │
 │  └─────────────┘  └─────────────┘  └─────────────────────┘ │
 ├─────────────────────────────────────────────────────────────┤
-│                    Storage Layer                             │
+│                    Camada de Armazenamento                    │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
 │  │   SQLite    │  │    WAL      │  │   Block Pruning     │ │
-│  │  Database   │  │   Mode      │  │   Disk Management   │ │
+│  │  Database   │  │   Mode      │  │   Gerenciamento     │ │
 │  └─────────────┘  └─────────────┘  └─────────────────────┘ │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Data Flow
+---
 
-### Transaction Flow
+## Fluxo de uma Transacao
 
-```
-1. User creates transaction
-2. Transaction signed with ECDSA (+ optional WOTS+)
-3. Transaction added to mempool
-4. Transaction broadcast to peers
-5. Miner selects transactions from mempool
-6. Miner creates block with transactions
-7. Block broadcast to network
-8. Validators sign block (PoS)
-9. Block added to blockchain
-10. UTXOs updated
-```
-
-### Mining Flow
+### Passo a passo
 
 ```
-1. Miner selects transactions from mempool
-2. Creates coinbase transaction (reward)
-3. Builds block with header + transactions
-4. Computes Merkle root
-5. Starts mining loop (Argon2id)
-6. Finds valid nonce (hash starts with N zeros)
-7. Broadcasts compact block
-8. Waits for validator signatures
-9. Adds block to chain
+1. Usuario cria transacao
+2. Transacao assinada com ECDSA (+ opcional WOTS+)
+3. Transacao adicionada a mempool
+4. Transacao transmitida para peers
+5. Minerador seleciona transacoes da mempool
+6. Minerador cria bloco com transacoes
+7. Bloco transmitido para a rede
+8. Validadores assinam o bloco (PoS)
+9. Bloco adicionado a blockchain
+10. UTXOs atualizados
 ```
 
-## Security Model
+### Como funciona na pratica
 
-### Cryptographic Primitives
+```
+Usuario clica "Enviar"
+     ↓
+Carteira cria transacao
+     ↓
+Assina com chave privada (ECDSA)
+     ↓
+Envia para mempool (pool de pendentes)
+     ↓
+Minerador pega transacoes do pool
+     ↓
+Inclui no bloco que esta minerando
+     ↓
+Encontra nonce valido (Argon2id)
+     ↓
+Transmite bloco para rede
+     ↓
+Validadores verificam e assinam
+     ↓
+Bloco confirmado na chain
+     ↓
+Saldo atualizado
+```
 
-| Component | Algorithm | Purpose |
-|-----------|-----------|---------|
-| Signatures | ECDSA (secp256k1) | Transaction authentication |
-| Quantum | WOTS+ (SHA-256) | Future-proof signatures |
-| Hashing | SHA-256 | Block hashing, Merkle trees |
-| Mining | Argon2id | ASIC-resistant PoW |
-| Encryption | AES-256-GCM | Wallet encryption |
-| KDF | PBKDF2 (600K) | Password derivation |
-| P2P | TLS 1.3 | Network encryption |
+---
 
-### Trust Model
+## Fluxo de Mineracao
 
-- No central authority
-- Consensus via PoW + PoS
-- Double-spend prevention via UTXO
-- Validator stake as economic security
+```
+1. Minerador seleciona transacoes da mempool
+2. Cria transacao coinbase (recompensa)
+3. Monta bloco com header + transacoes
+4. Calcula Merkle root
+5. Inicia loop de mineracao (Argon2id)
+6. Encontra nonce valido (hash com N zeros)
+7. Transmite bloco compacto
+8. Espera assinaturas de validadores
+9. Adiciona bloco a chain
+```
 
-## Consensus Mechanism
+---
+
+## Modelo de Seguranca
+
+### Primitivas Criptograficas
+
+| Componente | Algoritmo | Finalidade |
+|------------|-----------|------------|
+| Assinaturas | ECDSA (secp256k1) | Autenticacao de transacoes |
+| Quantum | WOTS+ (SHA-256) | Assinaturas futuras |
+| Hashing | SHA-256 | Hash de blocos, Merkle trees |
+| Mineracao | Argon2id | PoW resistente a ASIC |
+| Criptografia | AES-256-GCM | Criptografia de carteira |
+| KDF | PBKDF2 (600K) | Derivacao de senha |
+| P2P | TLS 1.3 | Criptografia de rede |
+
+### Como suas chaves funcionam
+
+```
+Chave Privada (secreta)
+     ↓
+Assina transacoes
+     ↓
+Gera Chave Publica
+     ↓
+Gera Endereco (T1ABC...)
+     ↓
+Other people enviam TRC para este endereco
+```
+
+---
+
+## Modelo de Confiabilidade
+
+- Sem autoridade central
+- Consenso via PoW + PoS
+- Prevencao de double-spend via UTXO
+- Stake dos validadores como seguranca economica
+
+---
+
+## Mecanismo de Consenso
 
 ### PoW (Proof of Work)
 
-- Algorithm: Argon2id
-- Memory: 64MB
-- Time cost: 1 iteration
-- Target: 30 second blocks
+- **Algoritmo:** Argon2id
+- **Memoria:** 64 MB
+- **Custo de tempo:** 1 iteracao
+- **Paralelismo:** 1
+- **Multi-threading:** Usa todas as CPUs
+- **Proposito:** Mineracao resistente a ASIC
 
 ### PoS (Proof of Stake)
 
-- Minimum stake: 100 TRC
-- Selection: Stake-weighted random
-- Threshold: 3 signatures per block
-- Reward: 30% of block reward
+- **Stake minimo:** Dinamico (2x recompensa atual, min 10, max 200 TRC)
+- **Selecao:** Ponderada por stake
+- **Limiar:** 3 assinaturas por bloco
+- **Recompensa:** 30% da recompensa do bloco
 
-### Difficulty Adjustment
+### Delegacao
 
-- Adjusts every 20 blocks
-- Target: 30 second block time
-- Increases if blocks too fast
-- Decreases if blocks too slow
+- **Stake minimo para delegar:** 1 TRC
+- **Comissao do validador:** 10%
+- **Periodo de unbonding:** 7 dias
+- **Max delegacoes:** 100 por endereco
 
-## Network Protocol
+### Ajuste de Dificuldade
 
-### Message Types
+- **Intervalo:** A cada 10 blocos
+- **Alvo:** 5 minutos por bloco
+- **Ajuste:** ±1 baseado na diferenca do tempo
 
-| Type | Direction | Description |
-|------|-----------|-------------|
-| HANDSHAKE | Both | Initial connection |
-| HANDSHAKE_ACK | Both | Connection confirmed |
-| NEW_BLOCK | Broadcast | New block announcement |
-| COMPACT_BLOCK | Broadcast | Block header + tx hashes |
-| NEW_TX | Broadcast | New transaction |
-| GET_CHAIN | Request | Request full chain |
-| CHAIN | Response | Full chain data |
-| REQUEST_SIGNATURE | Request | Validator signature request |
-| BLOCK_SIGNATURE | Response | Validator signature |
+---
+
+## Protocolo de Rede
+
+### Tipos de Mensagem
+
+| Tipo | Direcao | Descricao |
+|------|---------|-----------|
+| HANDSHAKE | Ambos | Conexao inicial com negociacao de versao |
+| HANDSHAKE_ACK | Ambos | Conexao confirmada |
+| BLOCK_ANNOUNCE | Broadcast | Anuncio de bloco (hash + height) |
+| TX_ANNOUNCE | Broadcast | Anuncio de transacao (hash) |
+| NEW_BLOCK | Broadcast | Bloco completo |
+| COMPACT_BLOCK | Broadcast | Header + hashes de tx |
+| NEW_TX | Broadcast | Nova transacao |
+| GET_BLOCK | Request | Solicita bloco especifico |
+| GET_TX | Request | Solicita transacao especifica |
+| GET_CHAIN | Request | Sincronizacao da chain |
+| CHAIN | Response | Dados completos da chain |
+| SYNC_REQUEST | Request | Sincronizacao em lote |
+| SYNC_BLOCK_BATCH | Response | Lote de blocos |
+| REQUEST_SIGNATURE | Request | Solicitacao de assinatura |
+| BLOCK_SIGNATURE | Response | Assinatura do validador |
+| REGISTER_VALIDATOR | Broadcast | Registro de validador |
+| DELEGATE | Broadcast | Delegacao de stake |
+| PING/PONG | Ambos | Keepalive |
 
 ### Rate Limiting
 
-- 100 messages per 10 seconds per peer
-- Automatic ban at -50 reputation score
-- Ban duration: 1 hour (configurable)
+- 200 mensagens por 10 segundos por peer
+- Ban automatico em score de reputacao -50
+- Duracao do ban: 1 hora (configuravel)
+- Cooldown de reconexao: 60 segundos
 
-## Database Schema
+---
 
-### Tables
+## Schema do Banco de Dados
+
+### Tabelas
 
 ```sql
 blocks (height, hash, previous_hash, timestamp, nonce, difficulty, pow_hash, data)
@@ -161,11 +233,73 @@ mempool (tx_hash, sender, recipient, amount, fee, timestamp)
 metadata (key, value)
 ```
 
-### Indexes
+### Indices
 
 ```sql
 idx_tx_sender ON transactions(sender)
 idx_tx_recipient ON transactions(recipient)
 idx_tx_block ON transactions(block_height)
 idx_utxo_sender ON utxos(sender, spent)
+```
+
+---
+
+## Fluxo de Dados
+
+### Transacao
+
+```
+1. Usuario cria transacao
+2. Transacao assinada com ECDSA (+ opcional WOTS+)
+3. Transacao adicionada a mempool
+4. Transacao transmitida para peers
+5. Minerador seleciona transacoes da mempool
+6. Minerador cria bloco com transacoes
+7. Bloco transmitido para a rede
+8. Validadores assinam bloco (PoS)
+9. Bloco adicionado a blockchain
+10. UTXOs atualizados
+```
+
+### Mineracao
+
+```
+1. Minerador seleciona transacoes da mempool
+2. Cria transacao coinbase (recompensa)
+3. Monta bloco com header + transacoes
+4. Calcula Merkle root
+5. Inicia loop de mineracao (Argon2id)
+6. Encontra nonce valido (hash com N zeros)
+7. Transmite bloco compacto
+8. Espera assinaturas de validadores
+9. Adiciona bloco a chain
+```
+
+---
+
+## Prevencao de Problemas
+
+### Double-spend (Gasto duplo)
+
+```
+- UTXO rastreia cada saida de transacao
+- Se um UTXO ja foi gasto, nao pode ser gasto novamente
+- Validacao em tempo real antes de aceitar transacao
+```
+
+### Blocos duplicados
+
+```
+- Verificacao de hash duplicado
+- Verificacao de height duplicado
+- Apenas o primeiro bloco e aceito
+```
+
+### Ataques a rede
+
+```
+- Rate limiting previne DoS
+- Reputacao previne Sybil
+- DHT descentralizado previne Eclipse
+- TLS previne MitM
 ```
