@@ -268,7 +268,11 @@ def cmd_mine(args):
 
     try:
         import asyncio
-        asyncio.run(miner.mine_continuous(w.pubkey_hex(), callback=None))
+
+        async def async_on_block(block):
+            on_block_found(block)
+
+        asyncio.run(miner.mine_continuous(w.pubkey_hex(), callback=async_on_block))
     except KeyboardInterrupt:
         miner.stop()
 
