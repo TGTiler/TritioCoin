@@ -22,6 +22,7 @@ from network.api import TritioAPI
 from network.dht import DHT, get_dht
 from network.discovery import PeerDiscovery
 from network.gossip import GossipNode, GossipProtocol
+from core.delegation import DelegationPool
 
 logging.basicConfig(
     level=logging.INFO,
@@ -103,6 +104,7 @@ class TritioNode(GossipNode):
         self.mempool = Mempool(self.db, self.net_config.mempool_max, self.net_config.min_fee_satoshis)
         self.miner = Miner(self.blockchain, self.mempool)
         self.consensus = ConsensusEngine(self.blockchain)
+        self.delegation_pool = DelegationPool()
         self.p2p = P2PNode(config['host'], config['port'])
         self.p2p.on_message = self._on_msg
 
@@ -241,6 +243,9 @@ class TritioNode(GossipNode):
 
         elif t == "REGISTER_VALIDATOR":
             await self._handle_register_validator(msg)
+
+        elif t == "DELEGATE":
+            await self._handle_delegate(msg)
 
         elif t == "PING":
             await self.p2p.send(peer, {"type": "PONG"})
@@ -515,6 +520,19 @@ class TritioNode(GossipNode):
                     logger.warning(f"Validator registration rejected: {address[:16]}...")
             except Exception as e:
                 logger.error(f"Validator registration error: {e}")
+
+    async def _handle_delegate(self, msg: dict):
+        """Handle delegation broadcast from other nodes."""
+        delegator = msg.get("delegator")
+        validator = msg.get("validator")
+        amount = msg.get("amount", 0)
+
+        if not delegator or not validator or amount <= 0:
+            return
+
+        # Register delegation locally
+        self.delegation_pool.delegate(delegator, validator, amount)
+        logger.info(f"Delegation received: {delegator[:16]}... -> {validator[:16]}... ({amount} TRC)")
 
     async def _auto_connect(self):
         """Auto-connect to network using peer discovery."""
