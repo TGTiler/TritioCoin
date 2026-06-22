@@ -1,55 +1,174 @@
-# Contributing to TritioCoin
+# Como Contribuir com TritioCoin
 
-Thank you for your interest in contributing to TritioCoin!
+Obrigado por querer contribuir com o TritioCoin!
 
-## Getting Started
+---
 
-1. Fork the repository
-2. Clone your fork
-3. Create a feature branch
-4. Make your changes
-5. Submit a pull request
+## Comecando
 
-## Development Setup
+### 1. Fork o repositorio
+
+Vá ao GitHub e clique em "Fork" no canto superior direito.
+
+### 2. Clone seu fork
 
 ```bash
-# Clone your fork
-git clone https://github.com/yourusername/TritioCoin.git
+git clone https://github.com/SEU-USERNAME/TritioCoin.git
 cd TritioCoin
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run tests
-python test_all.py
 ```
 
-## Code Style
+### 3. Crie uma branch de funcionalidade
 
-- Follow PEP 8 for Python code
-- Use type hints where possible
-- Keep functions focused and small
-- Add docstrings for public functions
+```bash
+git checkout -b minha-nova-funcionalidade
+```
 
-## Commit Messages
+### 4. Faca suas mudancas
 
-- Use present tense ("Add feature" not "Added feature")
-- Reference issues when applicable
-- Keep messages concise
+### 5. Envie um Pull Request
+
+---
+
+## Ambiente de Desenvolvimento
+
+### Instalar dependencias
+
+```bash
+pip install -r requirements.txt
+```
+
+### Executar testes
+
+```bash
+# Todos os testes
+python -m pytest tests/ -v
+
+# Testes especificos
+python -m pytest tests/test_wallet.py -v
+python -m pytest tests/test_blockchain.py -v
+```
+
+### Rodar o no localmente
+
+```bash
+# Terminal 1: Iniciar seed
+python main.py --mode miner --become-seed
+
+# Terminal 2: Conectar
+python main.py --mode passive --seed 127.0.0.1:8333
+```
+
+---
+
+## Estrutura do Projeto
+
+```
+TritioCoin/
+├── core/               # Logica principal
+│   ├── blockchain.py   # Gerenciamento da chain
+│   ├── block.py        # Estrutura do bloco
+│   ├── miner.py        # Mineracao Argon2id
+│   ├── wallet.py       # Carteiras criptografadas
+│   ├── transaction.py  # Transacoes
+│   └── ...
+├── network/            # Rede P2P
+│   ├── p2p_node.py     # No P2P
+│   ├── api.py          # API REST
+│   └── dht.py          # Descoberta de peers
+├── main.py             # Ponto de entrada
+├── wallet.py           # CLI da carteira
+└── tests/              # Testes
+```
+
+---
+
+## Estilo de Codigo
+
+### Geral
+- Siga PEP 8 para Python
+- Use type hints quando possivel
+- Mantenha funcoes pequenas e focadas
+- Adicione docstrings para funcoes publicas
+
+### Exemplo de funcao
+```python
+def enviar_transacao(destinatario: str, valor: float) -> bool:
+    """
+    Envia uma transacao TRC.
+    
+    Args:
+        destinatario: Endereco do destinatario
+        valor: Valor em TRC para enviar
+        
+    Returns:
+        True se enviou com sucesso, False caso contrario
+    """
+    # Codigo aqui
+    pass
+```
+
+---
+
+## Mensagens de Commit
+
+- Use presente ("Adiciona feature" nao "Adicionou feature")
+- Referencie issues quando aplicavel
+- Mantenha mensagens curtas
+
+### Exemplos
+```
+Adiciona validacao de saldo antes de enviar
+Corrige bug na mineracao de blocos duplicados
+Atualiza documentacao da API
+```
+
+---
 
 ## Pull Requests
 
-1. Update documentation if needed
-2. Add tests for new features
-3. Ensure all tests pass
-4. Keep PRs focused on one feature
+1. Atualize a documentacao se necessario
+2. Adicione testes para novas funcionalidades
+3. Certifique-se de que todos os testes passam
+4. Mantenha PRs focados em uma feature
 
-## Reporting Issues
+### Checklist antes de enviar PR
+- [ ] Todos os testes passam: `python -m pytest tests/ -v`
+- [ ] Codigo segue PEP 8
+- [ ] Documentacao atualizada
+- [ ] Testes adicionados para mudancas
+- [ ] Commit messages claras
 
-- Use GitHub Issues
-- Include steps to reproduce
-- Include Python version and OS
+---
 
-## License
+## Reportar Bugs
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+Use GitHub Issues e inclua:
+- Descricao do bug
+- Passos para reproduzir
+- Comportamento esperado
+- Versao do Python e SO
+
+---
+
+## Areas para Contribuir
+
+### Para iniciantes
+- Corrigir erros de digitacao na documentacao
+- Adicionar exemplos de uso
+- Melhorar mensagens de erro
+
+### Para desenvolvedores intermediarios
+- Adicionar testes unitarios
+- Melhorar tratamento de erros
+- Otimizar performance
+
+### Para desenvolvedores avancados
+- Implementar novas features
+- Melhorar seguranca
+- Otimizar algoritmos
+
+---
+
+## Licenca
+
+Ao contribuir, voce concorda que suas contribuicoes serao licenciadas sob a MIT License.
