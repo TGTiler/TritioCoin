@@ -125,6 +125,16 @@ class TritioAPI:
         stats["websocket_clients"] = len(self.ws_clients)
         stats["dht"] = self.node.dht.get_stats() if hasattr(self.node, 'dht') else {}
         stats["external_address"] = self.node.p2p.get_external_address()
+
+        # Add validator stats
+        if hasattr(self.node, 'consensus'):
+            validator_stats = self.node.consensus.get_validator_stats()
+            stats["active_validators"] = validator_stats.get("active_validators", 0)
+            stats["total_stake"] = validator_stats.get("total_stake", 0)
+        else:
+            stats["active_validators"] = 0
+            stats["total_stake"] = 0
+
         return web.json_response(stats)
 
     async def handle_block(self, request):
@@ -254,8 +264,14 @@ class TritioAPI:
         return web.Response(text="Explorer not found", status=404)
 
     async def start(self):
-        runner = web.AppRunner(self.app)
-        await runner.setup()
-        site = web.TCPSite(runner, self.host, self.port)
-        await site.start()
-        logger.info(f"API listening on http://{self.host}:{self.port}")
+        try:
+            runner = web.AppRunner(self.app)
+            await runner.setup()
+            site = web.TCPSite(runner, self.host, self.port)
+            await site.start()
+            logger.info(f"API listening on http://{self.host}:{self.port}")
+        except OSError as e:
+            if "10048" in str(e):
+                logger.warning(f"Porta {self.port} ja esta em uso. API desabilitada.")
+            else:
+                logger.error(f"API error: {e}")
