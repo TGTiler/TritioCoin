@@ -7,6 +7,7 @@ import asyncio
 import logging
 from aiohttp import web
 from pathlib import Path
+from core.constants import SATOSHIS_PER_TRC
 
 logger = logging.getLogger("API")
 
@@ -225,16 +226,53 @@ class TritioAPI:
             data = await request.json()
             address = data.get("address")
             stake = data.get("stake", 0)
+            pubkey = data.get("pubkey")
+
+            if not address:
+                return web.json_response({"error": "Address required"}, status=400)
+
             if stake < self.node.consensus.min_stake:
-                return web.json_response({"error": "Insufficient stake"}, status=400)
+                return web.json_response({"error": f"Minimum stake: {self.node.consensus.min_stake} TRC"}, status=400)
+
+            # Check balance
+            from core.constants import trc_to_satoshis
+            balance = self.node.blockchain.balance_satoshis(address)
+            needed = trc_to_satoshis(stake)
+            if balance < needed:
+                return web.json_response({
+                    "error": f"Insufficient balance: {balance/SATOSHIS_PER_TRC:.8f} < {stake}"
+                }, status=400)
+
+            # Deduct stake from balance
+            self.node.blockchain._debit_satoshis(address, needed)
+
+            # Register locally
+            from core.wallet import Wallet
+            if pubkey:
+                import ecdsa
+                vk = ecdsa.VerifyingKey.from_string(bytes.fromhex(pubkey), curve=ecdsa.SECP256k1)
+                w = Wallet.__new__(Wallet)
+                w.private_key = None
+                w.public_key = vk
+                w.address = address
+                w.quantum_mode = False
+                w.hybrid_keys = None
+                w.mnemonic = None
+                self.node.consensus.register_validator(w, stake)
+
             # Broadcast registration
             await self.node.p2p.broadcast({
                 "type": "REGISTER_VALIDATOR",
                 "address": address,
                 "stake": stake,
-                "pubkey": data.get("pubkey")
+                "pubkey": pubkey
             })
-            return web.json_response({"status": "ok"})
+            return web.json_response({
+                "status": "ok",
+                "address": address,
+                "stake": stake,
+                "remaining_balance": (balance - needed) / SATOSHIS_PER_TRC
+            })
         except Exception as e:
             return web.json_response({"error": str(e)}, status=500)
 
