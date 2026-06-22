@@ -39,12 +39,37 @@ class ConsensusEngine:
     Anti-ASIC: validadores assinam blocos com ECDSA, sem necessidade de poder computacional.
     """
 
+    # Stake minimo como multiplo da recompensa atual
+    MIN_STAKE_MULTIPLIER = 2  # min_stake = recompensa * 2
+    MIN_STAKE_FLOOR = 10.0    # Nunca menos que 10 TRC
+    MIN_STAKE_CEILING = 200.0 # Nunca mais que 200 TRC
+
     def __init__(self, blockchain: Blockchain):
         self.blockchain = blockchain
         self.validators: Dict[str, Validator] = {}
-        self.min_stake = 100.0  # stake mínimo para ser validador
-        self.epoch_length = 50  # blocos por epoch
-        self.signature_threshold = 3  # assinaturas mínimas para confirmar bloco
+        self.epoch_length = 50
+        self.signature_threshold = 3
+
+    @property
+    def min_stake(self) -> float:
+        """Stake minimo dinamico baseado na recompensa atual da rede."""
+        reward = self.blockchain.reward_at()
+        dynamic = reward * self.MIN_STAKE_MULTIPLIER
+        return max(self.MIN_STAKE_FLOOR, min(self.MIN_STAKE_CEILING, dynamic))
+
+    def get_stake_info(self) -> dict:
+        """Retorna informacoes sobre o stake minimo dinamico."""
+        reward = self.blockchain.reward_at()
+        halvings = self.blockchain.height() // self.blockchain.config.halving_interval
+        return {
+            "min_stake": self.min_stake,
+            "current_reward": reward,
+            "multiplier": self.MIN_STAKE_MULTIPLIER,
+            "floor": self.MIN_STAKE_FLOOR,
+            "ceiling": self.MIN_STAKE_CEILING,
+            "halvings": halvings,
+            "next_halving": self.blockchain.halving_at()
+        }
 
     def register_validator(self, wallet: Wallet, stake: float) -> bool:
         """Registra um novo validador na rede."""
@@ -190,7 +215,8 @@ class ConsensusEngine:
             "total_stake": total_stake,
             "total_blocks_signed": total_signed,
             "min_stake": self.min_stake,
-            "signature_threshold": self.signature_threshold
+            "signature_threshold": self.signature_threshold,
+            "stake_info": self.get_stake_info()
         }
 
     def distribute_block_rewards(self, block: Block):
