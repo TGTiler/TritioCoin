@@ -46,16 +46,30 @@ def atomic_write(path: Path, data):
     os.replace(str(tmp), str(path))
 
 
-def load_seeds_config() -> list:
-    """Load optional seed nodes (fallback for DHT bootstrap)."""
+def load_seeds_config() -> dict:
+    """Load seeds config as dict with 'seeds' list and optional 'my_role'."""
+    config = {"seeds": [], "my_role": "peer"}
     if SEEDS_FILE.exists():
         try:
             with open(SEEDS_FILE) as f:
                 data = json.load(f)
-                return data.get("seeds", []) if isinstance(data, dict) else data
+                if isinstance(data, dict):
+                    config["seeds"] = data.get("seeds", [])
+                    config["my_role"] = data.get("my_role", "peer")
+                elif isinstance(data, list):
+                    config["seeds"] = data
         except Exception:
             pass
-    return []
+    return config
+
+
+def save_seeds_config(config: dict):
+    """Save seeds config to file."""
+    try:
+        with open(SEEDS_FILE, 'w') as f:
+            json.dump(config, f, indent=2)
+    except Exception as e:
+        logger.error(f"Failed to save seeds config: {e}")
 
 
 def get_random_seed(seeds: list) -> str:
@@ -105,6 +119,7 @@ class TritioNode(GossipNode):
         self.api = None
         self.orphan_pool: dict = {}
         self.max_orphans = 50
+        self._pending_signatures: dict = {}
 
         logger.info(f"Node started | Network: {self.network} | Mode: {self.mode} | "
                     f"Quantum: {'ON' if self.quantum else 'OFF'} | "
@@ -140,7 +155,6 @@ class TritioNode(GossipNode):
         password = os.environ.get("TRC_PASSWORD", "tritiocoin123")
         w.save(str(path), password)
         logger.info(f"New wallet created: {w.address}")
-        return w
         return w
 
     def _load_chain(self) -> Blockchain:
@@ -465,9 +479,6 @@ class TritioNode(GossipNode):
             return
 
         logger.info(f"Validator signature received: {address[:16]}... on block #{block_index}")
-        # Store signature for later inclusion
-        if not hasattr(self, '_pending_signatures'):
-            self._pending_signatures = {}
         if block_hash not in self._pending_signatures:
             self._pending_signatures[block_hash] = []
         self._pending_signatures[block_hash].append({
@@ -484,15 +495,26 @@ class TritioNode(GossipNode):
         if not address or stake < self.consensus.min_stake:
             return
 
-        # Create a temporary wallet for the validator
-        from core.wallet import Wallet as W
         if pubkey:
             try:
+                from core.wallet import Wallet
                 vk = ecdsa.VerifyingKey.from_string(bytes.fromhex(pubkey), curve=ecdsa.SECP256k1)
-                # Validator registered
-                logger.info(f"Validator registered: {address[:16]}... stake={stake}")
-            except Exception:
-                pass
+                w = Wallet.__new__(Wallet)
+                w.private_key = None
+                w.public_key = vk
+                w.address = address
+                w.quantum_mode = False
+                w.hybrid_keys = None
+                w.mnemonic = None
+
+                if self.consensus.register_validator(w, stake):
+                    logger.info(f"Validator registered: {address[:16]}... stake={stake} TRC")
+                    # Broadcast to other peers
+                    await self.p2p.broadcast(msg)
+                else:
+                    logger.warning(f"Validator registration rejected: {address[:16]}...")
+            except Exception as e:
+                logger.error(f"Validator registration error: {e}")
 
     async def _auto_connect(self):
         """Auto-connect to network using peer discovery."""
@@ -528,13 +550,6 @@ class TritioNode(GossipNode):
 
         logger.info(f"Connected to {connected} peers")
         return [(p.split(':')[0], int(p.split(':')[1])) for p in peers if ':' in p]
-
-        # Return all seeds for reconnect loop
-        seed_pairs = []
-        for s in all_seeds:
-            parts = s.split(':')
-            seed_pairs.append((parts[0], int(parts[1]) if len(parts) > 1 else 8333))
-        return seed_pairs
 
     async def become_seed(self):
         """Promote this node to seed status."""
@@ -581,8 +596,8 @@ class TritioNode(GossipNode):
         from network.dht import NodeInfo
         known_nodes = []
 
-        # Add seeds from seeds_config (already a list)
-        for seed_addr in self.seeds_config:
+        # Add seeds from seeds_config
+        for seed_addr in self.seeds_config.get("seeds", []):
             try:
                 parts = seed_addr.split(':')
                 if len(parts) == 2:
@@ -683,9 +698,8 @@ class TritioNode(GossipNode):
         await asyncio.sleep(0.5)
 
         # Add any pending signatures
-        pending = getattr(self, '_pending_signatures', {})
-        if block.hash in pending:
-            block.validator_signatures.extend(pending.pop(block.hash))
+        if block.hash in self._pending_signatures:
+            block.validator_signatures.extend(self._pending_signatures.pop(block.hash))
 
         if self.blockchain.add_block(block):
             self.blockchain.adjust_difficulty()
