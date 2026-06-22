@@ -30,6 +30,9 @@ echo   [MINERACAO]
 echo   12. Minerar blocos
 echo   13. Minerar e virar SEED
 echo.
+echo   [UTILITARIOS]
+echo   14. Parar todos os processos
+echo.
 echo   0. Sair
 echo.
 echo  ============================================
@@ -48,6 +51,7 @@ if "%opcao%"=="10" goto INFO
 if "%opcao%"=="11" goto PEERS
 if "%opcao%"=="12" goto MINERAR
 if "%opcao%"=="13" goto MINERAR_SEED
+if "%opcao%"=="14" goto PARAR
 if "%opcao%"=="0" goto SAIR
 
 echo Opcao invalida!
@@ -194,6 +198,18 @@ set /p porta="  Porta (padrao 8333): "
 if "%porta%"=="" set porta=8333
 echo.
 python main.py --port %porta% --mode miner --become-seed
+pause
+goto MENU
+
+:PARAR
+cls
+echo.
+echo  Parando todos os processos TritioCoin...
+echo.
+taskkill /F /IM python.exe >nul 2>&1
+timeout /t 2 >nul
+echo  Processos parados!
+echo.
 pause
 goto MENU
 
