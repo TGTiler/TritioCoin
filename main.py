@@ -21,6 +21,7 @@ from network.p2p_node import P2PNode
 from network.api import TritioAPI
 from network.dht import DHT, get_dht
 from network.discovery import PeerDiscovery
+from network.gossip import GossipNode, GossipProtocol
 
 logging.basicConfig(
     level=logging.INFO,
@@ -64,8 +65,9 @@ def get_random_seed(seeds: list) -> str:
     return random.choice(seeds)
 
 
-class TritioNode:
+class TritioNode(GossipNode):
     def __init__(self, config: dict):
+        GossipNode.__init__(self)
         self.config = config
         self.running = False
         self.quantum = config.get('quantum', False)
@@ -77,7 +79,6 @@ class TritioNode:
         # Network configuration
         self.net_config = get_network(self.network)
         if self.network == "testnet":
-            # Testnet uses separate data directory
             self.db = Database(DATA_DIR / "testnet.db")
         else:
             self.db = Database(DATA_DIR / "mainnet.db")
@@ -161,54 +162,85 @@ class TritioNode:
         atomic_write(self._chain_path(), bc.serialize())
 
     async def _on_msg(self, msg: dict, peer: str, writer):
+        # First try gossip protocol
+        if await self.gossip_handle_message(msg, peer, writer):
+            return
+
         t = msg.get("type")
         if t == "HANDSHAKE":
             await self.p2p.send(peer, {"type": "HANDSHAKE_ACK",
-                                        "version": 1,
+                                        "version": 2,
                                         "height": self.blockchain.height(),
                                         "role": self.seeds_config.get("my_role", "peer"),
-                                        "seeds": self.seeds_config.get("seeds", [])})
+                                        "seeds": self.seeds_config.get("seeds", []),
+                                        "gossip": True})
             if msg.get("role") == "seed" and not self.is_seed:
                 await self.p2p.send(peer, {"type": "GET_CHAIN"})
-            # Sync seeds from handshake
             remote_seeds = msg.get("seeds", [])
             await self._merge_seeds(remote_seeds)
+
         elif t == "HANDSHAKE_ACK":
             role = msg.get("role", "peer")
             height = msg.get("height", "?")
             logger.info(f"Connected to {peer} (height={height}, role={role})")
             if isinstance(height, int) and height > self.blockchain.height():
-                await self.p2p.send(peer, {"type": "GET_CHAIN"})
-            # Sync seeds from handshake ack
+                await self.start_sync(peer, height)
             remote_seeds = msg.get("seeds", [])
             await self._merge_seeds(remote_seeds)
+
         elif t == "NEW_BLOCK":
             await self._handle_block(msg.get("block"))
+
         elif t == "COMPACT_BLOCK":
             await self._handle_compact_block(msg)
+
         elif t == "GET_BLOCK":
             await self._handle_get_block(msg, peer)
+
         elif t == "NEW_TX":
             await self._handle_tx(msg.get("tx"))
+
+        elif t == "GET_TX":
+            await self._handle_get_tx(msg, peer)
+
         elif t == "GET_CHAIN":
             await self.p2p.send(peer, {"type": "CHAIN",
                                         "chain": self.blockchain.serialize()})
+
         elif t == "CHAIN":
             await self._handle_chain(msg.get("chain"))
+
         elif t == "SEED_ANNOUNCE":
             await self._handle_seed_announce(msg)
+
         elif t == "SEED_REMOVE":
             await self._handle_seed_remove(msg)
+
         elif t == "SEED_SYNC":
             await self._handle_seed_sync(msg, peer)
+
         elif t == "REQUEST_SIGNATURE":
             await self._handle_request_signature(msg, peer)
+
         elif t == "BLOCK_SIGNATURE":
             await self._handle_block_signature(msg)
+
         elif t == "REGISTER_VALIDATOR":
             await self._handle_register_validator(msg)
+
         elif t == "PING":
             await self.p2p.send(peer, {"type": "PONG"})
+
+    async def _handle_get_tx(self, msg: dict, peer: str):
+        """Respond to GET_TX request with full transaction."""
+        tx_hash = msg.get("tx_hash")
+        if not tx_hash:
+            return
+
+        for tx_data in self.mempool.get():
+            if tx_data.get("tx_hash") == tx_hash:
+                await self.p2p.send(peer, {"type": "NEW_TX", "tx": tx_data})
+                return
 
     async def _handle_block(self, block_data: dict):
         if not block_data:
@@ -231,9 +263,23 @@ class TritioNode:
                 [tx.get("hash") for tx in block.transactions if tx.get("hash")]
             )
             logger.info(f"Block #{block.header.index} accepted (height={self.blockchain.height()})")
+
+            # Announce block via gossip
+            await self.gossip_announce_block(block.hash, block.header.index)
+
+            # Broadcast to WebSocket clients
+            if self.api:
+                await self.api.broadcast_ws({
+                    "type": "new_block",
+                    "height": block.header.index,
+                    "hash": block.hash,
+                    "tx_count": len(block.transactions)
+                })
+
+            # Try to connect orphans
+            await self._connect_orphans()
         else:
             logger.info(f"Block #{block.header.index} rejected (duplicate or invalid)")
-            # Broadcast to WebSocket clients
             if self.api:
                 await self.api.broadcast_ws({
                     "type": "new_block",
@@ -322,6 +368,11 @@ class TritioNode:
         tx = Transaction.from_dict(tx_data)
         if self.mempool.add(tx, self.blockchain.balance):
             logger.info(f"Tx accepted: {tx}")
+
+            # Announce via gossip
+            if tx.tx_hash:
+                await self.gossip_announce_tx(tx.tx_hash)
+
             # Broadcast to WebSocket clients
             if self.api:
                 await self.api.broadcast_ws({
@@ -603,53 +654,68 @@ class TritioNode:
     async def _mining_loop(self):
         while self.running:
             if self.mode == 'miner':
-                block = self.miner.mine(self.wallet.pubkey_hex())
+                block = await self.miner.mine_async(self.wallet.pubkey_hex())
                 if block:
-                    # Sign with miner key
-                    block_data = f"{block.header.index}{block.hash}".encode()
-                    sig = self.wallet.sign_tx(hashlib.sha256(block_data).digest())
-                    block.validator_signatures.append({
-                        "address": self.wallet.address,
-                        "signature": sig["ecdsa_signature"].hex(),
-                        "signature_mode": sig["signature_mode"]
-                    })
+                    await self._process_mined_block(block)
 
-                    # Request validator signatures
-                    await self.p2p.broadcast({
-                        "type": "REQUEST_SIGNATURE",
-                        "block": block.serialize()
-                    })
-
-                    # Wait briefly for signatures
-                    await asyncio.sleep(0.5)
-
-                    # Add any pending signatures
-                    pending = getattr(self, '_pending_signatures', {})
-                    if block.hash in pending:
-                        block.validator_signatures.extend(pending.pop(block.hash))
-
-                    if self.blockchain.add_block(block):
-                        self.blockchain.adjust_difficulty()
-                        # Broadcast compact block
-                        tx_hashes = [tx.get("hash") for tx in block.transactions]
-                        compact = {
-                            "type": "COMPACT_BLOCK",
-                            "header": block.serialize()["header"],
-                            "tx_hashes": tx_hashes,
-                            "pow_hash": block.pow_hash,
-                            "hash": block.hash,
-                            "validator_signatures": block.validator_signatures
-                        }
-                        await self.p2p.broadcast(compact)
-
-                        # Distribute rewards
-                        self.consensus.distribute_block_rewards(block)
-
-            # Validator mode: sign blocks received
             elif self.mode == 'validator':
                 await asyncio.sleep(1)
 
             await asyncio.sleep(0.1)
+
+    async def _process_mined_block(self, block):
+        # Sign with miner key
+        block_data = f"{block.header.index}{block.hash}".encode()
+        sig = self.wallet.sign_tx(hashlib.sha256(block_data).digest())
+        block.validator_signatures.append({
+            "address": self.wallet.address,
+            "signature": sig["ecdsa_signature"].hex(),
+            "signature_mode": sig["signature_mode"]
+        })
+
+        # Request validator signatures
+        await self.p2p.broadcast({
+            "type": "REQUEST_SIGNATURE",
+            "block": block.serialize()
+        })
+
+        # Wait briefly for signatures
+        await asyncio.sleep(0.5)
+
+        # Add any pending signatures
+        pending = getattr(self, '_pending_signatures', {})
+        if block.hash in pending:
+            block.validator_signatures.extend(pending.pop(block.hash))
+
+        if self.blockchain.add_block(block):
+            self.blockchain.adjust_difficulty()
+
+            # Announce block via gossip
+            await self.gossip_announce_block(block.hash, block.header.index)
+
+            # Broadcast compact block
+            tx_hashes = [tx.get("hash") for tx in block.transactions]
+            compact = {
+                "type": "COMPACT_BLOCK",
+                "header": block.serialize()["header"],
+                "tx_hashes": tx_hashes,
+                "pow_hash": block.pow_hash,
+                "hash": block.hash,
+                "validator_signatures": block.validator_signatures
+            }
+            await self.p2p.broadcast(compact)
+
+            # Distribute rewards
+            self.consensus.distribute_block_rewards(block)
+
+            # Broadcast to WebSocket
+            if self.api:
+                await self.api.broadcast_ws({
+                    "type": "new_block",
+                    "height": block.header.index,
+                    "hash": block.hash,
+                    "tx_count": len(block.transactions)
+                })
 
     def _on_peer_found(self, peer_addr: str):
         """Callback when DHT discovers a new peer."""
