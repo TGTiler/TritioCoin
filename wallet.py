@@ -36,7 +36,16 @@ def get_wallet(quantum=False, password=None) -> Wallet:
     name = "wallet_quantum.json" if quantum else "wallet.json"
     path = DATA_DIR / name
     if path.exists():
-        return Wallet.load(str(path), password)
+        try:
+            return Wallet.load(str(path), password)
+        except Exception as e:
+            error_str = str(e)
+            if "InvalidTag" in error_str or "decrypt" in error_str.lower():
+                print("ERRO: Senha incorreta!")
+                print("A carteira esta criptografada com outra senha.")
+                print("Tente novamente com a senha correta.")
+                sys.exit(1)
+            raise
     w = Wallet.create(quantum)
     DATA_DIR.mkdir(exist_ok=True)
     return w
