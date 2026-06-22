@@ -1425,3 +1425,342 @@ KeyboardInterrupt
 2026-06-21 22:46:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
 2026-06-21 22:46:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
 2026-06-21 22:46:12 [ERROR] P2P: Read error from 192.168.0.108:56894: 'list' object has no attribute 'get'
+2026-06-21 22:46:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:46:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:46:34 [ERROR] P2P: Read error from 192.168.0.108:56899: 'list' object has no attribute 'get'
+2026-06-21 22:46:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:46:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:46:42 [ERROR] P2P: Read error from 192.168.0.108:56900: 'list' object has no attribute 'get'
+2026-06-21 22:47:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:47:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:47:04 [ERROR] P2P: Read error from 192.168.0.108:56902: 'list' object has no attribute 'get'
+2026-06-21 22:47:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:47:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:47:12 [ERROR] P2P: Read error from 192.168.0.108:56905: 'list' object has no attribute 'get'
+2026-06-21 22:47:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:47:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:47:34 [ERROR] P2P: Read error from 192.168.0.108:56911: 'list' object has no attribute 'get'
+2026-06-21 22:47:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:47:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:47:42 [ERROR] P2P: Read error from 192.168.0.108:56912: 'list' object has no attribute 'get'
+2026-06-21 22:48:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:48:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:48:04 [ERROR] P2P: Read error from 192.168.0.108:56915: 'list' object has no attribute 'get'
+2026-06-21 22:48:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:48:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:48:12 [ERROR] P2P: Read error from 192.168.0.108:56919: 'list' object has no attribute 'get'
+2026-06-21 22:48:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:48:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:48:34 [ERROR] P2P: Read error from 192.168.0.108:56922: 'list' object has no attribute 'get'
+2026-06-21 22:48:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:48:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:48:42 [ERROR] P2P: Read error from 192.168.0.108:56927: 'list' object has no attribute 'get'
+2026-06-21 22:49:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:49:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:49:04 [ERROR] P2P: Read error from 192.168.0.108:56934: 'list' object has no attribute 'get'
+2026-06-21 22:49:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:49:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:49:12 [ERROR] P2P: Read error from 192.168.0.108:56946: 'list' object has no attribute 'get'
+2026-06-21 22:49:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:49:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:49:34 [ERROR] P2P: Read error from 192.168.0.108:56950: 'list' object has no attribute 'get'
+2026-06-21 22:49:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:49:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:49:42 [ERROR] P2P: Read error from 192.168.0.108:56951: 'list' object has no attribute 'get'
+2026-06-21 22:50:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:50:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:50:04 [ERROR] P2P: Read error from 192.168.0.108:56961: 'list' object has no attribute 'get'
+2026-06-21 22:50:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:50:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:50:12 [ERROR] P2P: Read error from 192.168.0.108:56964: 'list' object has no attribute 'get'
+2026-06-21 22:50:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:50:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:50:34 [ERROR] P2P: Read error from 192.168.0.108:56978: 'list' object has no attribute 'get'
+2026-06-21 22:50:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:50:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:50:42 [ERROR] P2P: Read error from 192.168.0.108:56979: 'list' object has no attribute 'get'
+2026-06-21 22:51:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:51:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:51:04 [ERROR] P2P: Read error from 192.168.0.108:56986: 'list' object has no attribute 'get'
+2026-06-21 22:51:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:51:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:51:12 [ERROR] P2P: Read error from 192.168.0.108:56989: 'list' object has no attribute 'get'
+2026-06-21 22:51:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:51:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:51:34 [ERROR] P2P: Read error from 192.168.0.108:56993: 'list' object has no attribute 'get'
+2026-06-21 22:51:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:51:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:51:42 [ERROR] P2P: Read error from 192.168.0.108:56995: 'list' object has no attribute 'get'
+2026-06-21 22:52:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:52:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:52:04 [ERROR] P2P: Read error from 192.168.0.108:56996: 'list' object has no attribute 'get'
+2026-06-21 22:52:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:52:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:52:12 [ERROR] P2P: Read error from 192.168.0.108:56999: 'list' object has no attribute 'get'
+2026-06-21 22:52:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:52:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:52:34 [ERROR] P2P: Read error from 192.168.0.108:57003: 'list' object has no attribute 'get'
+2026-06-21 22:52:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:52:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:52:42 [ERROR] P2P: Read error from 192.168.0.108:57005: 'list' object has no attribute 'get'
+2026-06-21 22:53:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:53:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:53:04 [ERROR] P2P: Read error from 192.168.0.108:57011: 'list' object has no attribute 'get'
+2026-06-21 22:53:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:53:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:53:12 [ERROR] P2P: Read error from 192.168.0.108:57014: 'list' object has no attribute 'get'
+2026-06-21 22:53:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:53:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:53:34 [ERROR] P2P: Read error from 192.168.0.108:57054: 'list' object has no attribute 'get'
+2026-06-21 22:53:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:53:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:53:42 [ERROR] P2P: Read error from 192.168.0.108:57055: 'list' object has no attribute 'get'
+2026-06-21 22:54:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:54:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:54:04 [ERROR] P2P: Read error from 192.168.0.108:57056: 'list' object has no attribute 'get'
+2026-06-21 22:54:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:54:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:54:12 [ERROR] P2P: Read error from 192.168.0.108:57060: 'list' object has no attribute 'get'
+2026-06-21 22:54:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:54:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:54:34 [ERROR] P2P: Read error from 192.168.0.108:57064: 'list' object has no attribute 'get'
+2026-06-21 22:54:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:54:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:54:42 [ERROR] P2P: Read error from 192.168.0.108:57066: 'list' object has no attribute 'get'
+2026-06-21 22:55:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:55:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:55:04 [ERROR] P2P: Read error from 192.168.0.108:57068: 'list' object has no attribute 'get'
+2026-06-21 22:55:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:55:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:55:12 [ERROR] P2P: Read error from 192.168.0.108:57071: 'list' object has no attribute 'get'
+2026-06-21 22:55:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:55:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:55:34 [ERROR] P2P: Read error from 192.168.0.108:57074: 'list' object has no attribute 'get'
+2026-06-21 22:55:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:55:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:55:42 [ERROR] P2P: Read error from 192.168.0.108:57075: 'list' object has no attribute 'get'
+2026-06-21 22:56:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:56:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:56:04 [ERROR] P2P: Read error from 192.168.0.108:57079: 'list' object has no attribute 'get'
+2026-06-21 22:56:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:56:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:56:12 [ERROR] P2P: Read error from 192.168.0.108:57082: 'list' object has no attribute 'get'
+2026-06-21 22:56:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:56:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:56:34 [ERROR] P2P: Read error from 192.168.0.108:57086: 'list' object has no attribute 'get'
+2026-06-21 22:56:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:56:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:56:42 [ERROR] P2P: Read error from 192.168.0.108:57087: 'list' object has no attribute 'get'
+2026-06-21 22:57:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:57:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:57:04 [ERROR] P2P: Read error from 192.168.0.108:57089: 'list' object has no attribute 'get'
+2026-06-21 22:57:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:57:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:57:12 [ERROR] P2P: Read error from 192.168.0.108:57092: 'list' object has no attribute 'get'
+2026-06-21 22:57:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:57:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:57:34 [ERROR] P2P: Read error from 192.168.0.108:57098: 'list' object has no attribute 'get'
+2026-06-21 22:57:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:57:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:57:42 [ERROR] P2P: Read error from 192.168.0.108:57101: 'list' object has no attribute 'get'
+2026-06-21 22:58:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:58:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:58:04 [ERROR] P2P: Read error from 192.168.0.108:57104: 'list' object has no attribute 'get'
+2026-06-21 22:58:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:58:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:58:12 [ERROR] P2P: Read error from 192.168.0.108:57109: 'list' object has no attribute 'get'
+2026-06-21 22:58:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:58:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:58:34 [ERROR] P2P: Read error from 192.168.0.108:57113: 'list' object has no attribute 'get'
+2026-06-21 22:58:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:58:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:58:42 [ERROR] P2P: Read error from 192.168.0.108:57114: 'list' object has no attribute 'get'
+2026-06-21 22:59:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:59:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:59:04 [ERROR] P2P: Read error from 192.168.0.108:57128: 'list' object has no attribute 'get'
+2026-06-21 22:59:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:59:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:59:12 [ERROR] P2P: Read error from 192.168.0.108:57132: 'list' object has no attribute 'get'
+2026-06-21 22:59:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:59:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:59:34 [ERROR] P2P: Read error from 192.168.0.108:57137: 'list' object has no attribute 'get'
+2026-06-21 22:59:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 22:59:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 22:59:42 [ERROR] P2P: Read error from 192.168.0.108:57138: 'list' object has no attribute 'get'
+2026-06-21 23:00:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:00:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:00:04 [ERROR] P2P: Read error from 192.168.0.108:57141: 'list' object has no attribute 'get'
+2026-06-21 23:00:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:00:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:00:12 [ERROR] P2P: Read error from 192.168.0.108:57145: 'list' object has no attribute 'get'
+2026-06-21 23:00:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:00:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:00:34 [ERROR] P2P: Read error from 192.168.0.108:57156: 'list' object has no attribute 'get'
+2026-06-21 23:00:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:00:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:00:42 [ERROR] P2P: Read error from 192.168.0.108:57158: 'list' object has no attribute 'get'
+2026-06-21 23:01:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:01:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:01:04 [ERROR] P2P: Read error from 192.168.0.108:57162: 'list' object has no attribute 'get'
+2026-06-21 23:01:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:01:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:01:12 [ERROR] P2P: Read error from 192.168.0.108:57166: 'list' object has no attribute 'get'
+2026-06-21 23:01:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:01:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:01:34 [ERROR] P2P: Read error from 192.168.0.108:57170: 'list' object has no attribute 'get'
+2026-06-21 23:01:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:01:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:01:42 [ERROR] P2P: Read error from 192.168.0.108:57171: 'list' object has no attribute 'get'
+2026-06-21 23:02:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:02:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:02:04 [ERROR] P2P: Read error from 192.168.0.108:57178: 'list' object has no attribute 'get'
+2026-06-21 23:02:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:02:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:02:12 [ERROR] P2P: Read error from 192.168.0.108:57184: 'list' object has no attribute 'get'
+2026-06-21 23:02:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:02:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:02:34 [ERROR] P2P: Read error from 192.168.0.108:57187: 'list' object has no attribute 'get'
+2026-06-21 23:02:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:02:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:02:42 [ERROR] P2P: Read error from 192.168.0.108:57188: 'list' object has no attribute 'get'
+2026-06-21 23:03:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:03:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:03:04 [ERROR] P2P: Read error from 192.168.0.108:57191: 'list' object has no attribute 'get'
+2026-06-21 23:03:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:03:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:03:12 [ERROR] P2P: Read error from 192.168.0.108:57195: 'list' object has no attribute 'get'
+2026-06-21 23:03:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:03:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:03:34 [ERROR] P2P: Read error from 192.168.0.108:57198: 'list' object has no attribute 'get'
+2026-06-21 23:03:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:03:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:03:42 [ERROR] P2P: Read error from 192.168.0.108:57200: 'list' object has no attribute 'get'
+2026-06-21 23:04:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:04:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:04:04 [ERROR] P2P: Read error from 192.168.0.108:57201: 'list' object has no attribute 'get'
+2026-06-21 23:04:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:04:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:04:12 [ERROR] P2P: Read error from 192.168.0.108:57206: 'list' object has no attribute 'get'
+2026-06-21 23:04:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:04:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:04:34 [ERROR] P2P: Read error from 192.168.0.108:57211: 'list' object has no attribute 'get'
+2026-06-21 23:04:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:04:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:04:42 [ERROR] P2P: Read error from 192.168.0.108:57213: 'list' object has no attribute 'get'
+2026-06-21 23:05:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:05:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:05:04 [ERROR] P2P: Read error from 192.168.0.108:57218: 'list' object has no attribute 'get'
+2026-06-21 23:05:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:05:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:05:12 [ERROR] P2P: Read error from 192.168.0.108:57221: 'list' object has no attribute 'get'
+2026-06-21 23:05:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:05:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:05:34 [ERROR] P2P: Read error from 192.168.0.108:57229: 'list' object has no attribute 'get'
+2026-06-21 23:05:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:05:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:05:42 [ERROR] P2P: Read error from 192.168.0.108:57230: 'list' object has no attribute 'get'
+2026-06-21 23:06:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:06:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:06:04 [ERROR] P2P: Read error from 192.168.0.108:57239: 'list' object has no attribute 'get'
+2026-06-21 23:06:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:06:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:06:12 [ERROR] P2P: Read error from 192.168.0.108:57243: 'list' object has no attribute 'get'
+2026-06-21 23:06:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:06:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:06:34 [ERROR] P2P: Read error from 192.168.0.108:57247: 'list' object has no attribute 'get'
+2026-06-21 23:06:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:06:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:06:42 [ERROR] P2P: Read error from 192.168.0.108:57249: 'list' object has no attribute 'get'
+2026-06-21 23:07:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:07:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:07:04 [ERROR] P2P: Read error from 192.168.0.108:57254: 'list' object has no attribute 'get'
+2026-06-21 23:07:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:07:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:07:12 [ERROR] P2P: Read error from 192.168.0.108:57257: 'list' object has no attribute 'get'
+2026-06-21 23:07:34 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:07:34 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:07:34 [ERROR] P2P: Read error from 192.168.0.108:57260: 'list' object has no attribute 'get'
+2026-06-21 23:07:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:07:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:07:42 [ERROR] P2P: Read error from 192.168.0.108:57261: 'list' object has no attribute 'get'
+2026-06-21 23:08:04 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:08:04 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:08:04 [ERROR] P2P: Read error from 192.168.0.108:57264: 'list' object has no attribute 'get'
+2026-06-21 23:08:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:08:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:08:12 [ERROR] P2P: Read error from 192.168.0.108:57271: 'list' object has no attribute 'get'
+2026-06-21 23:08:35 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:08:35 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:08:35 [ERROR] P2P: Read error from 192.168.0.108:57301: 'list' object has no attribute 'get'
+2026-06-21 23:08:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:08:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:08:42 [ERROR] P2P: Read error from 192.168.0.108:57303: 'list' object has no attribute 'get'
+2026-06-21 23:09:05 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:09:05 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:09:05 [ERROR] P2P: Read error from 192.168.0.108:57305: 'list' object has no attribute 'get'
+2026-06-21 23:09:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:09:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:09:12 [ERROR] P2P: Read error from 192.168.0.108:57308: 'list' object has no attribute 'get'
+2026-06-21 23:09:35 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:09:35 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:09:35 [ERROR] P2P: Read error from 192.168.0.108:57318: 'list' object has no attribute 'get'
+2026-06-21 23:09:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:09:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:09:42 [ERROR] P2P: Read error from 192.168.0.108:57320: 'list' object has no attribute 'get'
+2026-06-21 23:10:05 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:10:05 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:10:05 [ERROR] P2P: Read error from 192.168.0.108:57322: 'list' object has no attribute 'get'
+2026-06-21 23:10:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:10:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:10:12 [ERROR] P2P: Read error from 192.168.0.108:57325: 'list' object has no attribute 'get'
+2026-06-21 23:10:35 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:10:35 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:10:35 [ERROR] P2P: Read error from 192.168.0.108:57329: 'list' object has no attribute 'get'
+2026-06-21 23:10:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:10:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:10:42 [ERROR] P2P: Read error from 192.168.0.108:57330: 'list' object has no attribute 'get'
+2026-06-21 23:11:05 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:11:05 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:11:05 [ERROR] P2P: Read error from 192.168.0.108:57331: 'list' object has no attribute 'get'
+2026-06-21 23:11:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:11:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:11:12 [ERROR] P2P: Read error from 192.168.0.108:57334: 'list' object has no attribute 'get'
+2026-06-21 23:11:35 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:11:35 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:11:35 [ERROR] P2P: Read error from 192.168.0.108:57354: 'list' object has no attribute 'get'
+2026-06-21 23:11:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:11:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:11:42 [ERROR] P2P: Read error from 192.168.0.108:57355: 'list' object has no attribute 'get'
+2026-06-21 23:12:05 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:12:05 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:12:05 [ERROR] P2P: Read error from 192.168.0.108:57357: 'list' object has no attribute 'get'
+2026-06-21 23:12:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:12:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:12:12 [ERROR] P2P: Read error from 192.168.0.108:57361: 'list' object has no attribute 'get'
+2026-06-21 23:12:35 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:12:35 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:12:35 [ERROR] P2P: Read error from 192.168.0.108:57366: 'list' object has no attribute 'get'
+2026-06-21 23:12:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:12:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:12:42 [ERROR] P2P: Read error from 192.168.0.108:57369: 'list' object has no attribute 'get'
+2026-06-21 23:13:05 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:13:05 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:13:05 [ERROR] P2P: Read error from 192.168.0.108:57371: 'list' object has no attribute 'get'
+2026-06-21 23:13:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:13:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:13:12 [ERROR] P2P: Read error from 192.168.0.108:57375: 'list' object has no attribute 'get'
+2026-06-21 23:13:35 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:13:35 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:13:35 [ERROR] P2P: Read error from 192.168.0.108:57391: 'list' object has no attribute 'get'
+2026-06-21 23:13:42 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:13:42 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:13:42 [ERROR] P2P: Read error from 192.168.0.108:57396: 'list' object has no attribute 'get'
+2026-06-21 23:14:05 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:14:05 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:14:05 [ERROR] P2P: Read error from 192.168.0.108:57415: 'list' object has no attribute 'get'
+2026-06-21 23:14:12 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:14:12 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:14:12 [ERROR] P2P: Read error from 192.168.0.108:57418: 'list' object has no attribute 'get'
+2026-06-21 23:14:35 [INFO] P2P: [+] Conectado ao peer! (1 peers ativos)
+2026-06-21 23:14:35 [INFO] P2P: [+] Novo peer conectado! (1 peers ativos)
+2026-06-21 23:14:35 [ERROR] P2P: Read error from 192.168.0.108:57429: 'list' object has no attribute 'get'
