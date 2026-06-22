@@ -352,7 +352,7 @@ class P2PNode:
             "GET_BLOCK", "GET_TX", "NEW_TX", "GET_CHAIN", "CHAIN",
             "SEED_ANNOUNCE", "SEED_REMOVE", "SEED_SYNC",
             "REQUEST_SIGNATURE", "BLOCK_SIGNATURE", "REGISTER_VALIDATOR",
-            "PING", "PONG"
+            "DELEGATE", "PING", "PONG"
         }
         return msg_type in valid_types
 
