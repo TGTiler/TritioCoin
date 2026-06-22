@@ -24,7 +24,7 @@ class Database:
         else:
             self.db_path = db_path
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        self.conn = sqlite3.connect(str(self.db_path))
+        self.conn = sqlite3.connect(str(self.db_path), check_same_thread=False)
         self.conn.execute("PRAGMA journal_mode=WAL")
         self.conn.execute("PRAGMA synchronous=NORMAL")
         self._create_tables()
@@ -117,6 +117,12 @@ class Database:
             "SELECT data FROM blocks WHERE height = ?", (height,)
         ).fetchone()
         return json.loads(row[0]) if row else None
+
+    def has_block_with_hash(self, block_hash: str) -> bool:
+        row = self.conn.execute(
+            "SELECT 1 FROM blocks WHERE hash = ?", (block_hash,)
+        ).fetchone()
+        return row is not None
 
     def get_block_height(self) -> int:
         row = self.conn.execute("SELECT MAX(height) FROM blocks").fetchone()
