@@ -39,6 +39,13 @@ class TritioAPI:
         self.app.router.add_post("/api/tx", self.handle_send_tx)
         self.app.router.add_post("/api/validator/register", self.handle_register_validator)
 
+        # Delegation endpoints
+        self.app.router.add_post("/api/delegate", self.handle_delegate)
+        self.app.router.add_post("/api/undelegate", self.handle_undelegate)
+        self.app.router.add_post("/api/claim", self.handle_claim_rewards)
+        self.app.router.add_get("/api/delegations/{address}", self.handle_get_delegations)
+        self.app.router.add_get("/api/delegation/stats", self.handle_delegation_stats)
+
         # WebSocket endpoint
         self.app.router.add_get("/ws", self.handle_websocket)
 
@@ -276,6 +283,125 @@ class TritioAPI:
         except Exception as e:
             return web.json_response({"error": str(e)}, status=500)
 
+    # ========== Delegation Endpoints ==========
+
+    async def handle_delegate(self, request):
+        """Delegate TRC to a validator."""
+        try:
+            data = await request.json()
+            delegator = data.get("delegator")
+            validator = data.get("validator")
+            amount = data.get("amount", 0)
+
+            if not delegator or not validator:
+                return web.json_response({"error": "delegator and validator required"}, status=400)
+
+            if amount <= 0:
+                return web.json_response({"error": "amount must be > 0"}, status=400)
+
+            # Check balance
+            balance = self.node.blockchain.balance_satoshis(delegator)
+            needed = trc_to_satoshis(amount)
+            if balance < needed:
+                return web.json_response({"error": "Insufficient balance"}, status=400)
+
+            # Check if validator exists
+            if validator not in self.node.consensus.validators:
+                return web.json_response({"error": "Validator not found"}, status=400)
+
+            # Deduct from delegator
+            self.node.blockchain._debit_satoshis(delegator, needed)
+
+            # Create delegation
+            ok = self.node.delegation_pool.delegate(delegator, validator, amount)
+            if not ok:
+                # Refund if failed
+                self.node.blockchain._credit_satoshis(delegator, needed)
+                return web.json_response({"error": "Delegation failed"}, status=400)
+
+            # Broadcast
+            await self.node.p2p.broadcast({
+                "type": "DELEGATE",
+                "delegator": delegator,
+                "validator": validator,
+                "amount": amount
+            })
+
+            return web.json_response({
+                "status": "ok",
+                "delegator": delegator,
+                "validator": validator,
+                "amount": amount,
+                "remaining_balance": (balance - needed) / SATOSHIS_PER_TRC
+            })
+        except Exception as e:
+            return web.json_response({"error": str(e)}, status=500)
+
+    async def handle_undelegate(self, request):
+        """Start undelegation process."""
+        try:
+            data = await request.json()
+            delegator = data.get("delegator")
+            validator = data.get("validator")
+            amount = data.get("amount", 0)
+
+            if not delegator or not validator:
+                return web.json_response({"error": "delegator and validator required"}, status=400)
+
+            ok = self.node.delegation_pool.undelegate(delegator, validator, amount)
+            if not ok:
+                return web.json_response({"error": "Undelegation failed"}, status=400)
+
+            return web.json_response({
+                "status": "ok",
+                "unbonding_days": 7,
+                "message": "Undelegation started. Tokens available after 7 days."
+            })
+        except Exception as e:
+            return web.json_response({"error": str(e)}, status=500)
+
+    async def handle_claim_rewards(self, request):
+        """Claim delegation rewards."""
+        try:
+            data = await request.json()
+            delegator = data.get("delegator")
+
+            if not delegator:
+                return web.json_response({"error": "delegator required"}, status=400)
+
+            rewards = self.node.delegation_pool.claim_rewards(delegator)
+
+            # Credit rewards to balance
+            if rewards > 0:
+                reward_sat = trc_to_satoshis(rewards)
+                self.node.blockchain._credit_satoshis(delegator, reward_sat)
+
+            return web.json_response({
+                "status": "ok",
+                "rewards_claimed": rewards
+            })
+        except Exception as e:
+            return web.json_response({"error": str(e)}, status=500)
+
+    async def handle_get_delegations(self, request):
+        """Get delegations for an address."""
+        address = request.match_info["address"]
+        delegations = self.node.delegation_pool.get_delegations(address)
+        pending = self.node.delegation_pool.get_pending_undelegation(address)
+
+        return web.json_response({
+            "address": address,
+            "delegations": delegations,
+            "pending_undelegations": pending,
+            "total_delegated": sum(d["amount"] for d in delegations),
+            "total_pending_rewards": sum(d["pending_rewards"] for d in delegations)
+        })
+
+    async def handle_delegation_stats(self, request):
+        """Get delegation pool statistics."""
+        stats = self.node.delegation_pool.get_stats()
+        return web.json_response(stats)
+
     async def handle_index(self, request):
         return web.Response(
             text="TritioCoin API v1.0.0\n\nEndpoints:\n"
@@ -290,6 +416,11 @@ class TritioAPI:
                  "  GET  /api/validators\n"
                  "  POST /api/tx\n"
                  "  POST /api/validator/register\n"
+                 "  POST /api/delegate\n"
+                 "  POST /api/undelegate\n"
+                 "  POST /api/claim\n"
+                 "  GET  /api/delegations/{address}\n"
+                 "  GET  /api/delegation/stats\n"
                  "  WS   /ws\n"
                  "  WEB  /explorer",
             content_type="text/plain"
