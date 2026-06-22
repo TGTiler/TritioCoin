@@ -27,7 +27,7 @@ PROTOCOL_VERSION = 2
 MIN_PROTOCOL_VERSION = 1  # Minimum supported version
 
 MAX_MSG_SIZE = 10 * 1024 * 1024
-RATE_LIMIT_MSGS = 100
+RATE_LIMIT_MSGS = 200
 RATE_LIMIT_WINDOW = 10
 CERT_DIR = Path("tritiocoin_data/certs")
 
@@ -210,17 +210,23 @@ class P2PNode:
 
     async def start(self):
         """Start the P2P server."""
-        # Try NAT traversal
-        nat_result = await self.nat.discover(self.port)
-        self.external_address = self.nat.get_external_address()
+        try:
+            # Try NAT traversal
+            nat_result = await self.nat.discover(self.port)
+            self.external_address = self.nat.get_external_address()
 
-        self.server = await asyncio.start_server(
-            self._handle_conn, self.host, self.port,
-            ssl=self.ssl_context
-        )
-        logger.info(f"P2P listening on {self.host}:{self.port} (TLS)")
-        if self.external_address:
-            logger.info(f"External address: {self.external_address}")
+            self.server = await asyncio.start_server(
+                self._handle_conn, self.host, self.port,
+                ssl=self.ssl_context
+            )
+            logger.info(f"P2P listening on {self.host}:{self.port} (TLS)")
+            if self.external_address:
+                logger.info(f"External address: {self.external_address}")
+        except OSError as e:
+            if "10048" in str(e):
+                logger.warning(f"Porta P2P {self.port} ja esta em uso. P2P desabilitado.")
+            else:
+                logger.error(f"P2P error: {e}")
 
     async def connect(self, host: str, port: int) -> bool:
         key = f"{host}:{port}"
@@ -250,7 +256,7 @@ class P2PNode:
 
             if self.reputation:
                 self.reputation.on_connect(key)
-            logger.info(f"Connected to {key} (TLS, v{PROTOCOL_VERSION})")
+            logger.info(f"[+] Conectado ao peer! ({len(self.peers)} peers ativos)")
             return True
         except Exception as e:
             logger.debug(f"Connection failed to {key}: {e}")
@@ -260,8 +266,18 @@ class P2PNode:
                            writer: asyncio.StreamWriter):
         addr = writer.get_extra_info('peername')
         key = f"{addr[0]}:{addr[1]}"
+
+        # Skip duplicate connections
+        if key in self.peers:
+            logger.debug(f"Duplicate connection from {key}, ignoring")
+            try:
+                writer.close()
+            except:
+                pass
+            return
+
         self.peers[key] = writer
-        logger.info(f"Incoming TLS connection from {key}")
+        logger.info(f"[+] Novo peer conectado: {key} ({len(self.peers)} peers ativos)")
         await self._read_loop(reader, writer, key)
 
     async def _read_loop(self, reader: asyncio.StreamReader,
@@ -384,8 +400,8 @@ class P2PNode:
         """Get external IP:port if behind NAT."""
         return self.external_address
 
-    async def reconnect_loop(self, seeds: list, interval: int = 30):
-        """Auto-reconnect to seeds."""
+    async def reconnect_loop(self, seeds: list, interval: int = 60):
+        """Auto-reconnect to seeds with cooldown."""
         while True:
             for host, port in seeds:
                 key = f"{host}:{port}"
