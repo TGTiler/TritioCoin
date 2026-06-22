@@ -125,12 +125,15 @@ class NATTraversal:
 class P2PNode:
     """Production P2P node with TLS, protocol versioning, and NAT traversal."""
 
+    CONNECT_COOLDOWN = 60  # Seconds before retrying failed connection
+
     def __init__(self, host: str, port: int):
         self.host = host
         self.port = port
         self.peers: Dict[str, asyncio.StreamWriter] = {}
         self.peer_ids: Dict[str, str] = {}
         self.peer_versions: Dict[str, int] = {}
+        self.last_connect_attempt: Dict[str, float] = {}
         self.server = None
         self.on_message = None
         self.node_id = self._generate_node_id()
@@ -232,6 +235,13 @@ class P2PNode:
         key = f"{host}:{port}"
         if key in self.peers:
             return True
+
+        # Cooldown: don't retry too quickly after failure
+        now = time.time()
+        last_attempt = self.last_connect_attempt.get(key, 0)
+        if now - last_attempt < self.CONNECT_COOLDOWN:
+            return False
+        self.last_connect_attempt[key] = now
 
         if self.reputation and self.reputation.is_banned(key):
             logger.warning(f"Cannot connect to banned peer: {key}")
