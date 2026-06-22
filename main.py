@@ -231,6 +231,8 @@ class TritioNode:
                 [tx.get("hash") for tx in block.transactions if tx.get("hash")]
             )
             logger.info(f"Block #{block.header.index} accepted (height={self.blockchain.height()})")
+        else:
+            logger.info(f"Block #{block.header.index} rejected (duplicate or invalid)")
             # Broadcast to WebSocket clients
             if self.api:
                 await self.api.broadcast_ws({
