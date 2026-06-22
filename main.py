@@ -194,13 +194,16 @@ class TritioNode(GossipNode):
 
         t = msg.get("type")
         if t == "HANDSHAKE":
+            peer_height = msg.get("height", 0)
             await self.p2p.send(peer, {"type": "HANDSHAKE_ACK",
                                         "version": 2,
                                         "height": self.blockchain.height(),
                                         "role": self.seeds_config.get("my_role", "peer"),
                                         "seeds": self.seeds_config.get("seeds", []),
                                         "gossip": True})
-            if msg.get("role") == "seed" and not self.is_seed:
+            # If peer has more blocks, request sync
+            if isinstance(peer_height, int) and peer_height > self.blockchain.height():
+                logger.info(f"Peer {peer} has more blocks ({peer_height} > {self.blockchain.height()}), requesting sync")
                 await self.p2p.send(peer, {"type": "GET_CHAIN"})
             remote_seeds = msg.get("seeds", [])
             await self._merge_seeds(remote_seeds)
