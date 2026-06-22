@@ -259,7 +259,7 @@ def cmd_mine(args):
         if bc.add_block(block):
             DATA_DIR.mkdir(exist_ok=True)
             atomic_write(DATA_DIR / "blockchain.json", bc.serialize())
-            print(f"\n  Saldo: {bc.balance(w.pubkey_hex()):.8f} TRC")
+            print(f"\n  Saldo: {bc.balance(w.address):.8f} TRC")
 
     print(f"\n  Endereco: {w.address}")
     print(f"  Altura da chain: {bc.height()}")
@@ -272,7 +272,7 @@ def cmd_mine(args):
         async def async_on_block(block):
             on_block_found(block)
 
-        asyncio.run(miner.mine_continuous(w.pubkey_hex(), callback=async_on_block))
+        asyncio.run(miner.mine_continuous(w.address, callback=async_on_block))
     except KeyboardInterrupt:
         miner.stop()
 
