@@ -1,7 +1,8 @@
 {
     "seeds": [
-        "tcp://bkvdc-190-89-162-131.run.pinggy-free.link:33337",
+        "192.168.0.112:8333",
+        "10.66.38.195:8333",
     ],
-    "last_updated": "2026-06-21",
+    "last_updated": "2026-06-22",
     "description": "TritioCoin seed nodes"
 }
