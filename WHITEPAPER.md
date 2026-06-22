@@ -2,14 +2,14 @@
 
 **A Quantum-Resistant Cryptocurrency for Everyday Use**
 
-Version 1.0.0
+Version 1.1.0
 Date: June 2026
 
 ---
 
 ## Abstract
 
-TritioCoin is a decentralized, peer-to-peer electronic cash system designed for everyday use with built-in protection against quantum computing threats. The system uses a hybrid Proof-of-Work/Proof-of-Stake consensus mechanism, quantum-resistant cryptography, and a fully decentralized peer discovery system based on Kademlia DHT.
+TritioCoin is a decentralized, peer-to-peer electronic cash system designed for everyday use with built-in protection against quantum computing threats. The system uses a hybrid Proof-of-Work/Proof-of-Stake consensus mechanism, quantum-resistant cryptography, delegation system, and a fully decentralized peer discovery system based on Kademlia DHT.
 
 ---
 
@@ -30,6 +30,7 @@ TritioCoin addresses these challenges with:
 - **Hybrid Signatures**: ECDSA + WOTS+ (Winternitz One-Time Signature) for quantum resistance
 - **DHT Peer Discovery**: Kademlia-based decentralized peer discovery without central authorities
 - **Dual Consensus**: PoW + PoS for security and decentralization
+- **Delegation System**: Users can delegate TRC to validators without running infrastructure
 
 ---
 
@@ -38,20 +39,20 @@ TritioCoin addresses these challenges with:
 ### 2.1 System Overview
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                    Application Layer                  │
-│  CLI Wallet │ Web Explorer │ REST API │ WebSocket    │
-├─────────────────────────────────────────────────────┤
-│                     Core Layer                        │
-│  Blockchain │ Mining │ Transactions │ Consensus      │
-│  Wallet │ HD Wallet │ Multi-Sig │ UTXO              │
-├─────────────────────────────────────────────────────┤
-│                    Network Layer                      │
-│  P2P TCP │ TLS 1.3 │ DHT │ Gossip Protocol          │
-├─────────────────────────────────────────────────────┤
-│                    Storage Layer                      │
-│  SQLite │ UTXO Set │ Block Pruning                   │
-└─────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                    Application Layer                         │
+│  CLI Wallet │ Web Explorer │ REST API │ WebSocket           │
+├─────────────────────────────────────────────────────────────┤
+│                     Core Layer                               │
+│  Blockchain │ Mining │ Transactions │ Consensus             │
+│  Wallet │ HD Wallet │ Multi-Sig │ UTXO │ Delegation        │
+├─────────────────────────────────────────────────────────────┤
+│                    Network Layer                             │
+│  P2P TCP │ TLS 1.3 │ DHT │ Gossip Protocol                 │
+├─────────────────────────────────────────────────────────────┤
+│                    Storage Layer                             │
+│  SQLite │ UTXO Set │ Block Pruning                          │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ### 2.2 Block Structure
@@ -62,7 +63,7 @@ Each block contains:
 |-------|------|-------------|
 | Version | 2 bytes | Protocol version |
 | Index | 4 bytes | Block height |
-| Timestamp | 8 seconds | Unix timestamp |
+| Timestamp | 8 bytes | Unix timestamp |
 | Previous Hash | 32 bytes | Hash of previous block |
 | Merkle Root | 32 bytes | Root of transaction tree |
 | Difficulty | 4 bytes | Current mining difficulty |
@@ -120,18 +121,26 @@ If either scheme remains secure, the transaction remains secure.
 - **Time Cost**: 1 iteration
 - **Parallelism**: 1
 - **Purpose**: ASIC-resistant mining
+- **Multi-threading**: Uses all CPU cores
 
 ### 4.2 Proof-of-Stake (PoS)
 
-- **Minimum Stake**: 100 TRC
+- **Minimum Stake**: Dynamic (2x current block reward, min 10 TRC, max 200 TRC)
 - **Selection**: Stake-weighted random
 - **Signature Threshold**: 3 validators per block
 - **Reward Share**: 30% of block reward
 
-### 4.3 Difficulty Adjustment
+### 4.3 Delegation
 
-- **Interval**: Every 20 blocks
-- **Target Block Time**: 30 seconds
+- **Minimum Delegation**: 1 TRC
+- **Validator Commission**: 10%
+- **Unbonding Period**: 7 days
+- **Max Delegations**: 100 per address
+
+### 4.4 Difficulty Adjustment
+
+- **Interval**: Every 10 blocks
+- **Target Block Time**: 5 minutes
 - **Adjustment**: ±1 based on block time deviation
 
 ---
@@ -142,17 +151,17 @@ If either scheme remains secure, the transaction remains secure.
 
 | Parameter | Value |
 |-----------|-------|
-| Maximum Supply | 21,000,000 TRC |
-| Initial Block Reward | 50 TRC |
-| Halving Interval | 210,000 blocks |
+| Maximum Supply | 19,000,000 TRC |
+| Initial Block Reward | 45 TRC |
+| Halving Interval | 190,000 blocks |
 | Minimum Reward | 0.00000001 TRC |
 
 ### 5.2 Emission Schedule
 
 ```
-Blocks 0-210,000:      50 TRC/block
-Blocks 210,001-420,000: 25 TRC/block
-Blocks 420,001-630,000: 12.5 TRC/block
+Blocks 0-190,000:       45 TRC/block
+Blocks 190,001-380,000: 22.5 TRC/block
+Blocks 380,001-570,000: 11.25 TRC/block
 ...continues halving until ~0.00000001 TRC
 ```
 
@@ -160,6 +169,7 @@ Blocks 420,001-630,000: 12.5 TRC/block
 
 - **Minimum Fee**: 0.0001 TRC
 - **Fee Market**: Users set fees, miners prioritize higher fees
+- **Burn Rate**: 10% of fees are burned (deflationary)
 
 ---
 
@@ -176,26 +186,31 @@ Blocks 420,001-630,000: 12.5 TRC/block
 
 #### Fallback: Seed Nodes
 
-- Optional seed nodes for initial bootstrap
-- Not required for network operation
+- GitHub-hosted seed list
+- Local seeds.json file
 - Can be specified via CLI: `--seed IP:PORT`
 
-### 6.2 Message Protocol
+### 6.2 Gossip Protocol
 
 | Message | Direction | Description |
 |---------|-----------|-------------|
-| HANDSHAKE | Both | Initial connection |
-| NEW_BLOCK | Broadcast | Block announcement |
+| HANDSHAKE | Both | Initial connection with version negotiation |
+| BLOCK_ANNOUNCE | Broadcast | Block hash + height announcement |
+| TX_ANNOUNCE | Broadcast | Transaction hash announcement |
+| NEW_BLOCK | Broadcast | Full block data |
 | COMPACT_BLOCK | Broadcast | Header + tx hashes |
-| NEW_TX | Broadcast | Transaction announcement |
-| GET_CHAIN | Request | Chain synchronization |
+| SYNC_REQUEST | Request | Batch block synchronization |
+| SYNC_BLOCK_BATCH | Response | Batch of blocks |
+| REGISTER_VALIDATOR | Broadcast | Validator registration |
+| DELEGATE | Broadcast | Delegation announcement |
 
 ### 6.3 Security
 
 - **TLS 1.3**: All P2P connections encrypted
-- **Rate Limiting**: 100 messages/10s per peer
-- **Peer Reputation**: Score-based banning
+- **Rate Limiting**: 200 messages/10s per peer
+- **Peer Reputation**: Score-based banning (auto-ban at -50)
 - **Message Validation**: All messages validated
+- **Connection Cooldown**: 60s between reconnection attempts
 
 ---
 
@@ -250,7 +265,16 @@ Blocks 420,001-630,000: 12.5 TRC/block
 | GET | /api/block/{height} | Block data |
 | GET | /api/balance/{address} | Address balance |
 | GET | /api/tx/{hash} | Transaction data |
+| GET | /api/mempool | Pending transactions |
+| GET | /api/peers | Connected peers |
+| GET | /api/validators | Active validators |
+| GET | /api/delegations/{address} | Delegations |
+| GET | /api/delegation/stats | Delegation statistics |
 | POST | /api/tx | Submit transaction |
+| POST | /api/validator/register | Register as validator |
+| POST | /api/delegate | Delegate TRC |
+| POST | /api/undelegate | Start undelegation |
+| POST | /api/claim | Claim rewards |
 
 ### 9.2 WebSocket
 
@@ -274,14 +298,14 @@ Real-time updates for:
 ### 10.2 Consensus Security
 
 - **51% Attack**: Requires majority of hash power (PoW) OR stake (PoS)
-- **Nothing-at-Stake**: Mitigated by slashing conditions
+- **Nothing-at-Stake**: Mitigated by validator requirements
 - **Long-Range Attack**: Mitigated by checkpointing
 
 ### 10.3 Network Security
 
 - **Eclipse Attack**: Mitigated by diverse peer connections
-- **Sybil Attack**: Mitigated by reputation system
-- **DoS Attack**: Mitigated by rate limiting
+- **Sybil Attack**: Mitigated by reputation system and stake requirements
+- **DoS Attack**: Mitigated by rate limiting and connection cooldowns
 
 ---
 
@@ -291,17 +315,20 @@ Real-time updates for:
 |---------|---------|----------|------------|
 | Consensus | PoW | PoS | PoW + PoS |
 | Quantum Safe | No | No | Yes |
-| Block Time | 10 min | 12 sec | 30 sec |
-| Max Supply | 21M | ∞ | 21M |
+| Block Time | 10 min | 12 sec | 5 min |
+| Max Supply | 21M | ∞ | 19M |
 | Multi-Sig | Yes | Yes | Yes |
 | HD Wallet | Yes | Yes | Yes |
 | DHT Discovery | No | No | Yes |
+| Delegation | No | Yes | Yes |
+| Burn Rate | No | Yes | 10% |
+| Dynamic Stake | No | No | Yes |
 
 ---
 
 ## 12. Conclusion
 
-TritioCoin provides a secure, decentralized cryptocurrency suitable for everyday use with built-in protection against future quantum computing threats. The hybrid consensus mechanism, quantum-resistant cryptography, and decentralized peer discovery make it a robust platform for the post-quantum era.
+TritioCoin provides a secure, decentralized cryptocurrency suitable for everyday use with built-in protection against future quantum computing threats. The hybrid consensus mechanism, quantum-resistant cryptography, delegation system, and decentralized peer discovery make it a robust platform for the post-quantum era.
 
 ---
 
