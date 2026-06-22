@@ -39,16 +39,17 @@ def get_wallet(quantum=False, password=None) -> Wallet:
         try:
             return Wallet.load(str(path), password)
         except Exception as e:
-            error_str = str(e)
-            if "InvalidTag" in error_str or "decrypt" in error_str.lower():
+            from cryptography.exceptions import InvalidTag
+            if isinstance(e, InvalidTag):
                 print("ERRO: Senha incorreta!")
                 print("A carteira esta criptografada com outra senha.")
                 print("Tente novamente com a senha correta.")
                 sys.exit(1)
             raise
-    w = Wallet.create(quantum)
-    DATA_DIR.mkdir(exist_ok=True)
-    return w
+    print("ERRO: Carteira nao encontrada!")
+    print(f"Arquivo esperado: {path}")
+    print("Crie uma carteira primeiro (opcao 2 do menu).")
+    sys.exit(1)
 
 
 def load_chain() -> Blockchain:
