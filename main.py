@@ -687,7 +687,7 @@ class TritioNode(GossipNode):
     async def _mining_loop(self):
         while self.running:
             if self.mode == 'miner':
-                block = await self.miner.mine_async(self.wallet.pubkey_hex())
+                block = await self.miner.mine_async(self.wallet.address)
                 if block:
                     await self._process_mined_block(block)
 
