@@ -179,11 +179,12 @@
                 document.getElementById('stat-height').textContent = status.height?.toLocaleString() || '-';
                 document.getElementById('stat-txs').textContent = status.transactions?.toLocaleString() || '-';
                 document.getElementById('stat-diff').textContent = status.difficulty || '-';
-                document.getElementById('stat-reward').textContent = status.reward?.toFixed(2) || '-';
-                document.getElementById('stat-mined').textContent = status.total_mined?.toLocaleString(undefined, {maximumFractionDigits: 2}) || '-';
-                document.getElementById('stat-peers').textContent = status.peers || '-';
-                document.getElementById('stat-validators').textContent = status.active_validators || '-';
-                document.getElementById('stat-mempool').textContent = status.mempool || '-';
+                document.getElementById('stat-reward').textContent = (status.reward_trc || status.reward || 0).toFixed(2);
+                document.getElementById('stat-mined').textContent = (status.total_mined_trc || status.total_mined || 0).toLocaleString(undefined, {maximumFractionDigits: 2});
+                document.getElementById('stat-supply').textContent = `de ${(status.max_supply_trc || 19000000).toLocaleString()} TRC`;
+                document.getElementById('stat-peers').textContent = status.peers || '0';
+                document.getElementById('stat-validators').textContent = status.active_validators || '0';
+                document.getElementById('stat-mempool').textContent = status.mempool || '0';
             }
         }
         
