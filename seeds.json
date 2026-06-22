@@ -1,5 +1,7 @@
 {
-    "seeds": [190.89.162.131],
+    "seeds": [
+        "192.168.0.108:8333"
+    ],
     "last_updated": "2026-06-21",
-    "description": "TritioCoin seed nodes - Atualizado automaticamente"
+    "description": "TritioCoin seed nodes"
 }
