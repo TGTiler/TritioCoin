@@ -215,6 +215,8 @@ class Miner:
         print(f"  Threads: {self.threads}")
         print()
 
+        from concurrent.futures import as_completed
+
         with ThreadPoolExecutor(max_workers=self.threads) as executor:
             futures = []
             for i in range(self.threads):
@@ -228,15 +230,18 @@ class Miner:
                 futures.append(future)
 
             result = None
-            for future in futures:
-                try:
-                    res = future.result(timeout=300)
-                    if res:
-                        result = res
-                        self._stop_event.set()
-                        break
-                except Exception as e:
-                    logger.error(f"Thread error: {type(e).__name__}: {e}")
+            try:
+                for future in as_completed(futures, timeout=None):
+                    try:
+                        res = future.result(timeout=1)
+                        if res:
+                            result = res
+                            self._stop_event.set()
+                            break
+                    except Exception as e:
+                        logger.debug(f"Thread finished: {type(e).__name__}")
+            except Exception as e:
+                logger.error(f"Mining error: {type(e).__name__}: {e}")
 
         if result:
             self.current_block.header.nonce = result["nonce"]
