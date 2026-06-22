@@ -1,3 +1,10 @@
+"""
+TritioCoin Peer Discovery
+Busca automatica de peers via:
+1. GitHub (lista atualizada)
+2. seeds.json local
+3. Conexoes existentes
+"""
 import asyncio
 import json
 import logging
