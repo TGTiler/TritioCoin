@@ -166,6 +166,16 @@ class TritioAPI:
     async def handle_balance(self, request):
         address = request.match_info["address"]
         balance = self.node.blockchain.balance(address)
+
+        # If not found by address, try all balances
+        if balance == 0:
+            all_balances = self.node.blockchain.db.get_all_balances()
+            for addr, bal in all_balances.items():
+                if addr == address or addr[:len(address)] == address:
+                    balance = bal / SATOSHIS_PER_TRC
+                    address = addr
+                    break
+
         return web.json_response({"address": address, "balance": balance})
 
     async def handle_tx(self, request):
@@ -179,6 +189,17 @@ class TritioAPI:
         address = request.match_info["address"]
         balance = self.node.blockchain.balance(address)
         txs = self.node.blockchain.db.get_address_txs(address)
+
+        # If not found, try searching all balances
+        if balance == 0 and not txs:
+            all_balances = self.node.blockchain.db.get_all_balances()
+            for addr, bal in all_balances.items():
+                if addr == address or addr[:len(address)] == address:
+                    balance = bal / SATOSHIS_PER_TRC
+                    txs = self.node.blockchain.db.get_address_txs(addr)
+                    address = addr
+                    break
+
         return web.json_response({
             "address": address,
             "balance": balance,
