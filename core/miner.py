@@ -1,11 +1,15 @@
 """
 TritioCoin Mining System
 Proof-of-Work with Argon2id (ASIC-resistant).
+Multi-threaded, async, with real-time progress.
 """
 import hashlib
 import json
 import time
 import logging
+import threading
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from typing import Optional, List, Dict
 from core.block import Block
 from core.blockchain import Blockchain
@@ -28,6 +32,7 @@ class MiningStats:
 
     def __init__(self):
         self.reset()
+        self._lock = threading.Lock()
 
     def reset(self):
         self.mining = False
@@ -37,31 +42,39 @@ class MiningStats:
         self.blocks_found = 0
         self.total_hashes = 0
         self.best_hash_rate = 0.0
+        self.found = False
 
     def start_mining(self):
-        self.mining = True
-        self.nonce = 0
-        self.hashes = 0
-        self.start_time = time.time()
+        with self._lock:
+            self.mining = True
+            self.found = False
+            self.nonce = 0
+            self.hashes = 0
+            self.start_time = time.time()
 
     def stop_mining(self):
-        self.mining = False
-        elapsed = time.time() - self.start_time
-        if elapsed > 0:
-            rate = self.hashes / elapsed
-            self.best_hash_rate = max(self.best_hash_rate, rate)
-        self.total_hashes += self.hashes
+        with self._lock:
+            self.mining = False
+            elapsed = time.time() - self.start_time
+            if elapsed > 0:
+                rate = self.hashes / elapsed
+                self.best_hash_rate = max(self.best_hash_rate, rate)
+            self.total_hashes += self.hashes
 
-    def increment(self):
-        self.nonce += 1
-        self.hashes += 1
-        self.total_hashes += 1
+    def increment(self, count=1):
+        with self._lock:
+            self.nonce += count
+            self.hashes += count
+            self.total_hashes += count
 
     def get_hash_rate(self) -> float:
         elapsed = time.time() - self.start_time
         if elapsed <= 0:
             return 0.0
         return self.hashes / elapsed
+
+    def get_elapsed(self) -> float:
+        return time.time() - self.start_time
 
     def to_dict(self) -> dict:
         elapsed = time.time() - self.start_time if self.start_time else 0
@@ -74,37 +87,50 @@ class MiningStats:
             "hash_rate": f"{rate:.0f} H/s",
             "best_hash_rate": f"{self.best_hash_rate:.0f} H/s",
             "blocks_found": self.blocks_found,
-            "elapsed": f"{elapsed:.1f}s"
+            "elapsed": f"{elapsed:.1f}s",
+            "threads": self.threads if hasattr(self, 'threads') else 1
         }
 
 
 class Miner:
     """
     TritioCoin Miner with Argon2id Proof-of-Work.
-    
+
     Features:
     - Argon2id hashing (ASIC-resistant)
     - SHA256 fallback if argon2 not available
+    - Multi-threaded mining (all CPU cores)
+    - Async mining (non-blocking)
+    - Auto-restart after block found
+    - Real-time progress display
     - Dynamic difficulty adjustment
-    - Block template creation
-    - Mining statistics
     """
 
-    # Argon2id parameters (tuned for CPU mining)
     ARGON_TIME_COST = 1
     ARGON_MEMORY_COST = 65536  # 64 MB
     ARGON_PARALLELISM = 1
     ARGON_HASH_LEN = 32
     ARGON_SALT = b"tritiocoin_v1"
 
-    def __init__(self, blockchain: Blockchain, mempool: Mempool):
+    def __init__(self, blockchain: Blockchain, mempool: Mempool, threads: int = None):
         self.blockchain = blockchain
         self.mempool = mempool
         self.stats = MiningStats()
         self.current_block: Optional[Block] = None
+        self.threads = threads or self._get_cpu_count()
+        self.stats.threads = self.threads
+        self._stop_event = threading.Event()
+        self._on_block_found = None
+        self._progress_callback = None
+
+    def _get_cpu_count(self) -> int:
+        try:
+            import os
+            return os.cpu_count() or 4
+        except:
+            return 4
 
     def _pow_hash(self, data: bytes) -> str:
-        """Compute proof-of-work hash."""
         if HAS_ARGON2:
             return hash_secret_raw(
                 secret=data,
@@ -115,90 +141,177 @@ class Miner:
                 hash_len=self.ARGON_HASH_LEN,
                 type=Type.ID
             ).hex()
-        # SHA256 fallback
         return hashlib.sha256(hashlib.sha256(data).digest()).hexdigest()
 
     def create_block_template(self, address: str) -> Block:
-        """Create a new block template for mining."""
         prev = self.blockchain.latest()
         diff = self.blockchain.adjust_difficulty()
         pending = self.mempool.get(500)
 
-        # Create coinbase transaction
-        reward = self.blockchain.reward_at()
         coinbase = TransactionBuilder.create_coinbase(
             address,
             self.blockchain.reward_at_satoshis(),
             self.blockchain.height()
         )
 
-        # Build transaction list
         txs = [coinbase.to_dict()] + [t.to_dict() for t in pending]
-
-        # Create block
         block = Block(prev.header.index + 1, prev.hash, txs, diff)
 
         return block
 
+    def _mine_worker(self, block: Block, target: str,
+                     start_nonce: int, step: int) -> Optional[Dict]:
+        """Single thread mining worker. Returns result dict if found."""
+        header_bytes = block.header.to_bytes()
+        nonce = start_nonce
+
+        while not self._stop_event.is_set():
+            block.header.nonce = nonce
+            data = block.header.to_bytes()
+            pow_hash = self._pow_hash(data)
+
+            if pow_hash.startswith(target):
+                return {"nonce": nonce, "pow_hash": pow_hash}
+
+            nonce += step
+            self.stats.increment(1)
+
+            if nonce % 50000 == 0 and self._progress_callback:
+                self._progress_callback(self.stats)
+
+        return None
+
+    def _print_progress(self, stats: MiningStats):
+        rate = stats.get_hash_rate()
+        elapsed = stats.get_elapsed()
+        nonce = stats.nonce
+        difficulty = self.current_block.header.difficulty if self.current_block else 0
+
+        target_zeros = "0" * difficulty
+        minutes = int(elapsed // 60)
+        seconds = int(elapsed % 60)
+
+        print(f"\r  Nonce: {nonce:>12,} | "
+              f"Hashrate: {rate:>8,.0f} H/s | "
+              f"Dificuldade: {difficulty} | "
+              f"Tempo: {minutes}m{seconds:02d}s | "
+              f"Threads: {self.threads}   ",
+              end="", flush=True)
+
     def mine(self, address: str) -> Optional[Block]:
-        """
-        Mine a new block.
-        Returns the mined block or None if interrupted.
-        """
         self.stats.start_mining()
+        self._stop_event.clear()
         self.current_block = self.create_block_template(address)
+        self._progress_callback = self._print_progress
 
         target = "0" * self.current_block.header.difficulty
         logger.info(f"Mining block #{self.current_block.header.index} "
-                    f"(difficulty={self.current_block.header.difficulty})")
+                    f"(difficulty={self.current_block.header.difficulty}, "
+                    f"threads={self.threads})")
 
-        while self.stats.mining:
-            self.current_block.header.nonce = self.stats.nonce
-            pow_hash = self._pow_hash(self.current_block.pow_data())
+        print(f"\n  Minerando bloco #{self.current_block.header.index}...")
+        print(f"  Dificuldade: {target} ({self.current_block.header.difficulty} zeros)")
+        print(f"  Recompensa: {self.blockchain.reward_at():.8f} TRC")
+        print(f"  Threads: {self.threads}")
+        print()
 
-            if pow_hash.startswith(target):
-                # Block found!
-                self.current_block.hash = self.current_block.content_hash()
-                self.current_block.pow_hash = pow_hash
+        with ThreadPoolExecutor(max_workers=self.threads) as executor:
+            futures = []
+            for i in range(self.threads):
+                future = executor.submit(
+                    self._mine_worker,
+                    self.current_block,
+                    target,
+                    i,
+                    self.threads
+                )
+                futures.append(future)
 
-                # Remove mined transactions from mempool
-                pending = self.mempool.get(500)
-                self.mempool.remove_many([t.tx_hash for t in pending])
+            result = None
+            for future in futures:
+                try:
+                    res = future.result(timeout=300)
+                    if res:
+                        result = res
+                        self._stop_event.set()
+                        break
+                except Exception as e:
+                    logger.error(f"Thread error: {type(e).__name__}: {e}")
 
-                self.stats.stop_mining()
-                self.stats.blocks_found += 1
+        if result:
+            self.current_block.header.nonce = result["nonce"]
+            self.current_block.hash = self.current_block.content_hash()
+            self.current_block.pow_hash = result["pow_hash"]
 
-                logger.info(f"Block #{self.current_block.header.index} mined! "
-                            f"Nonce={self.current_block.header.nonce} "
-                            f"Hash={self.current_block.hash[:16]}... "
-                            f"Rate={self.stats.get_hash_rate():.0f} H/s")
+            pending = self.mempool.get(500)
+            self.mempool.remove_many([t.tx_hash for t in pending])
 
-                return self.current_block
+            self.stats.stop_mining()
+            self.stats.blocks_found += 1
 
-            self.stats.increment()
+            print(f"\n  Bloco #{self.current_block.header.index} minerado!")
+            print(f"  Nonce: {result['nonce']:,}")
+            print(f"  Hash: {self.current_block.hash[:32]}...")
+            print(f"  Hashtotal: {self.stats.get_hash_rate():,.0f} H/s")
 
-            if self.stats.nonce % 10000 == 0:
-                rate = self.stats.get_hash_rate()
-                logger.debug(f"Mining... nonce={self.stats.nonce} rate={rate:.0f} H/s")
+            logger.info(f"Block #{self.current_block.header.index} mined! "
+                        f"Nonce={result['nonce']} "
+                        f"Hash={self.current_block.hash[:16]}... "
+                        f"Rate={self.stats.get_hash_rate():.0f} H/s")
+
+            return self.current_block
 
         self.stats.stop_mining()
+        print()
         return None
 
     def stop(self):
-        """Stop mining."""
+        self._stop_event.set()
         self.stats.stop_mining()
+        print("\n  Mineracao interrompida.")
         logger.info("Mining stopped")
 
+    async def mine_async(self, address: str) -> Optional[Block]:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self.mine, address)
+
+    async def mine_continuous(self, address: str, callback=None):
+        """Mine continuously. Auto-restart after each block found."""
+        print("\n  Mineracao continua iniciada (Ctrl+C para parar)")
+        print(f"  Endereco: {address[:32]}...")
+        print()
+
+        blocks_total = 0
+
+        while not self._stop_event.is_set():
+            block = await self.mine_async(address)
+
+            if block:
+                blocks_total += 1
+                print(f"\n  Total de blocos minerados: {blocks_total}")
+                print(f"  Reiniciando mineracao...")
+
+                if callback:
+                    await callback(block)
+
+                await asyncio.sleep(0.5)
+            else:
+                if self._stop_event.is_set():
+                    break
+                await asyncio.sleep(1)
+
+        print(f"\n  Mineracao finalizada. {blocks_total} blocos minerados.")
+
     def get_stats(self) -> dict:
-        """Get mining statistics."""
         stats = self.stats.to_dict()
         stats["difficulty"] = self.blockchain.difficulty
         stats["reward"] = self.blockchain.reward_at()
         stats["reward_satoshis"] = self.blockchain.reward_at_satoshis()
+        stats["threads"] = self.threads
+        stats["argon2"] = HAS_ARGON2
         return stats
 
     def get_block_template_info(self) -> dict:
-        """Get current block template information."""
         pending = self.mempool.get(10)
         return {
             "height": self.blockchain.height() + 1,
