@@ -67,6 +67,17 @@ class Blockchain:
         return len(self.chain)
 
     def add_block(self, block: Block) -> bool:
+        # Bloco duplicado: mesmo hash ja existe
+        if block.hash and self.db.has_block_with_hash(block.hash):
+            logger.debug(f"Duplicate block rejected: {block.hash[:16]}...")
+            return False
+
+        # Bloco no mesmo height: ja existe outro bloco nessa posicao
+        existing = self.db.get_block(block.header.index)
+        if existing:
+            logger.debug(f"Block at height {block.header.index} already exists, rejecting duplicate")
+            return False
+
         if not self._validate(block):
             return False
         self._apply(block)
