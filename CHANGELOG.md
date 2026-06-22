@@ -1,87 +1,105 @@
 # Changelog
 
-All notable changes to TritioCoin will be documented in this file.
+Todas as mudancas notaveis no TritioCoin serao documentadas neste arquivo.
 
-## [1.0.0] - 2026-06-21 (Production Release)
+## [1.0.1] - 2026-06-21
 
-### Added
+### Corrigido
+
+#### Seguranca
+- Previne blocos duplicados (mesmo hash) de serem aceitos
+- Previne blocos no mesmo height de serem aceitos
+- Novo metodo `has_block_with_hash()` no Database
+- Melhor mensagem de erro quando carteira nao existe
+- Melhor mensagem de erro quando senha esta incorreta
+
+#### Confiabilidade
+- Verificacao de blocos duplicados antes de validar
+- Log claro quando bloco e rejeitado
+- Tratamento de erro InvalidTag com isinstance()
+
+---
+
+## [1.0.0] - 2026-06-21 (Versao de Producao)
+
+### Adicionado
 
 #### Core
-- Block structure with 86-byte binary headers
-- Blockchain with genesis block
-- 19M supply cap with halving every 190,000 blocks
-- 45 TRC initial block reward
-- ~5 minute block time
-- Dynamic difficulty adjustment
+- Estrutura de bloco com headers binarios de 86 bytes
+- Blockchain com bloco genesis
+- Supply cap de 19M com halving a cada 190.000 blocos
+- Recompensa inicial de 45 TRC
+- Tempo de bloco de ~5 minutos
+- Ajuste dinamico de dificuldade
 
-#### Economics
-- Satoshi-based amounts (8 decimal places)
-- 10% burn rate on transaction fees
-- Deflationary supply model
-- Halving schedule
+#### Economia
+- Valores baseados em satoshis (8 casas decimais)
+- Taxa de queima de 10% nas transacoes
+- Modelo de supply deflacionario
+- Agenda de halving
 
-#### Security
-- AES-256-GCM wallet encryption (PBKDF2 600K iterations)
-- BIP39 24-word mnemonic backup
-- TLS 1.3 P2P encryption
-- ECDSA secp256k1 signatures
-- WOTS+ quantum-resistant signatures (hybrid mode)
+#### Seguranca
+- Criptografia AES-256-GCM para carteiras (PBKDF2 600K iteracoes)
+- Backup BIP39 com 24 palavras
+- Criptografia TLS 1.3 para P2P
+- Assinaturas ECDSA secp256k1
+- Assinaturas WOTS+ resistentes a quantum (modo hibrido)
 
-#### Wallet
-- HD Wallet (BIP32/BIP44) support
-- Multi-signature wallets (M-of-N)
-- Address generation (TRC standard, QR quantum)
-- Wallet import/export
+#### Carteira
+- Suporte a HD Wallet (BIP32/BIP44)
+- Carteiras multi-assinatura (M-of-N)
+- Geracao de enderecos (TRC padrao, QR quantum)
+- Import/export de carteiras
 
-#### Mining
-- Argon2id Proof-of-Work (ASIC-resistant)
-- Mining pool support
-- Share-based reward distribution
-- Real-time hashrate monitoring
+#### Mineracao
+- Proof-of-Work Argon2id (resistente a ASIC)
+- Suporte a mining pool
+- Distribuicao de recompensas baseada em shares
+- Monitoramento de hashrate em tempo real
 
-#### Consensus
-- PoW + PoS hybrid consensus
-- Validator registration and selection
-- Block signing and verification
-- Stake-weighted validator selection
+#### Consenso
+- Consenso hibrido PoW + PoS
+- Registro e selecao de validadores
+- Assinatura e verificacao de blocos
+- Selecao de validadores ponderada por stake
 
-#### Storage
-- SQLite database with WAL mode
-- UTXO-based balance tracking
-- Block pruning for disk space
-- Atomic writes for crash safety
+#### Armazenamento
+- Banco SQLite com modo WAL
+- Rastreamento de saldo baseado em UTXO
+- Pruning de blocos para espaco em disco
+- Escritas atomicas para seguranca contra crashes
 
-#### Network
-- TCP P2P with TLS 1.3
-- Kademlia DHT for decentralized peer discovery
+#### Rede
+- P2P TCP com TLS 1.3
+- Kademlia DHT para descoberta descentralizada de peers
 - NAT traversal (UPnP)
-- Peer reputation system
+- Sistema de reputacao de peers
 - Rate limiting
-- Compact block relay
-- Orphan block handling
+- Relay de blocos compactos
+- Tratamento de blocos orfaos
 
 #### API
-- REST API with 11+ endpoints
-- WebSocket for real-time updates
-- Block explorer web interface
+- REST API com 11+ endpoints
+- WebSocket para atualizacoes em tempo real
+- Interface web do explorador de blocos
 
-#### Governance
-- DAO with proposals and voting
-- Treasury management
-- Public staking with rewards
-- Micropayment channels
+#### Governanca
+- DAO com propostas e votacao
+- Gerenciamento de tesouraria
+- Staking publico com recompensas
+- Canais de micropagamentos
 
 #### CLI
-- Wallet creation and management
-- Balance checking
-- Transaction sending
-- Mining control
-- Network status
+- Criacao e gerenciamento de carteiras
+- Verificacao de saldo
+- Envio de transacoes
+- Controle de mineracao
+- Status da rede
 
-#### Other
-- Mainnet and Testnet support
+#### Outros
+- Suporte a Mainnet e Testnet
 - Light Client (SPV)
-- Docker deployment
-- Systemd service
-- 80 automated tests
-- Comprehensive documentation
+- Deploy com Docker
+- Servico systemd
+- 80 testes automatizados
+- Documentacao completa
