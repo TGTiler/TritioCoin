@@ -226,6 +226,11 @@ def cmd_list(args):
 
 def cmd_mine(args):
     quantum = '--quantum' in sys.argv
+    threads = 1
+    for arg in args:
+        if arg.startswith('--threads='):
+            threads = int(arg.split('=')[1])
+
     password = prompt_password()
     w = get_wallet(quantum, password)
     bc = load_chain()
@@ -239,32 +244,33 @@ def cmd_mine(args):
                 mempool.add(tx)
 
     from core.miner import Miner
-    miner = Miner(bc, mempool)
-
-    print(f"Mining with address: {w.address}")
-    print(f"Chain height: {bc.height()}")
-    print(f"Mempool: {mempool.size()} transactions")
-    print("Mining... (Ctrl+C to stop)")
+    miner = Miner(bc, mempool, threads=threads)
 
     import hashlib
+
+    def on_block_found(block):
+        block_data = f"{block.header.index}{block.hash}".encode()
+        sig = w.sign_tx(hashlib.sha256(block_data).digest())
+        block.validator_signatures.append({
+            "address": w.address,
+            "signature": sig["ecdsa_signature"].hex(),
+            "signature_mode": sig["signature_mode"]
+        })
+        if bc.add_block(block):
+            DATA_DIR.mkdir(exist_ok=True)
+            atomic_write(DATA_DIR / "blockchain.json", bc.serialize())
+            print(f"\n  Saldo: {bc.balance(w.pubkey_hex()):.8f} TRC")
+
+    print(f"\n  Endereco: {w.address}")
+    print(f"  Altura da chain: {bc.height()}")
+    print(f"  Transacoes pendentes: {mempool.size()}")
+    print(f"  Threads: {threads}")
+
     try:
-        while True:
-            block = miner.mine(w.pubkey_hex())
-            if block:
-                block_data = f"{block.header.index}{block.hash}".encode()
-                sig = w.sign_tx(hashlib.sha256(block_data).digest())
-                block.validator_signatures.append({
-                    "address": w.address,
-                    "signature": sig["ecdsa_signature"].hex(),
-                    "signature_mode": sig["signature_mode"]
-                })
-                if bc.add_block(block):
-                    DATA_DIR.mkdir(exist_ok=True)
-                    atomic_write(DATA_DIR / "blockchain.json", bc.serialize())
-                    print(f"Block #{block.header.index} mined! Hash: {block.hash[:32]}...")
-                    print(f"Balance: {bc.balance(w.pubkey_hex()):.8f} TRC")
+        import asyncio
+        asyncio.run(miner.mine_continuous(w.pubkey_hex(), callback=None))
     except KeyboardInterrupt:
-        print("\nMining stopped")
+        miner.stop()
 
 
 def atomic_write(path, data):
