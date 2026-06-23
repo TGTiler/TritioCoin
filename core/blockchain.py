@@ -43,11 +43,42 @@ class Blockchain:
         self.chain = []
         self.difficulty = int(self.db.get_metadata("difficulty") or self.config.difficulty)
         db_height = self.db.get_block_height()
+        loaded = 0
         for i in range(db_height + 1):
             block_data = self.db.get_block(i)
             if block_data:
                 b = Block.deserialize(block_data)
+                # Validate each block on load
+                if i > 0 and not self._validate_loaded_block(b, loaded):
+                    logger.warning(f"Invalid block at height {i}, stopping load")
+                    break
                 self.chain.append(b)
+                loaded += 1
+        logger.info(f"Loaded {loaded}/{db_height + 1} blocks from database")
+
+    def _validate_loaded_block(self, block: Block, prev_index: int) -> bool:
+        """Validate a block when loading from database."""
+        if len(self.chain) == 0:
+            return True  # Genesis block
+
+        prev = self.chain[-1]
+
+        # Check block hash matches content
+        if block.hash and block.hash != block.content_hash():
+            logger.warning(f"Block hash mismatch at height {block.header.index}")
+            return False
+
+        # Check previous hash links
+        if block.header.previous_hash.hex() != prev.hash:
+            logger.warning(f"Block chain broken at height {block.header.index}")
+            return False
+
+        # Check PoW hash
+        if block.pow_hash and not block.pow_hash.startswith("0" * block.header.difficulty):
+            logger.warning(f"Invalid PoW at height {block.header.index}")
+            return False
+
+        return True
 
     def _genesis(self):
         g = Block(0, "0" * 64, [], self.difficulty)
@@ -89,18 +120,35 @@ class Blockchain:
         return True
 
     def _validate(self, block: Block) -> bool:
+        """Validate a block before adding to chain."""
         prev = self.latest()
+
+        # Check block height
         if block.header.index != prev.header.index + 1:
-            return False
-        if block.header.previous_hash.hex() != prev.hash:
-            return False
-        if not block.pow_hash or not block.pow_hash.startswith("0" * block.header.difficulty):
-            return False
-        if block.header.timestamp > int(time.time()) + 300:
-            return False
-        if block.hash != block.content_hash():
+            logger.warning(f"Invalid height: {block.header.index} != {prev.header.index + 1}")
             return False
 
+        # Check previous hash
+        if block.header.previous_hash.hex() != prev.hash:
+            logger.warning(f"Invalid previous hash at height {block.header.index}")
+            return False
+
+        # Check PoW hash
+        if not block.pow_hash or not block.pow_hash.startswith("0" * block.header.difficulty):
+            logger.warning(f"Invalid PoW hash at height {block.header.index}")
+            return False
+
+        # Check timestamp (not too far in future)
+        if block.header.timestamp > int(time.time()) + 300:
+            logger.warning(f"Block timestamp too far in future: {block.header.timestamp}")
+            return False
+
+        # Check block hash matches content
+        if block.hash and block.hash != block.content_hash():
+            logger.warning(f"Block hash mismatch at height {block.header.index}")
+            return False
+
+        # Validate transactions
         expected_reward = self.reward_at_satoshis()
         coinbase_count = 0
         block_total_satoshis = 0
@@ -108,7 +156,7 @@ class Blockchain:
         for tx_data in block.transactions:
             tx = Transaction.from_dict(tx_data)
             if not tx.is_valid():
-                logger.warning(f"Invalid tx: {tx}")
+                logger.warning(f"Invalid transaction in block {block.header.index}")
                 return False
 
             if tx.sender_pubkey == "COINBASE":
@@ -122,17 +170,19 @@ class Blockchain:
                 sender_balance = self.balance_satoshis(tx.sender_pubkey)
                 needed = trc_to_satoshis(tx.amount + tx.fee)
                 if sender_balance < needed:
-                    logger.warning(f"Insufficient balance: {sender_balance} < {needed}")
+                    logger.warning(f"Insufficient balance in block {block.header.index}")
                     return False
                 if self.db.has_utxo(tx.tx_hash):
-                    logger.warning(f"Double-spend: {tx.tx_hash[:16]}")
+                    logger.warning(f"Double-spend in block {block.header.index}")
                     return False
                 block_total_satoshis += trc_to_satoshis(tx.fee)
 
+        # Check coinbase count
         if coinbase_count > 1:
             logger.warning("Multiple coinbase transactions")
             return False
 
+        # Check supply cap
         total_mined = self.total_mined_satoshis()
         if total_mined + block_total_satoshis > self.config.max_supply_satoshis:
             logger.warning("Supply cap exceeded")
@@ -187,6 +237,41 @@ class Blockchain:
     def _debit_satoshis(self, addr: str, amount_sat: int):
         current = self.db.get_balance(addr)
         self.db.set_balance(addr, current - amount_sat)
+
+    def verify_block(self, block: Block) -> bool:
+        """Verify a block is valid without adding it to chain."""
+        return self._validate(block)
+
+    def get_block_hash(self, height: int) -> Optional[str]:
+        """Get block hash by height."""
+        if 0 <= height < len(self.chain):
+            return self.chain[height].hash
+        return None
+
+    def is_chain_valid(self) -> bool:
+        """Verify the entire chain is valid."""
+        if len(self.chain) == 0:
+            return True
+
+        # Check genesis
+        genesis = self.chain[0]
+        if genesis.header.index != 0:
+            return False
+
+        # Check each block
+        for i in range(1, len(self.chain)):
+            block = self.chain[i]
+            prev = self.chain[i - 1]
+
+            if block.header.previous_hash.hex() != prev.hash:
+                logger.warning(f"Chain broken at height {i}")
+                return False
+
+            if block.hash and block.hash != block.content_hash():
+                logger.warning(f"Block hash mismatch at height {i}")
+                return False
+
+        return True
 
     def balance_satoshis(self, address: str) -> int:
         return self.db.get_balance(address)
