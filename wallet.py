@@ -57,10 +57,105 @@ def load_chain() -> Blockchain:
 
 
 def connect_to_seed():
-    """Try to connect to a seed node and sync."""
+    """Connect to seed using full discovery system (GitHub + DHT + local)."""
     import socket
-    seeds = []
+    import urllib.request
+
+    all_peers = []
+
+    # 1. Fetch from GitHub (updated seed list)
+    try:
+        response = urllib.request.urlopen(
+            "https://raw.githubusercontent.com/TGTiler/TritioCoin/refs/heads/main/seeds.json",
+            timeout=5
+        )
+        data = json.loads(response.read().decode())
+        if isinstance(data, dict):
+            github_seeds = data.get("seeds", [])
+        else:
+            github_seeds = data if isinstance(data, list) else []
+        if github_seeds:
+            all_peers.extend(github_seeds)
+            print(f"  GitHub: {len(github_seeds)} seeds encontrados")
+    except:
+        pass
+
+    # 2. Load local seeds.json
     seeds_file = DATA_DIR / "seeds.json"
+    if seeds_file.exists():
+        try:
+            with open(seeds_file) as f:
+                data = json.load(f)
+                local_seeds = data.get("seeds", []) if isinstance(data, dict) else data
+                if local_seeds:
+                    all_peers.extend(local_seeds)
+                    print(f"  Local: {len(local_seeds)} seeds")
+        except:
+            pass
+
+    # 3. Check node status for running nodes
+    status_file = DATA_DIR / "status.json"
+    if status_file.exists():
+        try:
+            with open(status_file) as f:
+                status = json.load(f)
+                port = status.get("port", 8333)
+                local_seed = f"127.0.0.1:{port}"
+                if local_seed not in all_peers:
+                    all_peers.append(local_seed)
+                    print(f"  Local: node rodando na porta {port}")
+        except:
+            pass
+
+    # Remove duplicates
+    all_peers = list(dict.fromkeys(all_peers))
+
+    if not all_peers:
+        print("  Nenhum seed encontrado. Usando dados locais.")
+        return False
+
+    # Try to connect (keep trying until connected)
+    print(f"  Buscando peers... ({len(all_peers)} candidatos)")
+    connected = False
+    attempts = 0
+    max_attempts = 3
+
+    while not connected and attempts < max_attempts:
+        attempts += 1
+        for seed in all_peers:
+            try:
+                host, port_str = seed.rsplit(":", 1)
+                port = int(port_str)
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.settimeout(3)
+                result = sock.connect_ex((host, port))
+                sock.close()
+                if result == 0:
+                    print(f"  Seed {seed} conectado!")
+                    connected = True
+                    # Save connected peer for future use
+                    try:
+                        save_connected_peer(seed)
+                    except:
+                        pass
+                    break
+            except:
+                continue
+
+        if not connected and attempts < max_attempts:
+            print(f"  Tentativa {attempts}/{max_attempts}... tentando novamente em 2s")
+            import time
+            time.sleep(2)
+
+    if not connected:
+        print("  Nenhum seed disponivel. Usando dados locais.")
+    return connected
+
+
+def save_connected_peer(peer: str):
+    """Save a connected peer to seeds.json for future use."""
+    seeds_file = DATA_DIR / "seeds.json"
+    seeds = []
     if seeds_file.exists():
         try:
             with open(seeds_file) as f:
@@ -69,29 +164,11 @@ def connect_to_seed():
         except:
             pass
 
-    if not seeds:
-        print("  Nenhum seed encontrado. Usando dados locais.")
-        return False
-
-    print(f"  Conectando a rede...")
-    connected = False
-    for seed in seeds:
-        try:
-            host, port = seed.split(":")
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(3)
-            result = sock.connect_ex((host, int(port)))
-            sock.close()
-            if result == 0:
-                print(f"  Seed {seed} conectado!")
-                connected = True
-                break
-        except:
-            continue
-
-    if not connected:
-        print("  Nenhum seed disponivel. Usando dados locais.")
-    return connected
+    if peer not in seeds:
+        seeds.append(peer)
+        DATA_DIR.mkdir(exist_ok=True)
+        with open(seeds_file, "w") as f:
+            json.dump({"seeds": seeds}, f, indent=2)
 
 
 def atomic_write(path, data):
