@@ -38,6 +38,7 @@ echo.
 echo  ============================================
 set /p opcao="  Selecione: "
 
+if "%opcao%"=="" goto MENU
 if "%opcao%"=="1" goto INSTALAR
 if "%opcao%"=="2" goto CRIAR
 if "%opcao%"=="3" goto CRIAR_Q
