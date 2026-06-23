@@ -735,20 +735,12 @@ class TritioNode(GossipNode):
         if self.blockchain.add_block(block):
             self.blockchain.adjust_difficulty()
 
-            # Announce block via gossip
-            await self.gossip_announce_block(block.hash, block.header.index)
-
-            # Broadcast compact block
-            tx_hashes = [tx.get("hash") for tx in block.transactions]
-            compact = {
-                "type": "COMPACT_BLOCK",
-                "header": block.serialize()["header"],
-                "tx_hashes": tx_hashes,
-                "pow_hash": block.pow_hash,
-                "hash": block.hash,
-                "validator_signatures": block.validator_signatures
-            }
-            await self.p2p.broadcast(compact)
+            # Broadcast FULL block (not compact - coinbase is not in mempool)
+            await self.p2p.broadcast({
+                "type": "NEW_BLOCK",
+                "block": block.serialize()
+            })
+            logger.info(f"Block #{block.header.index} broadcast to all peers")
 
             # Distribute rewards
             self.consensus.distribute_block_rewards(block)
