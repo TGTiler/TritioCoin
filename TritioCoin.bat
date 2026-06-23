@@ -159,7 +159,7 @@ echo.
 echo  Iniciando seed na porta %porta%...
 echo  Deixe este terminal ABERTO!
 echo.
-python main.py --port %porta% --mode miner --become-seed
+python main.py --port %porta% --mode passive --become-seed
 pause
 goto MENU
 
