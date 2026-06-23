@@ -33,39 +33,39 @@ class TestPeerReputation:
 
     def test_initial_score(self):
         """Test initial peer score."""
-        rep = PeerReputation()
+        rep = PeerReputation(persist=False)
         score = rep.get_peer("192.168.1.1:8333")
         assert score.score == 100
 
     def test_valid_message(self):
         """Test valid message increases score."""
-        rep = PeerReputation()
+        rep = PeerReputation(persist=False)
         rep.on_valid_message("192.168.1.1:8333", "NEW_BLOCK")
         assert rep.get_score("192.168.1.1:8333") > 100
 
     def test_invalid_message(self):
         """Test invalid message decreases score."""
-        rep = PeerReputation()
+        rep = PeerReputation(persist=False)
         for _ in range(15):
             rep.on_invalid_message("192.168.1.1:8333", "spam")
         assert rep.is_banned("192.168.1.1:8333")
 
     def test_manual_ban(self):
         """Test manual peer banning."""
-        rep = PeerReputation()
+        rep = PeerReputation(persist=False)
         rep.ban_peer("192.168.1.1:8333", "DDoS", 300)
         assert rep.is_banned("192.168.1.1:8333")
 
     def test_unban(self):
         """Test peer unbanning."""
-        rep = PeerReputation()
+        rep = PeerReputation(persist=False)
         rep.ban_peer("192.168.1.1:8333", "test", 300)
         rep.unban_peer("192.168.1.1:8333")
         assert not rep.is_banned("192.168.1.1:8333")
 
     def test_stats(self):
         """Test reputation statistics."""
-        rep = PeerReputation()
+        rep = PeerReputation(persist=False)
         rep.on_connect("peer1")
         rep.on_valid_message("peer1")
         stats = rep.get_stats()
@@ -73,7 +73,7 @@ class TestPeerReputation:
 
     def test_get_top_peers(self):
         """Test top peers retrieval."""
-        rep = PeerReputation()
+        rep = PeerReputation(persist=False)
         for i in range(5):
             rep.on_valid_message(f"peer{i}")
         top = rep.get_top_peers(3)
@@ -81,9 +81,9 @@ class TestPeerReputation:
 
     def test_cleanup(self):
         """Test old peer cleanup."""
-        rep = PeerReputation()
+        rep = PeerReputation(persist=False)
         rep.on_connect("old_peer")
-        rep.peers["old_peer"].last_seen = 0  # Set to old time
+        rep.peers["old_peer"].last_seen = 0
         rep.cleanup()
         assert "old_peer" not in rep.peers
 
