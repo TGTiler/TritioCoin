@@ -455,17 +455,28 @@ class TritioNode(GossipNode):
             if added > 0:
                 logger.info(f"Synced {added} blocks (height: {self.blockchain.height()})")
         else:
-            # Full chain sync - replace local chain entirely
+            # Full chain sync
             remote = Blockchain.deserialize(chain_data, self.net_config, self.db)
+
             if remote.height() > old_height and remote.is_valid():
-                # Replace local chain with remote chain
+                # Remote is taller - accept it
                 self.blockchain = remote
                 self.p2p.blockchain_height = self.blockchain.height()
                 logger.info(f"Chain synced: {self.blockchain.height()} blocks (was {old_height})")
-                # Save the new chain
                 self._save_chain()
-            elif remote.height() == old_height:
-                logger.info("Chain already up to date")
+
+            elif remote.height() == old_height and remote.height() > 0:
+                # Same height - compare genesis hashes to detect fake chain
+                local_genesis = self.blockchain.chain[0].hash if self.blockchain.chain else None
+                remote_genesis = remote.chain[0].hash if remote.chain else None
+                if local_genesis and remote_genesis and local_genesis != remote_genesis:
+                    logger.warning(f"FAKE CHAIN DETECTED! Local genesis: {local_genesis[:16]}... != Remote: {remote_genesis[:16]}...")
+                    # Reject fake chain - do not replace
+                else:
+                    logger.info("Chain already up to date")
+
+            elif remote.height() < old_height:
+                logger.info(f"Remote chain shorter ({remote.height()} < {old_height}), keeping local")
 
     async def _handle_seed_announce(self, msg: dict):
         """Another node announced itself as seed. Add to seeds.json and gossip."""
