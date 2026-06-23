@@ -93,7 +93,6 @@ class P2PNode:
         self.node_id = self._generate_node_id()
         self.rate_limiter = RateLimiter()
         self.ssl_context = None
-        self.ssl_client_context = None
         self.reputation = None
         self.nat = NATTraversal()
         self.external_address = None
@@ -295,7 +294,9 @@ class P2PNode:
             "REQUEST_SIGNATURE", "BLOCK_SIGNATURE", "REGISTER_VALIDATOR",
             "DELEGATE", "PING", "PONG",
             "BLOCK_ANNOUNCE", "TX_ANNOUNCE",
-            "SYNC_REQUEST", "SYNC_BLOCK_BATCH", "GET_BLOCKS"
+            "SYNC_REQUEST", "SYNC_BLOCK_BATCH", "GET_BLOCKS",
+            "FIND_NODE", "FIND_VALUE", "STORE", "GET_PEERS",
+            "NODES", "VALUE", "STORED", "PEERS"
         }
         return msg_type in valid_types
 
