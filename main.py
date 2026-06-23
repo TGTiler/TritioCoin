@@ -7,6 +7,7 @@ import random
 import signal
 import sys
 import os
+import ecdsa
 from pathlib import Path
 
 from core.blockchain import Blockchain
@@ -177,14 +178,12 @@ class TritioNode(GossipNode):
         if path.exists():
             try:
                 with open(path) as f:
-                    bc = Blockchain.deserialize(json.load(f))
+                    bc = Blockchain.deserialize(json.load(f), self.net_config, self.db)
                 logger.info(f"Chain loaded: {bc.height()} blocks")
                 return bc
             except Exception as e:
                 logger.warning(f"Chain load error: {e}")
-        bc = Blockchain(self.config.get('difficulty', 4))
-        self._save_chain(bc)
-        return bc
+        return self.blockchain
 
     def _save_chain(self, bc: Blockchain = None):
         bc = bc or self.blockchain
@@ -456,12 +455,15 @@ class TritioNode(GossipNode):
             if added > 0:
                 logger.info(f"Synced {added} blocks (height: {self.blockchain.height()})")
         else:
-            # Full chain sync
+            # Full chain sync - replace local chain entirely
             remote = Blockchain.deserialize(chain_data, self.net_config, self.db)
             if remote.height() > old_height and remote.is_valid():
+                # Replace local chain with remote chain
                 self.blockchain = remote
                 self.p2p.blockchain_height = self.blockchain.height()
                 logger.info(f"Chain synced: {self.blockchain.height()} blocks (was {old_height})")
+                # Save the new chain
+                self._save_chain()
             elif remote.height() == old_height:
                 logger.info("Chain already up to date")
 
