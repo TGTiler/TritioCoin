@@ -1,12 +1,13 @@
 """
 TritioCoin CLI Wallet
-Commands: create, balance, send, history, info, list, peers
+Commands: create, balance, send, history, info, list, peers, mine
 """
 import sys
 import os
 import json
 import time
 import getpass
+import asyncio
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -22,7 +23,6 @@ DATA_DIR = Path("tritiocoin_data")
 
 
 def prompt_password(confirm=False) -> str:
-    """Prompt user for password."""
     pw = getpass.getpass("Password: ")
     if confirm:
         pw2 = getpass.getpass("Confirm password: ")
@@ -43,18 +43,62 @@ def get_wallet(quantum=False, password=None) -> Wallet:
             if isinstance(e, InvalidTag):
                 print("ERRO: Senha incorreta!")
                 print("A carteira esta criptografada com outra senha.")
-                print("Tente novamente com a senha correta.")
                 sys.exit(1)
             raise
     print("ERRO: Carteira nao encontrada!")
     print(f"Arquivo esperado: {path}")
-    print("Crie uma carteira primeiro (opcao 2 do menu).")
+    print("Crie uma carteira primeiro: python wallet.py create")
     sys.exit(1)
 
 
 def load_chain() -> Blockchain:
     db = Database(DATA_DIR / "mainnet.db")
     return Blockchain(MAINNET, db)
+
+
+def connect_to_seed():
+    """Try to connect to a seed node and sync."""
+    import socket
+    seeds = []
+    seeds_file = DATA_DIR / "seeds.json"
+    if seeds_file.exists():
+        try:
+            with open(seeds_file) as f:
+                data = json.load(f)
+                seeds = data.get("seeds", []) if isinstance(data, dict) else data
+        except:
+            pass
+
+    if not seeds:
+        print("  Nenhum seed encontrado. Usando dados locais.")
+        return False
+
+    print(f"  Conectando a rede...")
+    connected = False
+    for seed in seeds:
+        try:
+            host, port = seed.split(":")
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(3)
+            result = sock.connect_ex((host, int(port)))
+            sock.close()
+            if result == 0:
+                print(f"  Seed {seed} conectado!")
+                connected = True
+                break
+        except:
+            continue
+
+    if not connected:
+        print("  Nenhum seed disponivel. Usando dados locais.")
+    return connected
+
+
+def atomic_write(path, data):
+    tmp = str(path) + ".tmp"
+    with open(tmp, 'w') as f:
+        json.dump(data, f)
+    os.replace(tmp, str(path))
 
 
 def cmd_create(args):
@@ -82,11 +126,9 @@ def cmd_create(args):
     print()
     print(f"  Saved to: {DATA_DIR / name}")
     print(f"  Encrypted: AES-256-GCM")
-    return w
 
 
 def cmd_recover(args):
-    """Recover wallet from mnemonic."""
     quantum = '--quantum' in sys.argv
     print("Recover wallet from recovery phrase.")
     print()
@@ -120,30 +162,53 @@ def cmd_balance(args):
     quantum = '--quantum' in sys.argv
     password = prompt_password()
     w = get_wallet(quantum, password)
+
+    print("  Conectando para obter dados atualizados...")
+    connect_to_seed()
+
     bc = load_chain()
     bal = bc.balance(w.pubkey_hex()) + bc.balance(w.address)
-    print(f"Address: {w.address}")
-    print(f"Balance: {bal:.8f} TRC")
-    print(f"Chain:   {bc.height()} blocks")
+    print()
+    print(f"  Address: {w.address}")
+    print(f"  Balance: {bal:.8f} TRC")
+    print(f"  Chain:   {bc.height()} blocks (local)")
+    print()
+    print("  Nota: Para dados em tempo real, inicie um node (opcao 8 ou 12)")
 
 
 def cmd_send(args):
-    if len(args) < 2:
-        print("Usage: wallet.py send <recipient> <amount> [fee]")
-        return
-    recipient = args[0]
-    amount = float(args[1])
-    fee = float(args[2]) if len(args) > 2 else 0.001
-
     quantum = '--quantum' in sys.argv
     password = prompt_password()
     w = get_wallet(quantum, password)
+
+    # Valores interativos
+    recipient = input("  Endereco do destinatario: ").strip()
+    if not recipient:
+        print("  Cancelado.")
+        return
+
+    amount_str = input("  Valor (TRC): ").strip()
+    if not amount_str:
+        print("  Cancelado.")
+        return
+    try:
+        amount = float(amount_str)
+    except ValueError:
+        print("  ERRO: Valor invalido!")
+        return
+
+    fee_str = input("  Taxa (padrao 0.001): ").strip()
+    fee = float(fee_str) if fee_str else 0.001
+
+    print("  Conectando a rede...")
+    connect_to_seed()
+
     bc = load_chain()
     mempool = Mempool()
 
-    bal = bc.balance(w.pubkey_hex())
+    bal = bc.balance(w.pubkey_hex()) + bc.balance(w.address)
     if bal < amount + fee:
-        print(f"Insufficient funds: {bal:.8f} < {amount + fee:.8f}")
+        print(f"  ERRO: Saldo insuficiente! ({bal:.8f} < {amount + fee:.8f})")
         return
 
     tx = Transaction(w.pubkey_hex(), recipient, amount, fee)
@@ -155,7 +220,7 @@ def cmd_send(args):
     tx.tx_hash = tx.compute_hash()
 
     if not tx.is_valid():
-        print("Transaction validation failed")
+        print("  ERRO: Transacao invalida!")
         return
 
     mempool.add(tx)
@@ -170,13 +235,15 @@ def cmd_send(args):
     with open(mempool_path, 'w') as f:
         json.dump(existing, f)
 
-    print(f"Transaction created: {tx}")
-    print(f"  From:     {w.address}")
-    print(f"  To:       {recipient}")
-    print(f"  Amount:   {amount} TRC")
-    print(f"  Fee:      {fee} TRC")
-    print(f"  Mode:     {tx.signature_mode}")
+    print()
+    print(f"  Transacao criada com sucesso!")
+    print(f"  De:       {w.address}")
+    print(f"  Para:     {recipient}")
+    print(f"  Valor:    {amount} TRC")
+    print(f"  Taxa:     {fee} TRC")
     print(f"  Hash:     {tx.tx_hash[:32]}...")
+    print()
+    print("  Para confirmar, inicie um node (opcao 8 ou 12)")
 
 
 def cmd_history(args):
@@ -186,25 +253,29 @@ def cmd_history(args):
     bc = load_chain()
     hist = bc.history(w.pubkey_hex()) + bc.history(w.address)
     if not hist:
-        print("No transactions found")
+        print("  Nenhuma transacao encontrada")
         return
-    print(f"Transaction history for {w.address[:24]}...")
-    print(f"{'Block':<8} {'From':<20} {'To':<20} {'Amount':<12} {'Fee':<8}")
-    print("-" * 68)
+    print(f"  Historico para {w.address[:24]}...")
+    print(f"  {'Bloco':<8} {'De':<20} {'Para':<20} {'Valor':<12} {'Taxa':<8}")
+    print("  " + "-" * 68)
     for h in sorted(hist, key=lambda x: x['block']):
-        print(f"{h['block']:<8} {h['from']:<20} {h['to']:<20} "
+        print(f"  {h['block']:<8} {h['from']:<20} {h['to']:<20} "
               f"{h['amount']:<12.4f} {h['fee']:<8.6f}")
 
 
 def cmd_info(args):
+    print("  Conectando a rede...")
+    connect_to_seed()
+
     bc = load_chain()
     s = bc.stats()
     mined_pct = (s['circulating_satoshis'] / s['max_supply_satoshis']) * 100 if s['max_supply_satoshis'] > 0 else 0
-    print("TritioCoin Network Info")
+    print()
+    print("  TritioCoin Network Info")
     print(f"  Height:              {s['height']}")
     print(f"  Transactions:        {s['transactions']}")
     print(f"  Difficulty:          {s['difficulty']}")
-    print(f"  Reward:              {s['reward_trc']:.8f} TRC ({s['reward_satoshis']:,} sat)")
+    print(f"  Reward:              {s['reward_trc']:.8f} TRC")
     print(f"  Block Time:          ~5 minutes")
     print(f"  Total Mined:         {s['total_mined_trc']:.2f} / {s['max_supply_trc']:,.0f} TRC")
     print(f"  Total Burned:        {s['total_burned_trc']:.2f} TRC")
@@ -212,16 +283,69 @@ def cmd_info(args):
     print(f"  Supply Remaining:    {s['supply_remaining_trc']:.2f} TRC")
     print(f"  Burn Rate:           {s['burn_rate']*100:.0f}% of fees")
     print(f"  Next Halving:        Block {s['next_halving']:,}")
-    print(f"  Halving Interval:    190,000 blocks")
     print(f"  Addresses:           {s['addresses']}")
     print(f"  Valid:               {'Yes' if s['valid'] else 'No'}")
 
 
 def cmd_list(args):
+    print("  Carteiras encontradas:")
+    print()
+    found = False
     for name in ["wallet.json", "wallet_quantum.json"]:
         path = DATA_DIR / name
         if path.exists():
-            print(f"[{'QR' if 'quantum' in name else 'TRC'}] {name}")
+            found = True
+            tag = "QR (quantica)" if "quantum" in name else "TRC (padrao)"
+            try:
+                with open(path) as f:
+                    data = json.load(f)
+                addr = data.get("address", "?")
+                print(f"  [{tag}]")
+                print(f"    Arquivo: {name}")
+                print(f"    Endereco: {addr}")
+                print()
+            except:
+                print(f"  [{tag}] {name} (erro ao ler)")
+                print()
+
+    if not found:
+        print("  Nenhuma carteira encontrada.")
+        print("  Crie uma com: python wallet.py create")
+
+
+def cmd_peers(args):
+    print("  Conectando a rede...")
+    connected = connect_to_seed()
+
+    status_path = DATA_DIR / "status.json"
+    if status_path.exists():
+        with open(status_path) as f:
+            status = json.load(f)
+
+        print()
+        print("  TritioCoin Node Status")
+        print(f"  Port:      {status.get('port', '?')}")
+        print(f"  Mode:      {status.get('mode', '?')}")
+        print(f"  Role:      {status.get('role', 'peer')}")
+        print(f"  Address:   {status.get('address', '?')}")
+        print(f"  Height:    {status.get('height', '?')} blocks")
+        print(f"  Difficulty: {status.get('difficulty', '?')}")
+        print(f"  Mempool:   {status.get('mempool', 0)} txs")
+        print(f"  Mining:    {'Yes' if status.get('is_mining') else 'No'}")
+        print()
+
+        peers = status.get('peers', [])
+        count = status.get('peers_count', 0)
+        print(f"  Connected Peers: {count}")
+        if peers:
+            for p in peers:
+                print(f"    - {p}")
+        else:
+            print("    (nenhum)")
+    else:
+        print()
+        print("  Nenhum node rodando.")
+        print("  Inicie com: python main.py --mode passive")
 
 
 def cmd_mine(args):
@@ -267,52 +391,12 @@ def cmd_mine(args):
     print(f"  Threads: {threads}")
 
     try:
-        import asyncio
-
         async def async_on_block(block):
             on_block_found(block)
 
         asyncio.run(miner.mine_continuous(w.address, callback=async_on_block))
     except KeyboardInterrupt:
         miner.stop()
-
-
-def atomic_write(path, data):
-    tmp = str(path) + ".tmp"
-    with open(tmp, 'w') as f:
-        json.dump(data, f)
-    os.replace(tmp, str(path))
-
-
-def cmd_peers(args):
-    """Show connected peers in real-time."""
-    status_path = DATA_DIR / "status.json"
-    if not status_path.exists():
-        print("No node running. Start with: python main.py")
-        return
-
-    with open(status_path) as f:
-        status = json.load(f)
-
-    print("TritioCoin Node Status")
-    print(f"  Port:     {status.get('port', '?')}")
-    print(f"  Mode:     {status.get('mode', '?')}")
-    print(f"  Role:     {status.get('role', 'peer')}")
-    print(f"  Address:  {status.get('address', '?')}")
-    print(f"  Height:   {status.get('height', '?')} blocks")
-    print(f"  Difficulty: {status.get('difficulty', '?')}")
-    print(f"  Mempool:  {status.get('mempool', 0)} txs")
-    print(f"  Mining:   {'Yes' if status.get('is_mining') else 'No'}")
-    print()
-
-    peers = status.get('peers', [])
-    count = status.get('peers_count', 0)
-    print(f"  Connected Peers: {count}")
-    if peers:
-        for p in peers:
-            print(f"    - {p}")
-    else:
-        print("    (none)")
 
 
 CMDS = {
@@ -338,7 +422,7 @@ def main():
         print("  create              Create a new wallet (shows mnemonic)")
         print("  recover             Recover wallet from mnemonic")
         print("  balance             Show wallet balance")
-        print("  send <to> <amt> [fee]  Send TRC to address")
+        print("  send                Send TRC to address")
         print("  history             Show transaction history")
         print("  info                Show network info")
         print("  list                List all wallets")
