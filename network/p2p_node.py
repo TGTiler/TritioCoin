@@ -454,7 +454,9 @@ class P2PNode:
             "GET_BLOCK", "GET_TX", "NEW_TX", "GET_CHAIN", "CHAIN",
             "SEED_ANNOUNCE", "SEED_REMOVE", "SEED_SYNC",
             "REQUEST_SIGNATURE", "BLOCK_SIGNATURE", "REGISTER_VALIDATOR",
-            "DELEGATE", "PING", "PONG", "CHALLENGE", "CHALLENGE_RESPONSE"
+            "DELEGATE", "PING", "PONG", "CHALLENGE", "CHALLENGE_RESPONSE",
+            "BLOCK_ANNOUNCE", "TX_ANNOUNCE",
+            "SYNC_REQUEST", "SYNC_BLOCK_BATCH", "GET_BLOCKS"
         }
         return msg_type in valid_types
 
