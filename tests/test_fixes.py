@@ -118,7 +118,7 @@ def test_wallet_not_found():
     assert exit_code == 1, f"Exit code should be 1, got {exit_code}"
     assert 'Carteira' in msg, f"Should mention 'Carteira', got: {msg}"
     assert 'ERRO' in msg, f"Should have ERRO, got: {msg}"
-    assert 'opcao 2' in msg, f"Should mention opcao 2, got: {msg}"
+    assert 'create' in msg.lower() or 'criar' in msg.lower(), f"Should mention create/criar, got: {msg}"
     print("  OK")
 
 
