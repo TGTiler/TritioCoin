@@ -142,6 +142,7 @@ class P2PNode:
         self.reputation = None
         self.nat = NATTraversal()
         self.external_address = None
+        self.blockchain_height = 0
         self._setup_certs()
 
     def _generate_node_id(self) -> str:
@@ -254,14 +255,15 @@ class P2PNode:
             self.peers[key] = writer
             asyncio.create_task(self._read_loop(reader, writer, key))
 
-            # Send handshake with protocol version
+            # Send handshake with protocol version and height
             await self._send(writer, {
                 "type": "HANDSHAKE",
                 "version": PROTOCOL_VERSION,
                 "min_version": MIN_PROTOCOL_VERSION,
                 "node_id": self.node_id,
                 "port": self.port,
-                "external_address": self.external_address
+                "external_address": self.external_address,
+                "height": self.blockchain_height
             })
 
             if self.reputation:
