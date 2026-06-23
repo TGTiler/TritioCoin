@@ -123,6 +123,9 @@ class TritioNode(GossipNode):
         self.max_orphans = 50
         self._pending_signatures: dict = {}
 
+        # Update P2P height after blockchain loads
+        self.p2p.blockchain_height = self.blockchain.height()
+
         logger.info(f"Node started | Network: {self.network} | Mode: {self.mode} | "
                     f"Quantum: {'ON' if self.quantum else 'OFF'} | "
                     f"Address: {self.wallet.address} | "
@@ -205,6 +208,9 @@ class TritioNode(GossipNode):
             if isinstance(peer_height, int) and peer_height > self.blockchain.height():
                 logger.info(f"Peer {peer} has more blocks ({peer_height} > {self.blockchain.height()}), requesting sync")
                 await self.p2p.send(peer, {"type": "GET_CHAIN"})
+            else:
+                # Peer might be behind - send our chain info
+                logger.info(f"Handshake from {peer} (peer_height={peer_height}, my_height={self.blockchain.height()})")
             remote_seeds = msg.get("seeds", [])
             await self._merge_seeds(remote_seeds)
 
@@ -213,7 +219,10 @@ class TritioNode(GossipNode):
             height = msg.get("height", "?")
             logger.info(f"Connected to {peer} (height={height}, role={role})")
             if isinstance(height, int) and height > self.blockchain.height():
+                logger.info(f"Remote has more blocks, syncing from {peer}")
                 await self.start_sync(peer, height)
+            elif isinstance(height, int) and height < self.blockchain.height():
+                logger.info(f"I have more blocks ({self.blockchain.height()} > {height}), should broadcast")
             remote_seeds = msg.get("seeds", [])
             await self._merge_seeds(remote_seeds)
 
@@ -291,6 +300,7 @@ class TritioNode(GossipNode):
             return
 
         if self.blockchain.add_block(block):
+            self.p2p.blockchain_height = self.blockchain.height()
             self.mempool.remove_many(
                 [tx.get("hash") for tx in block.transactions if tx.get("hash")]
             )
@@ -387,6 +397,7 @@ class TritioNode(GossipNode):
 
                 if orphan.header.previous_hash.hex() == self.blockchain.latest().hash:
                     if self.blockchain.add_block(orphan):
+                        self.p2p.blockchain_height = self.blockchain.height()
                         self.mempool.remove_many(
                             [tx.get("hash") for tx in orphan.transactions if tx.get("hash")]
                         )
@@ -733,6 +744,7 @@ class TritioNode(GossipNode):
             block.validator_signatures.extend(self._pending_signatures.pop(block.hash))
 
         if self.blockchain.add_block(block):
+            self.p2p.blockchain_height = self.blockchain.height()
             self.blockchain.adjust_difficulty()
 
             # Broadcast FULL block (not compact - coinbase is not in mempool)
