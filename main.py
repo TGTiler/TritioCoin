@@ -207,7 +207,7 @@ class TritioNode(GossipNode):
             # If peer has more blocks, request sync
             if isinstance(peer_height, int) and peer_height > self.blockchain.height():
                 logger.info(f"Peer {peer} has more blocks ({peer_height} > {self.blockchain.height()}), requesting sync")
-                await self.p2p.send(peer, {"type": "GET_CHAIN"})
+                await self.p2p.send(peer, {"type": "GET_CHAIN", "my_height": self.blockchain.height()})
             else:
                 # Peer might be behind - send our chain info
                 logger.info(f"Handshake from {peer} (peer_height={peer_height}, my_height={self.blockchain.height()})")
@@ -242,8 +242,22 @@ class TritioNode(GossipNode):
             await self._handle_get_tx(msg, peer)
 
         elif t == "GET_CHAIN":
-            await self.p2p.send(peer, {"type": "CHAIN",
-                                        "chain": self.blockchain.serialize()})
+            # Send only blocks the peer needs
+            peer_height = msg.get("my_height", 0)
+            if isinstance(peer_height, int) and peer_height > 0:
+                # Send only blocks from peer_height to end
+                blocks = []
+                for i in range(peer_height, self.blockchain.height()):
+                    block_data = self.blockchain.db.get_block(i)
+                    if block_data:
+                        blocks.append(block_data)
+                await self.p2p.send(peer, {"type": "CHAIN",
+                                            "chain": {"blocks": blocks, "difficulty": self.blockchain.difficulty}})
+                logger.info(f"Sent {len(blocks)} blocks to peer (from height {peer_height})")
+            else:
+                # Send full chain (fallback)
+                await self.p2p.send(peer, {"type": "CHAIN",
+                                            "chain": self.blockchain.serialize()})
 
         elif t == "CHAIN":
             await self._handle_chain(msg.get("chain"))
@@ -427,12 +441,29 @@ class TritioNode(GossipNode):
         if not chain_data:
             return
         old_height = self.blockchain.height()
-        remote = Blockchain.deserialize(chain_data, self.net_config, self.db)
-        if remote.height() > old_height and remote.is_valid():
-            self.blockchain = remote
-            logger.info(f"Chain synced: {self.blockchain.height()} blocks (was {old_height})")
-        elif remote.height() == old_height:
-            logger.info("Chain already up to date")
+
+        # Handle both full chain and partial sync
+        if "blocks" in chain_data:
+            # Partial sync - only new blocks
+            blocks = chain_data.get("blocks", [])
+            added = 0
+            for block_data in blocks:
+                from core.block import Block
+                block = Block.deserialize(block_data)
+                if self.blockchain.add_block(block):
+                    added += 1
+                    self.p2p.blockchain_height = self.blockchain.height()
+            if added > 0:
+                logger.info(f"Synced {added} blocks (height: {self.blockchain.height()})")
+        else:
+            # Full chain sync
+            remote = Blockchain.deserialize(chain_data, self.net_config, self.db)
+            if remote.height() > old_height and remote.is_valid():
+                self.blockchain = remote
+                self.p2p.blockchain_height = self.blockchain.height()
+                logger.info(f"Chain synced: {self.blockchain.height()} blocks (was {old_height})")
+            elif remote.height() == old_height:
+                logger.info("Chain already up to date")
 
     async def _handle_seed_announce(self, msg: dict):
         """Another node announced itself as seed. Add to seeds.json and gossip."""
