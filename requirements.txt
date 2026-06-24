@@ -1,7 +1,7 @@
 # TritioCoin Dependencies
 
 # Core
-argon2-cffi>=21.3.0      # Argon2id PoW hashing
+# blake2b PoW hashing (built into Python hashlib, no external dependency needed)
 ecdsa>=0.18.0             # ECDSA signatures (secp256k1)
 cryptography>=41.0.0      # AES-256-GCM wallet encryption, TLS certs
 mnemonic>=0.20.0          # BIP39 mnemonic backup
