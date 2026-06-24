@@ -24,7 +24,9 @@ from pathlib import Path
 logger = logging.getLogger("Discovery")
 
 SEED_URL = "https://raw.githubusercontent.com/TGTiler/TritioCoin/refs/heads/main/seeds.json"
-FALLBACK_SEEDS = []
+FALLBACK_SEEDS = [
+    "127.0.0.1:8333",
+]
 DNS_SEEDS = [
     "seeds.tritiocoin.org",
     "seed.tritiocoin.org",
