@@ -753,6 +753,11 @@ class TritioNode(GossipNode):
             await asyncio.sleep(2)
 
     async def _mining_loop(self):
+        # Wait for at least one peer connection before mining
+        while self.running and len(self.p2p.peers) == 0:
+            logger.info("Waiting for peer connection before mining...")
+            await asyncio.sleep(5)
+
         while self.running:
             if self.mode == 'miner':
                 block = await self.miner.mine_async(self.wallet.address)
