@@ -57,9 +57,39 @@ class NATTraversal:
     def __init__(self):
         self.external_ip = None
         self.external_port = None
+        self.upnp_device = None
 
     async def discover(self, internal_port: int) -> dict:
         result = {"internal_port": internal_port, "external_port": internal_port, "upnp": False}
+
+        # Try UPnP first
+        try:
+            import miniupnpc
+            u = miniupnpc.UPnP()
+            u.discoverdelay = 200
+            u.discover()
+            u.selectigd()
+            external_ip = u.externalip()
+            if external_ip:
+                self.external_ip = external_ip
+                result["external_ip"] = external_ip
+
+                addportmapping = u.addportmapping(
+                    internal_port, 'TCP', internal_port, 'UDP',
+                    'TritioCoin P2P'
+                )
+                if addportmapping:
+                    self.external_port = internal_port
+                    self.upnp_device = u
+                    result["upnp"] = True
+                    result["external_port"] = internal_port
+                    return result
+        except ImportError:
+            pass
+        except Exception as e:
+            logger.debug(f"UPnP failed: {e}")
+
+        # Fallback to IP lookup
         try:
             import urllib.request
             response = await asyncio.to_thread(
@@ -68,9 +98,16 @@ class NATTraversal:
             data = json.loads(response.read().decode())
             self.external_ip = data.get("ip")
             result["external_ip"] = self.external_ip
-        except:
+        except Exception:
             pass
         return result
+
+    def cleanup(self):
+        if self.upnp_device:
+            try:
+                self.upnp_device.deleteportmapping(self.external_port, 'TCP')
+            except Exception:
+                pass
 
     def get_external_address(self) -> Optional[str]:
         if self.external_ip and self.external_port:
@@ -120,7 +157,7 @@ class P2PNode:
         self.ssl_context.load_cert_chain(cert_file, key_file)
         try:
             self.ssl_context.minimum_version = ssl.TLSVersion.TLSv1_3
-        except:
+        except Exception:
             pass
 
         self.ssl_client_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
@@ -129,7 +166,7 @@ class P2PNode:
         self.ssl_client_context.verify_mode = ssl.CERT_NONE
         try:
             self.ssl_client_context.minimum_version = ssl.TLSVersion.TLSv1_3
-        except:
+        except Exception:
             pass
 
     def _generate_self_signed_cert(self, cert_path: Path, key_path: Path):
@@ -227,7 +264,7 @@ class P2PNode:
         if key in self.peers:
             try:
                 writer.close()
-            except:
+            except Exception:
                 pass
             return
         self.peers[key] = writer
@@ -337,7 +374,7 @@ class P2PNode:
         self.peer_versions.pop(key, None)
         try:
             writer.close()
-        except:
+        except Exception:
             pass
 
     def get_peers(self) -> list:
