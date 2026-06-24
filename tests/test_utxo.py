@@ -30,8 +30,8 @@ class TestUTXO:
             block.pow_hash = "0" * bc.difficulty + "test"
             bc.add_block(block)
 
-        # Updated: 3 blocks * 45 TRC = 135 TRC
-        assert utxo.get_balance(w.pubkey_hex()) == 135.0
+        # 3 blocks * 50 TRC = 150 TRC
+        assert utxo.get_balance(w.pubkey_hex()) == 150.0
 
     def test_utxo_selection(self, db, testnet):
         """Test UTXO selection algorithm."""
@@ -89,8 +89,8 @@ class TestUTXO:
         bc = Blockchain(testnet, db)
         w = Wallet.create()
 
-        # Updated: 45 TRC coinbase
-        coinbase = Transaction("COINBASE", w.pubkey_hex(), 45.0)
+        # 50 TRC coinbase
+        coinbase = Transaction("COINBASE", w.pubkey_hex(), 50.0)
         coinbase.timestamp = int(time.time() * 1000)
         coinbase.tx_hash = coinbase.compute_hash()
         block = Block(1, bc.latest().hash, [coinbase.to_dict()], bc.difficulty)
@@ -100,5 +100,5 @@ class TestUTXO:
 
         utxos = db.get_unspent_utxos(w.pubkey_hex())
         assert len(utxos) == 1
-        # Updated: 45 TRC = 4,500,000,000 satoshis
-        assert utxos[0]["amount"] == 45 * SATOSHIS_PER_TRC
+        # 50 TRC = 5,000,000,000 satoshis
+        assert utxos[0]["amount"] == 50 * SATOSHIS_PER_TRC
