@@ -77,7 +77,7 @@ def connect_to_seed():
         if github_seeds:
             all_peers.extend(github_seeds)
             print(f"  GitHub: {len(github_seeds)} seeds encontrados")
-    except:
+    except Exception:
         pass
 
     # 2. Load local seeds.json
@@ -90,7 +90,7 @@ def connect_to_seed():
                 if local_seeds:
                     all_peers.extend(local_seeds)
                     print(f"  Local: {len(local_seeds)} seeds")
-        except:
+        except Exception:
             pass
 
     # 3. Check node status for running nodes
@@ -104,7 +104,7 @@ def connect_to_seed():
                 if local_seed not in all_peers:
                     all_peers.append(local_seed)
                     print(f"  Local: node rodando na porta {port}")
-        except:
+        except Exception:
             pass
 
     # Remove duplicates
@@ -136,10 +136,10 @@ def connect_to_seed():
                     # Save connected peer for future use
                     try:
                         save_connected_peer(seed)
-                    except:
+                    except Exception:
                         pass
                     break
-            except:
+            except Exception:
                 continue
 
         if not connected and attempts < max_attempts:
@@ -161,7 +161,7 @@ def save_connected_peer(peer: str):
             with open(seeds_file) as f:
                 data = json.load(f)
                 seeds = data.get("seeds", []) if isinstance(data, dict) else data
-        except:
+        except Exception:
             pass
 
     if peer not in seeds:
@@ -261,27 +261,56 @@ def broadcast_transaction(tx: Transaction) -> bool:
 
     tx_dict = tx.to_dict()
 
-    # 1. Try local API (HTTP POST to 127.0.0.1:8080)
-    try:
-        import urllib.request
-        import urllib.error
-        data = json.dumps(tx_dict).encode('utf-8')
-        req = urllib.request.Request(
-            "http://127.0.0.1:8080/api/tx",
-            data=data,
-            headers={"Content-Type": "application/json"}
-        )
-        resp = urllib.request.urlopen(req, timeout=3)
-        result = json.loads(resp.read().decode())
-        if result.get("status") == "ok":
-            print(f"  Transacao enviada via node local!")
-            return True
-    except (urllib.error.URLError, ConnectionRefusedError, OSError):
-        pass
-    except Exception as e:
-        logger.debug(f"Local API failed: {e}")
+    # 1. Try local API (HTTP POST to 127.0.0.1:8080) with retry
+    for attempt in range(3):
+        try:
+            import urllib.request
+            import urllib.error
+            data = json.dumps(tx_dict).encode('utf-8')
+            req = urllib.request.Request(
+                "http://127.0.0.1:8080/api/tx",
+                data=data,
+                headers={"Content-Type": "application/json"}
+            )
+            resp = urllib.request.urlopen(req, timeout=5)
+            result = json.loads(resp.read().decode())
+            if result.get("status") == "ok":
+                print(f"  Transacao enviada via node local!")
+                return True
+        except (urllib.error.URLError, ConnectionRefusedError, OSError):
+            if attempt < 2:
+                import time
+                time.sleep(1)
+        except Exception as e:
+            logger.debug(f"Local API attempt {attempt+1} failed: {e}")
+            if attempt < 2:
+                import time
+                time.sleep(1)
 
-    # 2. Try to broadcast via P2P to each seed
+    # 2. Try peers from status.json (running node)
+    status_file = DATA_DIR / "status.json"
+    if status_file.exists():
+        try:
+            with open(status_file) as f:
+                status = json.load(f)
+            peers = status.get("peers", [])
+            for peer in peers[:3]:
+                try:
+                    host, port_str = peer.rsplit(":", 1)
+                    port = int(port_str)
+                    ctx = ssl.create_default_context()
+                    ctx.check_hostname = False
+                    ctx.verify_mode = ssl.CERT_NONE
+                    reader, writer = asyncio.run(_p2p_broadcast(host, port, tx_dict, ctx))
+                    if writer:
+                        print(f"  Transacao enviada via peer {peer}!")
+                        return True
+                except Exception:
+                    continue
+        except Exception:
+            pass
+
+    # 3. Try to broadcast via P2P to each seed
     seeds = []
     try:
         response = urllib.request.urlopen(
@@ -290,7 +319,7 @@ def broadcast_transaction(tx: Transaction) -> bool:
         )
         data = json.loads(response.read().decode())
         seeds = data.get("seeds", []) if isinstance(data, dict) else data if isinstance(data, list) else []
-    except:
+    except Exception:
         pass
 
     seeds_file = DATA_DIR / "seeds.json"
@@ -302,25 +331,29 @@ def broadcast_transaction(tx: Transaction) -> bool:
                 for s in local_seeds:
                     if s not in seeds:
                         seeds.append(s)
-        except:
+        except Exception:
             pass
 
     for seed in seeds:
-        try:
-            host, port_str = seed.rsplit(":", 1)
-            port = int(port_str)
+        for attempt in range(2):
+            try:
+                host, port_str = seed.rsplit(":", 1)
+                port = int(port_str)
 
-            ctx = ssl.create_default_context()
-            ctx.check_hostname = False
-            ctx.verify_mode = ssl.CERT_NONE
+                ctx = ssl.create_default_context()
+                ctx.check_hostname = False
+                ctx.verify_mode = ssl.CERT_NONE
 
-            reader, writer = asyncio.run(_p2p_broadcast(host, port, tx_dict, ctx))
-            if writer:
-                print(f"  Transacao enviada via P2P para {seed}!")
-                return True
-        except Exception as e:
-            logger.debug(f"P2P broadcast to {seed} failed: {e}")
-            continue
+                reader, writer = asyncio.run(_p2p_broadcast(host, port, tx_dict, ctx))
+                if writer:
+                    print(f"  Transacao enviada via P2P para {seed}!")
+                    return True
+            except Exception as e:
+                logger.debug(f"P2P broadcast to {seed} attempt {attempt+1} failed: {e}")
+                if attempt < 1:
+                    import time
+                    time.sleep(2)
+                continue
 
     return False
 
@@ -400,7 +433,34 @@ def cmd_send(args):
         print(f"  ERRO: Saldo insuficiente! ({bal:.8f} < {amount + fee:.8f})")
         return
 
-    tx = Transaction(w.pubkey_hex(), recipient, amount, fee)
+    from core.transaction import TransactionBuilder
+    from core.constants import trc_to_satoshis
+
+    amount_sat = trc_to_satoshis(amount)
+    fee_sat = trc_to_satoshis(fee)
+
+    utxos = bc.db.get_unspent_utxos(w.pubkey_hex())
+    if not utxos:
+        utxos = bc.db.get_unspent_utxos(w.address)
+
+    if not utxos:
+        print("  ERRO: Nenhum UTXO disponivel para envio!")
+        return
+
+    total_input = sum(u['amount'] for u in utxos)
+    if total_input < amount_sat + fee_sat:
+        print(f"  ERRO: Saldo insuficiente nos UTXOs! ({total_input/1e8:.8f} < {(amount_sat + fee_sat)/1e8:.8f})")
+        return
+
+    inputs = [{"tx_hash": u['tx_hash'], "amount": u['amount']} for u in utxos]
+    change_sat = total_input - amount_sat - fee_sat
+
+    tx = TransactionBuilder.create_transfer(
+        w.pubkey_hex(), recipient, amount_sat, fee_sat, inputs
+    )
+    tx.change = change_sat / 1e8
+    tx.timestamp = int(time.time())
+
     tx_data = bytes.fromhex(tx.compute_hash())
     sigs = w.sign_tx(tx_data)
     tx.signature = sigs["ecdsa_signature"]
@@ -440,7 +500,7 @@ def cmd_send(args):
     if sent:
         print(f"  Status:   Enviada para a rede!")
     else:
-        print(f"  Status:   Salva localmente (nenhum node disponivel)")
+        print(f"  Status:   Salva localmente")
         print(f"  Para confirmar, inicie um node: python main.py --mode passive")
 
 
@@ -502,7 +562,7 @@ def cmd_list(args):
                 print(f"    Arquivo: {name}")
                 print(f"    Endereco: {addr}")
                 print()
-            except:
+            except Exception:
                 print(f"  [{tag}] {name} (erro ao ler)")
                 print()
 
