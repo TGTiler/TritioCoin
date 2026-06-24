@@ -81,7 +81,10 @@ class Blockchain:
         return True
 
     def _genesis(self):
+        # Genesis timestamp fixo para todos os nodes (1 Jan 2026)
+        GENESIS_TIMESTAMP = 1767225600
         g = Block(0, "0" * 64, [], self.difficulty)
+        g.header.timestamp = GENESIS_TIMESTAMP
         g.hash = g.content_hash()
         g.pow_hash = "0" * self.difficulty + "genesis"
         self.chain.append(g)
@@ -89,7 +92,7 @@ class Blockchain:
         self.db.set_metadata("difficulty", str(self.difficulty))
         self.db.set_metadata("total_mined_satoshis", "0")
         self.db.set_metadata("total_burned_satoshis", "0")
-        logger.info(f"Genesis block created [{self.config.name}]")
+        logger.info(f"Genesis block created [{self.config.name}] hash={g.hash[:16]}...")
 
     def latest(self) -> Block:
         return self.chain[-1]
