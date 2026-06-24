@@ -37,8 +37,8 @@ class TestIntegration:
             block.pow_hash = "0" * bc.difficulty + "test"
             bc.add_block(block)
 
-        # Updated: 3 blocks * 45 TRC = 135 TRC
-        assert utxo.get_balance(alice.pubkey_hex()) == 135.0
+        # 3 blocks * 50 TRC = 150 TRC
+        assert utxo.get_balance(alice.pubkey_hex()) == 150.0
 
         # Send from Alice to Bob
         tx = utxo.create_transaction(alice, bob.pubkey_hex(), 50.0, 0.01)
