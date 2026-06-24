@@ -248,7 +248,7 @@
                             <td class="hide-mobile"><span class="hash" onclick="showTx('${tx.hash}')">${tx.hash?.substring(0, 16)}...</span></td>
                             <td>${isCoinbase ? 'Sistema' : tx.sender?.substring(0, 12) + '...'}</td>
                             <td>${tx.recipient?.substring(0, 12)}...</td>
-                            <td class="amount">${tx.amount?.toFixed(4)}</td>
+                            <td class="amount">${((tx.amount_satoshis || tx.amount || 0) / 100000000).toFixed(4)}</td>
                         </tr>
                     `;
                 }).join('');
@@ -273,7 +273,7 @@
                     <div class="detail-row">
                         <span class="detail-label">${isCoinbase ? 'Coinbase' : 'Transferencia'}</span>
                         <span class="detail-value">
-                            <span class="amount">${tx.amount?.toFixed(8)} TRC</span>
+                            <span class="amount">${((tx.amount_satoshis || tx.amount || 0) / 100000000).toFixed(8)} TRC</span>
                             ${!isCoinbase ? `<br><span style="font-size:11px;color:#8b949e">→ ${tx.recipient?.substring(0, 20)}...</span>` : ''}
                         </span>
                     </div>
@@ -313,7 +313,7 @@
                     <div class="detail-row"><span class="detail-label">Bloco</span><span class="detail-value green">#${tx.block_height}</span></div>
                     <div class="detail-row"><span class="detail-label">De</span><span class="detail-value">${tx.sender}</span></div>
                     <div class="detail-row"><span class="detail-label">Para</span><span class="detail-value">${tx.recipient}</span></div>
-                    <div class="detail-row"><span class="detail-label">Valor</span><span class="detail-value green">${tx.amount?.toFixed(8)} TRC</span></div>
+                    <div class="detail-row"><span class="detail-label">Valor</span><span class="detail-value green">${((tx.amount_satoshis || tx.amount || 0) / 100000000).toFixed(8)} TRC</span></div>
                     <div class="detail-row"><span class="detail-label">Taxa</span><span class="detail-value orange">${tx.fee?.toFixed(8)} TRC</span></div>
                     <div class="detail-row"><span class="detail-label">Timestamp</span><span class="detail-value">${tx.timestamp ? new Date(tx.timestamp * 1000).toLocaleString('pt-BR') : '-'}</span></div>
                 </div>
@@ -334,7 +334,7 @@
                     <div class="detail-row">
                         <span class="detail-label">${isIncoming ? 'Recebido' : 'Enviado'} (bloco #${tx.block_height})</span>
                         <span class="detail-value">
-                            <span class="${isIncoming ? 'amount' : 'fee'}">${isIncoming ? '+' : '-'}${tx.amount?.toFixed(8)} TRC</span>
+                            <span class="${isIncoming ? 'amount' : 'fee'}">${isIncoming ? '+' : '-'}${((tx.amount_satoshis || tx.amount || 0) / 100000000).toFixed(8)} TRC</span>
                             <br><span class="hash" onclick="showTx('${tx.tx_hash}')" style="font-size:10px">${tx.tx_hash?.substring(0, 20)}...</span>
                         </span>
                     </div>
