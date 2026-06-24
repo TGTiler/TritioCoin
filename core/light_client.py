@@ -273,5 +273,3 @@ class MerkleProof:
             index //= 2
 
         return current.hex() == root
-
-        return current.hex() == root
