@@ -7,6 +7,8 @@ import time
 import logging
 from typing import Optional, List, Dict
 
+from core.constants import trc_to_satoshis
+
 logger = logging.getLogger("Micropay")
 
 
@@ -209,6 +211,56 @@ class MicropaymentChannel:
             "total_payments": self.nonce
         }
 
+    def settle_on_chain(self, blockchain, mempool, wallet) -> Optional[str]:
+        """
+        Fecha o canal e cria uma transacao on-chain para settlement.
+        Retorna tx_hash ou None se falhar.
+        """
+        self.is_open = False
+        from core.transaction import TransactionBuilder
+
+        net = self.capacity - self.balance_sender
+        if abs(net) < 0.00000001:
+            logger.info(f"Canal {self._get_channel_id()}: saldo zerado, sem settlement necessario")
+            return self._get_channel_id()
+
+        if net > 0:
+            sender_addr = self.sender
+            receiver_addr = self.receiver
+            amount_trc = net
+        else:
+            sender_addr = self.receiver
+            receiver_addr = self.sender
+            amount_trc = -net
+
+        amount_sat = trc_to_satoshis(amount_trc)
+        fee_sat = trc_to_satoshis(0.0001)
+
+        utxos = blockchain.db.get_unspent_utxos(sender_addr)
+        if not utxos:
+            logger.warning(f"Sem UTXOs para {sender_addr[:16]}... para settlement do canal")
+            return None
+
+        total_input = sum(u['amount'] for u in utxos)
+        if total_input < amount_sat + fee_sat:
+            logger.warning(f"Saldo insuficiente para settlement: {total_input} < {amount_sat + fee_sat}")
+            return None
+
+        inputs = [{"tx_hash": u['tx_hash'], "amount": u['amount']} for u in utxos]
+        change_sat = total_input - amount_sat - fee_sat
+
+        tx = TransactionBuilder.create_transfer(
+            sender_addr, receiver_addr, amount_sat, fee_sat, inputs
+        )
+        tx.change = change_sat / 1e8
+        tx.timestamp = int(time.time())
+        tx.tx_hash = tx.compute_hash()
+
+        tx_dict = tx.to_dict()
+        mempool.add(tx)
+        logger.info(f"Settlement on-chain: {sender_addr[:16]}... -> {receiver_addr[:16]}... = {amount_trc:.8f} TRC")
+        return tx.tx_hash
+
     def _get_channel_id(self) -> str:
         """Generate channel ID."""
         data = f"{self.sender}:{self.receiver}:{self.opened_at}"
@@ -231,9 +283,12 @@ class MicropaymentChannel:
 class MicropaymentHub:
     """Hub for managing multiple micropayment channels."""
 
-    def __init__(self):
+    def __init__(self, blockchain=None, mempool=None, wallet=None):
         self.channels: Dict[str, MicropaymentChannel] = {}
         self.fee_estimator = FeeEstimator()
+        self.blockchain = blockchain
+        self.mempool = mempool
+        self.wallet = wallet
 
     def open_channel(self, sender: str, receiver: str, capacity: float) -> Optional[str]:
         """Open a new micropayment channel."""
@@ -256,12 +311,24 @@ class MicropaymentHub:
         return channel.create_payment(amount, sender)
 
     def close_channel(self, channel_id: str) -> Optional[dict]:
-        """Close a channel."""
+        """Close a channel with on-chain settlement."""
         channel = self.channels.get(channel_id)
         if not channel:
             return None
 
         result = channel.close()
+
+        if self.blockchain and self.mempool and self.wallet:
+            tx_hash = channel.settle_on_chain(self.blockchain, self.mempool, self.wallet)
+            if tx_hash:
+                result["settlement_tx"] = tx_hash
+                logger.info(f"Channel {channel_id} settled on-chain: {tx_hash[:16]}...")
+            else:
+                result["settlement_tx"] = None
+                logger.warning(f"Channel {channel_id} closed without on-chain settlement")
+        else:
+            result["settlement_tx"] = None
+
         logger.info(f"Channel closed: {channel_id}")
         return result
 
