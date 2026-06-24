@@ -9,6 +9,8 @@ import json
 from typing import Dict, List, Optional, Set
 from dataclasses import dataclass, field
 
+from core.constants import trc_to_satoshis
+
 logger = logging.getLogger("MiningPool")
 
 
@@ -55,7 +57,7 @@ class MiningPool:
     DIFF_TARGET_TIME = 300  # Target time between shares (5 min)
     SHARE_DIFF_MULTIPLIER = 1  # Share difficulty multiplier
 
-    def __init__(self):
+    def __init__(self, blockchain=None, mempool=None, db=None, wallet=None):
         self.miners: Dict[str, MinerStats] = {}
         self.shares: List[dict] = []  # Recent shares
         self.total_shares = 0
@@ -64,6 +66,10 @@ class MiningPool:
         self.last_payout = time.time()
         self.pending_payouts: Dict[str, int] = {}  # address -> satoshis
         self.active: bool = False
+        self.blockchain = blockchain
+        self.mempool = mempool
+        self.db = db
+        self.wallet = wallet
 
     def register_miner(self, address: str) -> bool:
         """Register a miner to the pool."""
@@ -130,6 +136,10 @@ class MiningPool:
         if not miner:
             return False
 
+        if not block_hash.startswith("0" * difficulty):
+            logger.warning(f"Invalid block hash from {miner_address[:16]}...")
+            return False
+
         self.total_blocks += 1
         logger.info(f"Block found by {miner_address[:16]}... hash={block_hash[:16]}...")
 
@@ -181,22 +191,51 @@ class MiningPool:
 
     def process_payouts(self) -> List[dict]:
         """
-        Process pending payouts when threshold is reached.
-        Returns list of payouts to be included in next block.
+        Process pending payouts and create on-chain transactions.
+        Returns list of tx hashes for tracking.
         """
-        payouts = []
+        tx_hashes = []
+
+        if not self.blockchain or not self.mempool or not self.wallet:
+            logger.warning("Pool sem blockchain/mempool/wallet, payouts so em memoria")
+            return tx_hashes
+
+        from core.transaction import TransactionBuilder
 
         for addr, amount in list(self.pending_payouts.items()):
             if amount >= self.MIN_PAYOUT:
-                payouts.append({
-                    "address": addr,
-                    "amount": amount,
-                    "timestamp": time.time()
-                })
-                del self.pending_payouts[addr]
-                logger.info(f"Payout ready: {addr[:16]}... {amount} sat")
+                utxos = self.db.get_unspent_utxos(self.wallet.address)
+                if not utxos:
+                    logger.warning(f"Sem UTXOs na pool wallet para payout de {addr[:16]}...")
+                    continue
 
-        return payouts
+                total_input = sum(u['amount'] for u in utxos)
+                if total_input < amount:
+                    logger.warning(f"Saldo insuficiente na pool: {total_input} < {amount}")
+                    continue
+
+                inputs = [{"tx_hash": u['tx_hash'], "amount": u['amount']} for u in utxos]
+                fee_sat = trc_to_satoshis(0.0001)
+                change_sat = total_input - amount - fee_sat
+
+                tx = TransactionBuilder.create_transfer(
+                    self.wallet.address, addr, amount, fee_sat, inputs
+                )
+                tx.change = change_sat / 1e8
+                tx.timestamp = int(time.time())
+
+                tx_data = bytes.fromhex(tx.compute_hash())
+                sigs = self.wallet.sign_tx(tx_data)
+                tx.signature = sigs["ecdsa_signature"]
+                tx.signature_mode = sigs["signature_mode"]
+                tx.tx_hash = tx.compute_hash()
+
+                self.mempool.add(tx)
+                tx_hashes.append(tx.tx_hash)
+                del self.pending_payouts[addr]
+                logger.info(f"Payout enviado: {addr[:16]}... {amount} sat -> {tx.tx_hash[:16]}...")
+
+        return tx_hashes
 
     def get_mining_difficulty(self) -> int:
         """Calculate dynamic difficulty based on pool hashrate."""
@@ -268,14 +307,40 @@ class MiningPool:
         """Get mining work for a miner (stratum-like)."""
         self.register_miner(miner_address)
 
+        prev_hash = "0" * 64
+        coinbase_tx = "0" * 64
+        merkle_root = "0" * 64
+        block_height = 0
+
+        if self.blockchain:
+            latest = self.blockchain.latest()
+            prev_hash = latest.hash
+            block_height = latest.header.index + 1
+
+            from core.transaction import TransactionBuilder
+            coinbase = TransactionBuilder.create_coinbase(
+                miner_address,
+                self.blockchain.reward_at_satoshis(),
+                block_height
+            )
+            coinbase_tx = coinbase.tx_hash or "0" * 64
+
+            pending = self.mempool.get(500) if self.mempool else []
+            if pending:
+                tx_hashes = [t.tx_hash for t in pending if t.tx_hash]
+                if tx_hashes:
+                    combined = "".join(tx_hashes)
+                    merkle_root = hashlib.sha256(combined.encode()).hexdigest()
+
         return {
             "type": "mining.notify",
             "job_id": hashlib.sha256(str(time.time()).encode()).hexdigest()[:16],
             "difficulty": self.get_mining_difficulty(),
             "timestamp": int(time.time()),
-            "prev_hash": "0" * 64,  # Would be actual prev hash
-            "coinbase_tx": "0" * 64,  # Would be actual coinbase
-            "merkle_root": "0" * 64,  # Would be actual merkle
+            "prev_hash": prev_hash,
+            "coinbase_tx": coinbase_tx,
+            "merkle_root": merkle_root,
+            "block_height": block_height,
             "miners": len(self.miners)
         }
 
