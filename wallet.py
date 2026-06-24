@@ -253,6 +253,118 @@ def cmd_balance(args):
     print("  Nota: Para dados em tempo real, inicie um node (opcao 8 ou 12)")
 
 
+def broadcast_transaction(tx: Transaction) -> bool:
+    """Broadcast transaction to the network. Tries local API, then seeds, then P2P."""
+    import socket
+    import ssl
+    import struct
+
+    tx_dict = tx.to_dict()
+
+    # 1. Try local API (HTTP POST to 127.0.0.1:8080)
+    try:
+        import urllib.request
+        import urllib.error
+        data = json.dumps(tx_dict).encode('utf-8')
+        req = urllib.request.Request(
+            "http://127.0.0.1:8080/api/tx",
+            data=data,
+            headers={"Content-Type": "application/json"}
+        )
+        resp = urllib.request.urlopen(req, timeout=3)
+        result = json.loads(resp.read().decode())
+        if result.get("status") == "ok":
+            print(f"  Transacao enviada via node local!")
+            return True
+    except (urllib.error.URLError, ConnectionRefusedError, OSError):
+        pass
+    except Exception as e:
+        logger.debug(f"Local API failed: {e}")
+
+    # 2. Try to broadcast via P2P to each seed
+    seeds = []
+    try:
+        response = urllib.request.urlopen(
+            "https://raw.githubusercontent.com/TGTiler/TritioCoin/refs/heads/main/seeds.json",
+            timeout=3
+        )
+        data = json.loads(response.read().decode())
+        seeds = data.get("seeds", []) if isinstance(data, dict) else data if isinstance(data, list) else []
+    except:
+        pass
+
+    seeds_file = DATA_DIR / "seeds.json"
+    if seeds_file.exists():
+        try:
+            with open(seeds_file) as f:
+                data = json.load(f)
+                local_seeds = data.get("seeds", []) if isinstance(data, dict) else data
+                for s in local_seeds:
+                    if s not in seeds:
+                        seeds.append(s)
+        except:
+            pass
+
+    for seed in seeds:
+        try:
+            host, port_str = seed.rsplit(":", 1)
+            port = int(port_str)
+
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
+
+            reader, writer = asyncio.run(_p2p_broadcast(host, port, tx_dict, ctx))
+            if writer:
+                print(f"  Transacao enviada via P2P para {seed}!")
+                return True
+        except Exception as e:
+            logger.debug(f"P2P broadcast to {seed} failed: {e}")
+            continue
+
+    return False
+
+
+async def _p2p_broadcast(host: str, port: int, tx_dict: dict, ssl_ctx):
+    """Connect to a peer via P2P and broadcast a transaction."""
+    import hashlib
+    import struct
+
+    node_id = hashlib.sha256(os.urandom(32)).hexdigest()[:32]
+
+    reader, writer = await asyncio.open_connection(host, port, ssl=ssl_ctx)
+
+    # Send handshake
+    handshake = json.dumps({
+        "type": "HANDSHAKE",
+        "version": 2,
+        "min_version": 1,
+        "node_id": node_id,
+        "port": 0,
+        "external_address": None,
+        "height": 0
+    }).encode('utf-8')
+    writer.write(struct.pack('>I', len(handshake)) + handshake)
+    await writer.drain()
+
+    # Read handshake response (with timeout)
+    try:
+        raw_len = await asyncio.wait_for(reader.readexactly(4), timeout=3)
+        msg_len = struct.unpack('>I', raw_len)[0]
+        raw_msg = await asyncio.wait_for(reader.readexactly(msg_len), timeout=3)
+    except (asyncio.TimeoutError, asyncio.IncompleteReadError):
+        writer.close()
+        return reader, None
+
+    # Send NEW_TX
+    tx_msg = json.dumps({"type": "NEW_TX", "tx": tx_dict}).encode('utf-8')
+    writer.write(struct.pack('>I', len(tx_msg)) + tx_msg)
+    await writer.drain()
+
+    writer.close()
+    return reader, writer
+
+
 def cmd_send(args):
     quantum = '--quantum' in sys.argv
     password = prompt_password()
@@ -300,6 +412,7 @@ def cmd_send(args):
         print("  ERRO: Transacao invalida!")
         return
 
+    # Save locally
     mempool.add(tx)
 
     DATA_DIR.mkdir(exist_ok=True)
@@ -312,6 +425,10 @@ def cmd_send(args):
     with open(mempool_path, 'w') as f:
         json.dump(existing, f)
 
+    # Broadcast to network
+    print("  Enviando transacao para a rede...")
+    sent = broadcast_transaction(tx)
+
     print()
     print(f"  Transacao criada com sucesso!")
     print(f"  De:       {w.address}")
@@ -319,8 +436,12 @@ def cmd_send(args):
     print(f"  Valor:    {amount} TRC")
     print(f"  Taxa:     {fee} TRC")
     print(f"  Hash:     {tx.tx_hash[:32]}...")
-    print()
-    print("  Para confirmar, inicie um node (opcao 8 ou 12)")
+
+    if sent:
+        print(f"  Status:   Enviada para a rede!")
+    else:
+        print(f"  Status:   Salva localmente (nenhum node disponivel)")
+        print(f"  Para confirmar, inicie um node: python main.py --mode passive")
 
 
 def cmd_history(args):
