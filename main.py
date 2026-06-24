@@ -24,6 +24,8 @@ from network.dht import DHT, get_dht
 from network.discovery import PeerDiscovery
 from network.gossip import GossipNode, GossipProtocol
 from core.delegation import DelegationPool
+from core.micropay import MicropaymentHub
+from core.pool import MiningPool
 
 logging.basicConfig(
     level=logging.INFO,
@@ -106,6 +108,8 @@ class TritioNode(GossipNode):
         self.miner = Miner(self.blockchain, self.mempool)
         self.consensus = ConsensusEngine(self.blockchain)
         self.delegation_pool = DelegationPool()
+        self.micropay_hub = MicropaymentHub(self.blockchain, self.mempool, self.wallet)
+        self.pool = MiningPool(self.blockchain, self.mempool, self.db, self.wallet)
         self.p2p = P2PNode(config['host'], config['port'])
         self.p2p.on_message = self._on_msg
 
@@ -148,7 +152,7 @@ class TritioNode(GossipNode):
                     # Try to load without password (unencrypted)
                     try:
                         return Wallet.load(str(path))
-                    except:
+                    except Exception:
                         logger.error("Carteira existe mas precisa de senha. "
                                     "Defina a variavel de ambiente TRC_PASSWORD.")
                         logger.error(f"Arquivo: {path}")
@@ -166,7 +170,10 @@ class TritioNode(GossipNode):
         logger.info("Nenhuma carteira encontrada. Criando nova carteira...")
         w = Wallet.create(self.quantum)
         DATA_DIR.mkdir(exist_ok=True)
-        password = os.environ.get("TRC_PASSWORD", "tritiocoin123")
+        password = os.environ.get("TRC_PASSWORD")
+        if not password:
+            logger.warning("TRC_PASSWORD nao definido. Usando senha padrao.")
+            password = "tritiocoin123"
         w.save(str(path), password)
         logger.info(f"Nova carteira criada: {w.address}")
         logger.info(f"Arquivo: {path}")
@@ -221,7 +228,11 @@ class TritioNode(GossipNode):
                 logger.info(f"Remote has more blocks, syncing from {peer}")
                 await self.start_sync(peer, height)
             elif isinstance(height, int) and height < self.blockchain.height():
-                logger.info(f"I have more blocks ({self.blockchain.height()} > {height}), should broadcast")
+                logger.info(f"I have more blocks ({self.blockchain.height()} > {height}), sending to {peer}")
+                for i in range(height, self.blockchain.height()):
+                    block_data = self.blockchain.db.get_block(i)
+                    if block_data:
+                        await self.p2p.send(peer, {"type": "NEW_BLOCK", "block": block_data})
             remote_seeds = msg.get("seeds", [])
             await self._merge_seeds(remote_seeds)
 
@@ -765,7 +776,7 @@ class TritioNode(GossipNode):
                     await self._process_mined_block(block)
 
             elif self.mode == 'validator':
-                await asyncio.sleep(1)
+                await self._validator_cycle()
 
             await asyncio.sleep(0.1)
 
@@ -815,6 +826,59 @@ class TritioNode(GossipNode):
                     "tx_count": len(block.transactions)
                 })
 
+    async def _validator_cycle(self):
+        """Ciclo de validacao PoS: seleciona, assina e propaga blocos."""
+        if self.wallet.address not in self.consensus.validators:
+            await asyncio.sleep(5)
+            return
+
+        current_height = self.blockchain.height()
+        selected = self.consensus.select_validators_for_block(current_height + 1)
+
+        if self.wallet.address in selected:
+            logger.info(f"Selecionado para validar bloco #{current_height + 1}")
+            from core.miner import Miner
+            miner = Miner(self.blockchain, self.mempool)
+            block = miner.create_block_template(self.wallet.address)
+
+            sig = self.consensus.sign_block(block, self.wallet)
+            if sig:
+                block.validator_signatures.append({
+                    "address": self.wallet.address,
+                    "signature": sig,
+                    "signature_mode": "ecdsa"
+                })
+
+            await self.p2p.broadcast({
+                "type": "REQUEST_SIGNATURE",
+                "block": block.serialize()
+            })
+
+            await asyncio.sleep(2)
+
+            if block.hash in self._pending_signatures:
+                block.validator_signatures.extend(self._pending_signatures.pop(block.hash))
+
+            if self.blockchain.add_block(block):
+                self.p2p.blockchain_height = self.blockchain.height()
+                self.blockchain.adjust_difficulty()
+                await self.p2p.broadcast({
+                    "type": "NEW_BLOCK",
+                    "block": block.serialize()
+                })
+                self.consensus.distribute_block_rewards(block)
+                logger.info(f"Bloco #{block.header.index} validado e broadcast")
+
+                if self.api:
+                    await self.api.broadcast_ws({
+                        "type": "new_block",
+                        "height": block.header.index,
+                        "hash": block.hash,
+                        "tx_count": len(block.transactions)
+                    })
+
+        await asyncio.sleep(1)
+
     def _on_peer_found(self, peer_addr: str):
         """Callback when DHT discovers a new peer."""
         logger.info(f"DHT discovered peer: {peer_addr}")
@@ -855,9 +919,20 @@ class TritioNode(GossipNode):
         # DHT peer discovery loop
         tasks.append(asyncio.create_task(self._dht_discovery_loop()))
 
-        # Mining
-        if self.mode == 'miner':
+        # Mining / Validator loop
+        if self.mode in ('miner', 'validator'):
             tasks.append(asyncio.create_task(self._mining_loop()))
+
+        # Register as validator if in validator mode
+        if self.mode == 'validator':
+            stake = self.config.get('stake', 0)
+            if stake > 0:
+                if self.consensus.register_validator(self.wallet, stake):
+                    logger.info(f"Validator registrado com stake: {stake} TRC")
+                else:
+                    logger.error(f"Falha ao registrar validator (stake minimo: {self.consensus.min_stake} TRC)")
+            else:
+                logger.warning("Modo validator sem stake definido. Use --stake <quantidade>")
 
         # Status loop (writes status.json for wallet.py)
         tasks.append(asyncio.create_task(self._status_loop()))
@@ -901,6 +976,7 @@ def parse_args():
     p.add_argument('--api', action='store_true', default=True)
     p.add_argument('--api-port', type=int, default=8080)
     p.add_argument('--no-api', action='store_true', help="Disable REST API")
+    p.add_argument('--stake', type=float, default=0, help="Stake amount for validator mode (TRC)")
     return p.parse_args()
 
 
@@ -910,7 +986,8 @@ async def main():
         'host': args.host, 'port': args.port, 'seed': args.seed,
         'mode': args.mode, 'difficulty': args.difficulty,
         'quantum': args.quantum, 'network': args.network,
-        'api': not args.no_api, 'api_port': args.api_port
+        'api': not args.no_api, 'api_port': args.api_port,
+        'stake': args.stake
     }
     node = TritioNode(config)
 
