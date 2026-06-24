@@ -34,11 +34,20 @@ class StakeInfo:
         }
 
     def _calculate_apy(self) -> float:
-        """Calculate annualized percentage yield."""
+        """Calculate annualized percentage yield based on lock duration."""
         if self.amount <= 0:
             return 0
-        # Simple APY calculation based on reward rate
-        return 5.0  # Placeholder - actual APY depends on network params
+
+        base_rate = 5.0
+
+        if self.lock_until > time.time():
+            remaining_days = (self.lock_until - time.time()) / 86400
+            if remaining_days > 300:
+                base_rate *= 1.5
+            elif remaining_days > 90:
+                base_rate *= 1.25
+
+        return round(base_rate, 2)
 
 
 class StakingPool:
