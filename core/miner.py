@@ -4,7 +4,6 @@ Proof-of-Work with blake2b (fast, ASIC-resistant).
 Multi-process, async, with real-time progress.
 """
 import hashlib
-import json
 import time
 import logging
 import struct
@@ -14,7 +13,7 @@ from core.block import Block
 from core.blockchain import Blockchain
 from core.mempool import Mempool
 from core.transaction import Transaction, TransactionBuilder
-from core.constants import SATOSHIS_PER_TRC, format_trc
+from core.constants import SATOSHIS_PER_TRC
 
 logger = logging.getLogger("Miner")
 
@@ -83,32 +82,33 @@ class MiningStats:
 
 
 def _mine_worker(header_base: bytes, target: str, start_nonce: int, step: int,
-                 result_queue: multiprocessing.Queue, stop_event: multiprocessing.Event,
-                 hashes_counter: multiprocessing.Value):
+                 result_queue):
     """Process-based mining worker. Runs in a separate OS process."""
     nonce = start_nonce
     local_hashes = 0
 
-    while not stop_event.is_set():
+    while True:
         data = header_base + struct.pack('>I', nonce)
         pow_hash = hashlib.blake2b(data, digest_size=32, person=b"tritiocoin_v1").hexdigest()
 
         if pow_hash.startswith(target):
-            with hashes_counter.get_lock():
-                hashes_counter.value += local_hashes
-            result_queue.put({"nonce": nonce, "pow_hash": pow_hash})
+            result_queue.put({"nonce": nonce, "pow_hash": pow_hash, "hashes": local_hashes})
             return
 
         nonce += step
         local_hashes += 1
 
-        if local_hashes % 50000 == 0:
-            with hashes_counter.get_lock():
-                hashes_counter.value += 50000
-            local_hashes = 0
+        # Check for stop signal (queue gets a None message from main process)
+        if local_hashes % 10000 == 0:
+            try:
+                signal = result_queue.get_nowait()
+                if signal is None:
+                    result_queue.put({"nonce": None, "pow_hash": None, "hashes": local_hashes})
+                    return
+            except Exception:
+                pass
 
-    with hashes_counter.get_lock():
-        hashes_counter.value += local_hashes
+    result_queue.put({"nonce": None, "pow_hash": None, "hashes": local_hashes})
 
 
 class Miner:
@@ -131,15 +131,18 @@ class Miner:
         self.current_block: Optional[Block] = None
         self.threads = threads or self._get_cpu_count()
         self.stats.threads = self.threads
-        self._stop_event = None
         self._on_block_found = None
         self._progress_callback = None
+
+    @property
+    def mining(self) -> bool:
+        return self.stats.mining
 
     def _get_cpu_count(self) -> int:
         try:
             import os
             return os.cpu_count() or 4
-        except:
+        except Exception:
             return 4
 
     @staticmethod
@@ -162,21 +165,19 @@ class Miner:
 
         return block
 
-    def _print_progress(self, hashes_counter, start_time, difficulty):
+    def _print_progress(self, total_hashes, start_time, difficulty):
         elapsed = time.time() - start_time
         if elapsed <= 0:
             return
-        with hashes_counter.get_lock():
-            total = hashes_counter.value
-        rate = total / elapsed
+        rate = total_hashes / elapsed
         minutes = int(elapsed // 60)
         seconds = int(elapsed % 60)
 
-        print(f"\r  Nonce: {total:>12,} | "
+        print(f"\r  Nonce: {total_hashes:>12,} | "
               f"Hashrate: {rate:>8,.0f} H/s | "
               f"Dificuldade: {difficulty} | "
               f"Tempo: {minutes}m{seconds:02d}s | "
-              f"Threads: {self.threads}   ",
+              f"Processos: {self.threads}   ",
               end="", flush=True)
 
     def mine(self, address: str) -> Optional[Block]:
@@ -196,48 +197,70 @@ class Miner:
         print(f"  Processos: {self.threads}")
         print()
 
-        self._stop_event = multiprocessing.Event()
         result_queue = multiprocessing.Queue()
-        hashes_counter = multiprocessing.Value('i', 0)
 
         processes = []
         for i in range(self.threads):
             p = multiprocessing.Process(
                 target=_mine_worker,
                 args=(header_base, target, i, self.threads,
-                      result_queue, self._stop_event, hashes_counter)
+                      result_queue)
             )
             processes.append(p)
             p.start()
 
         result = None
+        total_hashes = 0
         start_time = time.time()
 
         try:
             while True:
-                if not result_queue.empty():
-                    result = result_queue.get_nowait()
-                    self._stop_event.set()
-                    break
+                try:
+                    msg = result_queue.get_nowait()
+                    if msg is None:
+                        continue
+                    total_hashes += msg.get("hashes", 0)
+                    if msg.get("nonce") is not None:
+                        result = msg
+                        # Send stop signal to all workers
+                        for _ in range(self.threads):
+                            try:
+                                result_queue.put_nowait(None)
+                            except Exception:
+                                pass
+                        break
+                except Exception:
+                    pass
                 if all(not p.is_alive() for p in processes):
                     break
                 time.sleep(0.01)
 
                 elapsed = time.time() - start_time
                 if elapsed > 0 and int(elapsed * 2) % 2 == 0:
-                    self._print_progress(hashes_counter, start_time,
+                    self._print_progress(total_hashes, start_time,
                                          self.current_block.header.difficulty)
         except KeyboardInterrupt:
-            self._stop_event.set()
+            for _ in range(self.threads):
+                try:
+                    result_queue.put_nowait(None)
+                except Exception:
+                    pass
 
         for p in processes:
             p.join(timeout=2)
             if p.is_alive():
                 p.terminate()
 
-        with hashes_counter.get_lock():
-            self.stats.hashes = hashes_counter.value
-            self.stats.total_hashes += hashes_counter.value
+        # Drain remaining results
+        while not result_queue.empty():
+            try:
+                msg = result_queue.get_nowait()
+                total_hashes += msg.get("hashes", 0)
+            except Exception:
+                break
+
+        self.stats.hashes = total_hashes
+        self.stats.total_hashes += total_hashes
 
         if result:
             self.current_block.header.nonce = result["nonce"]
@@ -267,8 +290,6 @@ class Miner:
         return None
 
     def stop(self):
-        if self._stop_event:
-            self._stop_event.set()
         self.stats.stop_mining()
         print("\n  Mineracao interrompida.")
         logger.info("Mining stopped")
