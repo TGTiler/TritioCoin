@@ -29,6 +29,14 @@ class BlockHeader:
             self.difficulty, self.nonce
         )
 
+    def to_bytes_base(self) -> bytes:
+        return struct.pack(
+            '>H I Q 32s 32s I',
+            self.version, self.index, self.timestamp,
+            self.previous_hash, self.merkle_root,
+            self.difficulty
+        )
+
     @classmethod
     def from_bytes(cls, data: bytes) -> 'BlockHeader':
         if len(data) != 86:
