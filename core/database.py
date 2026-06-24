@@ -263,17 +263,19 @@ class Database:
         return inputs, change
 
     def add_mempool(self, tx_data: dict):
+        amount = tx_data.get("amount_satoshis") or tx_data.get("amount", 0)
+        fee = tx_data.get("fee_satoshis") or tx_data.get("fee", 0)
         self.conn.execute("""
             INSERT OR REPLACE INTO mempool
                 (tx_hash, sender, recipient, amount, fee, data,
                  timestamp, signature, signature_mode)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            tx_data["hash"],
+            tx_data.get("hash") or tx_data.get("tx_hash"),
             tx_data["sender"],
             tx_data["recipient"],
-            tx_data["amount"],
-            tx_data.get("fee", 0),
+            amount,
+            fee,
             tx_data.get("data", ""),
             tx_data["timestamp"],
             tx_data.get("signature"),
