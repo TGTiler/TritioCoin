@@ -5,11 +5,12 @@ TritioCoin Mempool
 - Fee-based prioritization
 - Satoshis for precision
 """
+import time
 import logging
 from typing import List, Optional
 from core.transaction import Transaction
 from core.database import Database
-from core.constants import SATOSHIS_PER_TRC, satoshis_to_trc, format_trc
+from core.constants import SATOSHIS_PER_TRC, satoshis_to_trc, format_trc, MAX_TXS_PER_SENDER, MAX_TX_AGE
 
 logger = logging.getLogger("Mempool")
 
@@ -31,9 +32,22 @@ class Mempool:
         if not tx.is_valid():
             return False
 
-        if tx.fee_satoshis < self.min_fee_sat:
-            logger.warning(f"Fee too low: {tx.fee_satoshis} < {self.min_fee_sat} sat")
+        if tx.is_expired():
+            logger.warning(f"Expired transaction rejected: {tx.tx_hash[:16]}")
             return False
+
+        effective_min_fee = self._dynamic_min_fee()
+        if tx.fee_satoshis < effective_min_fee:
+            logger.warning(f"Fee too low: {tx.fee_satoshis} < {effective_min_fee} sat")
+            return False
+
+        # Per-sender limit
+        if tx.sender_pubkey != "COINBASE":
+            sender_count = sum(1 for t in self.db.get_mempool()
+                             if t.get("sender") == tx.sender_pubkey)
+            if sender_count >= MAX_TXS_PER_SENDER:
+                logger.warning(f"Per-sender limit reached: {tx.sender_pubkey[:16]}")
+                return False
 
         # Real-time balance check
         if blockchain_balance and tx.sender_pubkey != "COINBASE":
@@ -79,11 +93,37 @@ class Mempool:
             self.db.remove_mempool(h)
 
     def _evict(self):
+        """Evict all transactions at the lowest fee level."""
         mempool = self.db.get_mempool()
-        if mempool:
-            worst = mempool[-1]
-            self.db.remove_mempool(worst["tx_hash"])
-            logger.warning(f"Mempool full, evicted lowest fee tx")
+        if not mempool:
+            return
+        fees = [tx.get("fee", 0) for tx in mempool]
+        if not fees:
+            return
+        min_fee = min(fees)
+        evicted = 0
+        for tx in mempool:
+            if tx.get("fee", 0) == min_fee:
+                self.db.remove_mempool(tx["tx_hash"])
+                evicted += 1
+        logger.warning(f"Mempool full, evicted {evicted} txs at fee {min_fee}")
+
+    def cleanup_expired(self):
+        """Remove expired transactions from mempool."""
+        now = int(time.time())
+        for tx in self.db.get_mempool():
+            if now - tx.get("timestamp", 0) > MAX_TX_AGE:
+                self.db.remove_mempool(tx["tx_hash"])
+                logger.debug(f"Expired tx removed: {tx['tx_hash'][:16]}")
+
+    def _dynamic_min_fee(self) -> int:
+        """Calculate dynamic minimum fee based on mempool congestion."""
+        fill_ratio = self.db.mempool_size() / max(self.max_size, 1)
+        if fill_ratio > 0.8:
+            return self.min_fee_sat * 5
+        elif fill_ratio > 0.5:
+            return self.min_fee_sat * 2
+        return self.min_fee_sat
 
     def total_fees_satoshis(self, n: int = None) -> int:
         """Get total fees in satoshis."""
