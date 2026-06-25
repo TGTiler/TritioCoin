@@ -464,28 +464,26 @@ class TritioNode(GossipNode):
             if added > 0:
                 logger.info(f"Synced {added} blocks (height: {self.blockchain.height()})")
         else:
-            # Full chain sync
-            remote = Blockchain.deserialize(chain_data, self.net_config, self.db)
+            # Full chain sync - CAREFUL: only accept if remote is significantly taller
+            try:
+                remote = Blockchain.deserialize(chain_data, self.net_config, self.db)
 
-            if remote.height() > old_height and remote.is_valid():
-                # Remote is taller - accept it
-                self.blockchain = remote
-                self.p2p.blockchain_height = self.blockchain.height()
-                logger.info(f"Chain synced: {self.blockchain.height()} blocks (was {old_height})")
-                self._save_chain()
+                # Only replace if remote is at least 5 blocks taller AND valid
+                if remote.height() > old_height + 5 and remote.is_valid():
+                    local_work = sum(2 ** b.header.difficulty for b in self.blockchain.chain)
+                    remote_work = sum(2 ** b.header.difficulty for b in remote.chain)
 
-            elif remote.height() == old_height and remote.height() > 0:
-                # Same height - compare genesis hashes to detect fake chain
-                local_genesis = self.blockchain.chain[0].hash if self.blockchain.chain else None
-                remote_genesis = remote.chain[0].hash if remote.chain else None
-                if local_genesis and remote_genesis and local_genesis != remote_genesis:
-                    logger.warning(f"FAKE CHAIN DETECTED! Local genesis: {local_genesis[:16]}... != Remote: {remote_genesis[:16]}...")
-                    # Reject fake chain - do not replace
-                else:
-                    logger.info("Chain already up to date")
-
-            elif remote.height() < old_height:
-                logger.info(f"Remote chain shorter ({remote.height()} < {old_height}), keeping local")
+                    if remote_work > local_work:
+                        logger.warning(f"Chain reorg: remote has more work ({remote.height()} vs {old_height})")
+                        self.blockchain = remote
+                        self.p2p.blockchain_height = self.blockchain.height()
+                        self._save_chain()
+                    else:
+                        logger.info(f"Remote taller but less work, keeping local chain")
+                elif remote.height() <= old_height:
+                    logger.debug(f"Remote chain shorter ({remote.height()} <= {old_height}), keeping local")
+            except Exception as e:
+                logger.warning(f"Chain sync failed: {e}")
 
     async def _handle_seed_announce(self, msg: dict):
         """Another node announced itself as seed. Add to seeds.json and gossip."""
