@@ -1,6 +1,6 @@
 """
 TritioCoin Mining System
-Proof-of-Work with blake2b (fast, ASIC-resistant).
+Proof-of-Work with Blake2b + memory-hardness (Argon2-style).
 Multi-process, async, with real-time progress.
 """
 import hashlib
@@ -14,6 +14,7 @@ from core.blockchain import Blockchain
 from core.mempool import Mempool
 from core.transaction import Transaction, TransactionBuilder
 from core.constants import SATOSHIS_PER_TRC
+from core.pow import memory_hard_hash
 
 logger = logging.getLogger("Miner")
 
@@ -89,7 +90,7 @@ def _mine_worker(header_base: bytes, target: str, start_nonce: int, step: int,
 
     while True:
         data = header_base + struct.pack('>I', nonce)
-        pow_hash = hashlib.blake2b(data, digest_size=32, person=b"tritiocoin_v1").hexdigest()
+        pow_hash = memory_hard_hash(data)
 
         if pow_hash.startswith(target):
             result_queue.put({"nonce": nonce, "pow_hash": pow_hash, "hashes": local_hashes})
@@ -147,16 +148,20 @@ class Miner:
 
     @staticmethod
     def _pow_hash(data: bytes) -> str:
-        return hashlib.blake2b(data, digest_size=32, person=b"tritiocoin_v1").hexdigest()
+        return memory_hard_hash(data)
 
     def create_block_template(self, address: str) -> Block:
         prev = self.blockchain.latest()
         diff = self.blockchain.adjust_difficulty()
         pending = self.mempool.get(500)
 
+        # Miner gets 70% of reward, validators get 30%
+        full_reward = self.blockchain.reward_at_satoshis()
+        miner_reward = int(full_reward * 0.7)
+
         coinbase = TransactionBuilder.create_coinbase(
             address,
-            self.blockchain.reward_at_satoshis(),
+            miner_reward,
             self.blockchain.height()
         )
 
