@@ -36,7 +36,10 @@ class TritioAPI:
         self.app.router.add_get("/api/mempool", self.handle_mempool)
         self.app.router.add_get("/api/peers", self.handle_peers)
         self.app.router.add_get("/api/validators", self.handle_validators)
+        self.app.router.add_get("/api/wallet/{address}", self.handle_wallet)
+        self.app.router.add_get("/api/sync", self.handle_sync)
         self.app.router.add_post("/api/tx", self.handle_send_tx)
+        self.app.router.add_post("/api/block", self.handle_submit_block)
         self.app.router.add_post("/api/validator/register", self.handle_register_validator)
 
         # Delegation endpoints
@@ -218,6 +221,78 @@ class TritioAPI:
         validators = self.node.consensus.get_active_validators()
         stats = self.node.consensus.get_validator_stats()
         return web.json_response({"validators": validators, "stats": stats})
+
+    async def handle_wallet(self, request):
+        """Complete wallet data: balance, tx count, last block, UTXOs."""
+        address = request.match_info["address"]
+        balance = self.node.blockchain.balance(address)
+        balance_sat = self.node.blockchain.balance_satoshis(address)
+        txs = self.node.blockchain.db.get_address_txs(address)
+        utxos = self.node.blockchain.db.get_unspent_utxos(address)
+        last_height = self.node.blockchain.height()
+
+        return web.json_response({
+            "address": address,
+            "balance": balance,
+            "balance_satoshis": balance_sat,
+            "transaction_count": len(txs),
+            "utxo_count": len(utxos),
+            "last_block_height": last_height,
+            "transactions": txs[:20]
+        })
+
+    async def handle_sync(self, request):
+        """Node sync status."""
+        height = self.node.blockchain.height()
+        peers = self.node.p2p.get_peer_count()
+        mempool_size = self.node.mempool.size()
+
+        # Check if we have peers and are syncing
+        is_synced = peers > 0
+        sync_status = "synced" if is_synced else "no_peers"
+
+        return web.json_response({
+            "height": height,
+            "peers": peers,
+            "mempool_size": mempool_size,
+            "sync_status": sync_status,
+            "difficulty": self.node.blockchain.difficulty,
+            "supply_mined": self.node.blockchain.total_mined_satoshis() / SATOSHIS_PER_TRC
+        })
+
+    async def handle_submit_block(self, request):
+        """Accept a block from wallet miner and broadcast to network."""
+        try:
+            data = await request.json()
+            from core.block import Block
+
+            block = Block.deserialize(data)
+
+            if self.node.blockchain.add_block(block):
+                self.node.p2p.blockchain_height = self.node.blockchain.height()
+                self.node.mempool.remove_many(
+                    [tx.get("hash") for tx in block.transactions if tx.get("hash")]
+                )
+
+                # Broadcast to all peers
+                await self.node.p2p.broadcast({"type": "NEW_BLOCK", "block": block.serialize()})
+
+                # Broadcast to WebSocket
+                await self.broadcast_ws({
+                    "type": "new_block",
+                    "height": block.header.index,
+                    "hash": block.hash,
+                    "tx_count": len(block.transactions)
+                })
+
+                return web.json_response({
+                    "status": "ok",
+                    "height": block.header.index,
+                    "hash": block.hash
+                })
+            return web.json_response({"error": "Block rejected"}, status=400)
+        except Exception as e:
+            return web.json_response({"error": str(e)}, status=500)
 
     async def handle_send_tx(self, request):
         try:
@@ -423,10 +498,13 @@ class TritioAPI:
                  "  GET  /api/balance/{address}\n"
                  "  GET  /api/tx/{tx_hash}\n"
                  "  GET  /api/address/{address}\n"
+                 "  GET  /api/wallet/{address}\n"
+                 "  GET  /api/sync\n"
                  "  GET  /api/mempool\n"
                  "  GET  /api/peers\n"
                  "  GET  /api/validators\n"
                  "  POST /api/tx\n"
+                 "  POST /api/block\n"
                  "  POST /api/validator/register\n"
                  "  POST /api/delegate\n"
                  "  POST /api/undelegate\n"
