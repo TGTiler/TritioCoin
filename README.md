@@ -2,11 +2,11 @@
 
 # TritioCoin
 
-**Criptomoeda resistente a computacao quantica para uso do dia a dia**
+**Criptomoeda para uso do dia a dia com mineracao memory-hard**
 
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
+[![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-v1.0%20Production-brightgreen.svg)]()
+[![Status](https://img.shields.io/badge/Status-v1.1%20Production-brightgreen.svg)]()
 
 </div>
 
@@ -14,12 +14,12 @@
 
 ## O que e TritioCoin?
 
-TritioCoin e uma criptomoeda descentralizada criada para funcionar em computadores antigos e dispositivos leves (Intel Celeron, ESP32, ARM). Ela protege seus dados contra ataques de computadores quanticos futuros.
+TritioCoin e uma criptomoeda descentralizada criada para funcionar em computadores antigos e dispositivos leves (Intel Celeron, ESP32, ARM). Utiliza Blake2b com memory-hardness para resistencia a ASICs.
 
 ### Por que TritioCoin?
 
 - **Funciona em qualquer PC** - Nao precisa de placa de video cara
-- **Segura contra computacao quantica** - Suas moedas estao protegidas para o futuro
+- **Mineracao memory-hard** - Blake2b com 256KB de memoria por hash
 - **Rede descentralizada** - Sem autoridade central, sem censura
 - **Deflacionaria** - 10% das taxas sao queimadas, valorizacao natural
 
@@ -35,7 +35,7 @@ TritioCoin e uma criptomoeda descentralizada criada para funcionar em computador
 3. Selecione: 2 (Criar carteira)
 4. Digite uma senha forte
 5. ANOTE as 24 palavras de recuperacao (MUITO IMPORTANTE!)
-6. Selecione: 8 (Conectar automatico)
+6. Selecione: 7 (Conectar automatico)
 7. Aguarde sincronizar com a rede
 ```
 
@@ -75,24 +75,23 @@ chmod +x deploy.sh
 
 [CARTEIRA]
  2. Criar carteira
- 3. Criar carteira quantica (resistente a quantum)
- 4. Ver saldo
- 5. Enviar TRC
- 6. Historico
- 7. Listar carteiras
+ 3. Ver saldo
+ 4. Enviar TRC
+ 5. Historico
+ 6. Listar carteiras
 
 [REDE]
- 8. Conectar (automatico)
- 9. Iniciar como SEED (primeiro no da rede)
-10. Ver info da rede
-11. Ver peers conectados
+ 7. Conectar (automatico)
+ 8. Iniciar como SEED (primeiro no da rede)
+ 9. Ver info da rede
+10. Ver peers conectados
 
 [MINERACAO]
-12. Minerar blocos
-13. Minerar e virar SEED
+11. Minerar blocos
+12. Minerar e virar SEED
 
 [UTILITARIOS]
-14. Parar todos os processos
+13. Parar todos os processos
 ```
 
 ---
@@ -101,9 +100,9 @@ chmod +x deploy.sh
 
 ```
 1. Abra TritioCoin.bat
-2. Selecione: 12 (Minerar blocos)
+2. Selecione: 11 (Minerar blocos)
 3. Aguarde - seu PC vai trabalhar encontrando blocos
-4. Quando encontrar um bloco, voce ganha 45 TRC!
+4. Quando encontrar um bloco, voce ganha 50 TRC!
 5. Ctrl+C para parar
 ```
 
@@ -115,7 +114,7 @@ chmod +x deploy.sh
 
 ```
 1. Abra TritioCoin.bat
-2. Selecione: 5 (Enviar TRC)
+2. Selecione: 4 (Enviar TRC)
 3. Digite o endereco do destinatario (comeca com T)
 4. Digite o valor em TRC
 5. Digite a taxa (padrao: 0.001)
@@ -142,15 +141,15 @@ python wallet.py recover
 | Recurso | Descricao |
 |---------|-----------|
 | **Supply Maximo** | 19.000.000 TRC |
-| **Recompensa** | 45 TRC por bloco |
+| **Recompensa** | 50 TRC por bloco |
 | **Halving** | A cada 190.000 blocos |
 | **Tempo de Bloco** | ~5 minutos |
 | **Taxa Minima** | 0.0001 TRC |
 | **Queima** | 10% das taxas |
-| **Consenso** | PoW (Argon2id) + PoS |
-| **Quantum** | ECDSA + WOTS+ hibrido |
+| **Consenso** | PoW (Blake2b memory-hard) + PoS |
+| **Assinaturas** | ECDSA secp256k1 |
 | **Carteiras** | BIP32/BIP44 HD, Multi-sig |
-| **Rede** | DHT, NAT traversal |
+| **Rede** | DHT, NAT traversal, TLS 1.3 |
 
 ---
 
@@ -161,7 +160,8 @@ TritioCoin/
 ├── core/
 │   ├── blockchain.py      # Gerenciamento da chain
 │   ├── block.py           # Estrutura do bloco
-│   ├── miner.py           # Mineracao Argon2id
+│   ├── pow.py             # PoW Blake2b memory-hard
+│   ├── miner.py           # Mineracao
 │   ├── mempool.py         # Pool de transacoes
 │   ├── transaction.py     # Transacoes baseadas em satoshis
 │   ├── utxo.py            # Gerenciamento UTXO
@@ -174,7 +174,6 @@ TritioCoin/
 │   ├── staking.py         # Staking publico
 │   ├── micropay.py        # Micropagamentos
 │   ├── light_client.py    # Cliente leve SPV
-│   ├── quantum.py         # WOTS+ resistente a quantum
 │   ├── constants.py       # Constantes em satoshis
 │   ├── database.py        # Persistencia SQLite
 │   └── network_config.py  # Configs Mainnet/Testnet
@@ -215,7 +214,7 @@ TritioCoin/
 | Parametro | Valor |
 |-----------|-------|
 | Supply Maximo | 19.000.000 TRC |
-| Recompensa Inicial | 45 TRC |
+| Recompensa Inicial | 50 TRC |
 | Intervalo de Halving | 190.000 blocos |
 | Tempo de Bloco | ~5 minutos |
 | Taxa Minima | 0.0001 TRC |
@@ -275,4 +274,4 @@ MIT License - Veja [LICENSE](LICENSE)
 
 ---
 
-**TritioCoin v1.0 - Producao**
+**TritioCoin v1.1 - Producao**
