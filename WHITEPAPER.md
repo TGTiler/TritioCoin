@@ -1,6 +1,6 @@
 # TritioCoin Whitepaper
 
-**A Quantum-Resistant Cryptocurrency for Everyday Use**
+**A Decentralized Cryptocurrency for Everyday Use**
 
 Version 1.1.0
 Date: June 2026
@@ -9,7 +9,7 @@ Date: June 2026
 
 ## Abstract
 
-TritioCoin is a decentralized, peer-to-peer electronic cash system designed for everyday use with built-in protection against quantum computing threats. The system uses a hybrid Proof-of-Work/Proof-of-Stake consensus mechanism, quantum-resistant cryptography, delegation system, and a fully decentralized peer discovery system based on Kademlia DHT.
+TritioCoin is a decentralized, peer-to-peer electronic cash system designed for everyday use. The system uses a hybrid Proof-of-Work/Proof-of-Stake consensus mechanism, delegation system, and a fully decentralized peer discovery system based on Kademlia DHT.
 
 ---
 
@@ -17,17 +17,17 @@ TritioCoin is a decentralized, peer-to-peer electronic cash system designed for 
 
 ### 1.1 Problem Statement
 
-Current cryptocurrencies face two major challenges:
+Current cryptocurrencies face several challenges:
 
-1. **Quantum Threat**: Shor's algorithm on quantum computers can break ECDSA, the signature scheme used by Bitcoin and most cryptocurrencies.
+1. **Centralization Risk**: Many cryptocurrencies rely on centralized seed nodes for peer discovery, creating single points of failure.
 
-2. **Centralization Risk**: Many cryptocurrencies rely on centralized seed nodes for peer discovery, creating single points of failure.
+2. **ASIC Centralization**: Mining hardware centralization leads to network control by a few entities.
 
 ### 1.2 Solution
 
 TritioCoin addresses these challenges with:
 
-- **Hybrid Signatures**: ECDSA + WOTS+ (Winternitz One-Time Signature) for quantum resistance
+- **Memory-Hard PoW**: Blake2b with 256KB memory requirement per hash, resisting ASIC/FPGA optimization
 - **DHT Peer Discovery**: Kademlia-based decentralized peer discovery without central authorities
 - **Dual Consensus**: PoW + PoS for security and decentralization
 - **Delegation System**: Users can delegate TRC to validators without running infrastructure
@@ -78,33 +78,16 @@ Total header size: 86 bytes (binary, Big-Endian)
 ### 3.1 ECDSA (Elliptic Curve Digital Signature Algorithm)
 
 - **Curve**: secp256k1 (same as Bitcoin)
-- **Purpose**: Transaction signatures (current)
+- **Purpose**: Transaction signatures
 - **Key Size**: 256 bits
 
-### 3.2 WOTS+ (Winternitz One-Time Signature)
-
-- **Hash Function**: SHA-256
-- **Purpose**: Quantum-resistant signatures (future)
-- **Security**: 2^128 against quantum attacks (Grover's algorithm)
-
-### 3.3 Hybrid Signatures
-
-TritioCoin uses both ECDSA and WOTS+ simultaneously:
-
-```
-Transaction = ECDSA_Signature + WOTS+_Signature
-Verification = ECDSA_Verify AND WOTS+_Verify
-```
-
-If either scheme remains secure, the transaction remains secure.
-
-### 3.4 Key Derivation
+### 3.2 Key Derivation
 
 - **BIP32**: Hierarchical Deterministic wallets
 - **BIP39**: 24-word mnemonic backup
 - **BIP44**: Multi-account derivation (m/44'/9999'/0'/0/0)
 
-### 3.5 Encryption
+### 3.3 Encryption
 
 - **Wallet Storage**: AES-256-GCM
 - **Key Derivation**: PBKDF2 (600,000 iterations)
@@ -116,11 +99,10 @@ If either scheme remains secure, the transaction remains secure.
 
 ### 4.1 Proof-of-Work (PoW)
 
-- **Algorithm**: Argon2id
-- **Memory**: 64 MB
-- **Time Cost**: 1 iteration
-- **Parallelism**: 1
-- **Purpose**: ASIC-resistant mining
+- **Algorithm**: Blake2b with memory-hardness
+- **Memory**: 256 KB per hash
+- **Structure**: Memory fill + random reads + chained rounds
+- **Purpose**: ASIC/FPGA-resistant mining
 - **Multi-threading**: Uses all CPU cores
 
 ### 4.2 Proof-of-Stake (PoS)
