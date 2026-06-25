@@ -823,47 +823,12 @@ class TritioNode(GossipNode):
                 })
 
     async def _validator_cycle(self):
-        """Ciclo de validacao PoS: seleciona, assina e propaga blocos."""
+        """Ciclo de validacao PoS: aguarda blocos de miners e assina."""
         if self.wallet.address not in self.consensus.validators:
             await asyncio.sleep(5)
             return
 
-        current_height = self.blockchain.height()
-        selected = self.consensus.select_validators_for_block(current_height + 1)
-
-        if self.wallet.address in selected:
-            logger.info(f"Selecionado para validar bloco #{current_height + 1}")
-            from core.miner import Miner
-            miner = Miner(self.blockchain, self.mempool)
-            block = miner.create_block_template(self.wallet.address)
-
-            sig = self.consensus.sign_block(block, self.wallet)
-            if sig:
-                block.validator_signatures.append({
-                    "address": self.wallet.address,
-                    "signature": sig,
-                    "signature_mode": "ecdsa"
-                })
-
-            await self.p2p.broadcast({
-                "type": "REQUEST_SIGNATURE",
-                "block": block.serialize()
-            })
-
-            await asyncio.sleep(2)
-
-            if block.hash in self._pending_signatures:
-                block.validator_signatures.extend(self._pending_signatures.pop(block.hash))
-
-            if self.blockchain.add_block(block):
-                self.p2p.blockchain_height = self.blockchain.height()
-                self.blockchain.adjust_difficulty()
-                await self.p2p.broadcast({
-                    "type": "NEW_BLOCK",
-                    "block": block.serialize()
-                })
-                self.consensus.distribute_block_rewards(block)
-                logger.info(f"Bloco #{block.header.index} validado e broadcast")
+        await asyncio.sleep(1)
 
                 if self.api:
                     await self.api.broadcast_ws({
