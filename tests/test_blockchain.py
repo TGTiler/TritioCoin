@@ -27,7 +27,8 @@ class TestBlockchain:
     def test_mine_block(self, blockchain):
         """Test mining a block."""
         w = Wallet.create()
-        coinbase = Transaction("COINBASE", w.pubkey_hex(), blockchain.reward_at())
+        miner_reward = int(blockchain.reward_at() * 0.7)
+        coinbase = Transaction("COINBASE", w.pubkey_hex(), miner_reward)
         coinbase.timestamp = int(time.time() * 1000)
         coinbase.tx_hash = coinbase.compute_hash()
         block = Block(1, blockchain.latest().hash, [coinbase.to_dict()], blockchain.difficulty)
@@ -38,25 +39,27 @@ class TestBlockchain:
 
     def test_supply_cap(self, blockchain):
         """Test supply cap is enforced."""
-        assert blockchain.config.max_supply_trc == 19_000_000  # Updated: 19M
+        assert blockchain.config.max_supply_trc == 19_000_000
 
     def test_balance_tracking(self, blockchain):
         """Test balance is tracked correctly."""
         w = Wallet.create()
-        coinbase = Transaction("COINBASE", w.pubkey_hex(), 45.0)  # Updated: 45 TRC
+        miner_reward = int(blockchain.reward_at() * 0.7)
+        coinbase = Transaction("COINBASE", w.pubkey_hex(), miner_reward)
         coinbase.timestamp = int(time.time() * 1000)
         coinbase.tx_hash = coinbase.compute_hash()
         block = Block(1, blockchain.latest().hash, [coinbase.to_dict()], blockchain.difficulty)
         block.hash = block.content_hash()
         block.pow_hash = "0" * blockchain.difficulty + "test"
         blockchain.add_block(block)
-        assert blockchain.balance(w.pubkey_hex()) == 45.0  # Updated: 45 TRC
+        assert blockchain.balance(w.pubkey_hex()) == miner_reward
 
     def test_persistence(self, db, testnet):
         """Test blockchain persistence."""
         bc = Blockchain(testnet, db)
         w = Wallet.create()
-        coinbase = Transaction("COINBASE", w.pubkey_hex(), 45.0)  # Updated: 45 TRC
+        miner_reward = int(bc.reward_at() * 0.7)
+        coinbase = Transaction("COINBASE", w.pubkey_hex(), miner_reward)
         coinbase.timestamp = int(time.time() * 1000)
         coinbase.tx_hash = coinbase.compute_hash()
         block = Block(1, bc.latest().hash, [coinbase.to_dict()], bc.difficulty)
@@ -67,7 +70,7 @@ class TestBlockchain:
         # Reload from same database
         bc2 = Blockchain(testnet, db)
         assert bc2.height() == 2
-        assert bc2.balance(w.pubkey_hex()) == 45.0  # Updated: 45 TRC
+        assert bc2.balance(w.pubkey_hex()) == miner_reward
 
     def test_serialization(self, blockchain):
         """Test blockchain serialization."""
@@ -83,7 +86,7 @@ class TestBlockchain:
     def test_reward_halving(self, blockchain):
         """Test reward calculation."""
         reward = blockchain.reward_at()
-        assert reward == 45.0  # Updated: 45 TRC initial reward
+        assert reward == 50.0  # Updated: 45 TRC initial reward
 
     def test_difficulty_adjustment(self, blockchain):
         """Test difficulty can be adjusted."""
