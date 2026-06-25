@@ -106,38 +106,86 @@ class Blockchain:
             logger.debug(f"Duplicate block rejected: {block.hash[:16]}...")
             return False
 
-        # Bloco no mesmo height: ja existe outro bloco nessa posicao
-        existing = self.db.get_block(block.header.index)
-        if existing:
-            logger.debug(f"Block at height {block.header.index} already exists, rejecting duplicate")
-            return False
-
-        # Reorg protection: check max depth
-        if block.header.index < self.height():
-            depth = self.height() - block.header.index
-            if depth > MAX_REORG_DEPTH:
-                logger.warning(f"Reorg depth {depth} exceeds max {MAX_REORG_DEPTH}")
+        # Bloco na posicao esperada (proximo da chain)
+        if block.header.index == self.height():
+            # Verificar se e o mesmo bloco
+            existing = self.db.get_block(block.header.index)
+            if existing and block.hash == existing.get("hash"):
+                logger.debug(f"Duplicate block at height {block.header.index}")
                 return False
 
-        # Reorg protection: check checkpoint
-        if self._is_past_checkpoint(block.header.index):
-            logger.warning(f"Cannot reorg past checkpoint at height {block.header.index}")
+            if not self._validate(block):
+                return False
+            self._apply(block)
+            self.chain.append(block)
+            self.db.save_block(block.header.index, block.serialize())
+            self.db.set_metadata("difficulty", str(self.difficulty))
+
+            if block.header.index % CHECKPOINT_INTERVAL == 0 and block.header.index > 0:
+                self.db.save_checkpoint(block.header.index, block.hash)
+                logger.info(f"Checkpoint saved at height {block.header.index}")
+
+            logger.info(f"Block #{block.header.index} added | "
+                        f"Supply: {self.total_mined_satoshis()/SATOSHIS_PER_TRC:.2f}/{self.config.max_supply_trc:.0f} TRC")
+            return True
+
+        # Bloco concorrente (mesmo height ou chain mais longa)
+        if block.header.index <= self.height():
+            return self._handle_reorg(block)
+
+        # Bloco muito a frente (height > self.height() + 1) - orphan
+        logger.debug(f"Block #{block.header.index} ahead of chain (height={self.height()})")
+        return False
+
+    def _handle_reorg(self, block: Block) -> bool:
+        """Handle chain reorganization when a competing chain arrives."""
+        fork_height = block.header.index
+
+        # Reorg protection: check max depth
+        depth = self.height() - fork_height
+        if depth > MAX_REORG_DEPTH:
+            logger.warning(f"Reorg depth {depth} exceeds max {MAX_REORG_DEPTH}")
             return False
 
-        if not self._validate(block):
+        # Reorg protection: check checkpoint
+        if self._is_past_checkpoint(fork_height):
+            logger.warning(f"Cannot reorg past checkpoint at height {fork_height}")
             return False
+
+        # Find fork point (common ancestor)
+        fork_point = fork_height - 1
+        if fork_point < 0:
+            fork_point = 0
+
+        # Compare cumulative work
+        current_work = sum(2 ** b.header.difficulty for b in self.chain[fork_point:])
+        new_work = 2 ** block.header.difficulty
+
+        if new_work <= current_work:
+            logger.debug(f"Competing chain has less work ({new_work} <= {current_work})")
+            return False
+
+        # Reorganize: undo blocks from fork_point to current tip
+        logger.warning(f"Chain reorganization: undoing {self.height() - fork_point} blocks")
+        for i in range(self.height() - 1, fork_point - 1, -1):
+            if i < len(self.chain):
+                self._undo_block(self.chain[i])
+                self.chain.pop()
+
+        # Apply new block
+        if not self._validate(block):
+            logger.warning("Reorg block validation failed")
+            return False
+
         self._apply(block)
         self.chain.append(block)
         self.db.save_block(block.header.index, block.serialize())
         self.db.set_metadata("difficulty", str(self.difficulty))
 
-        # Save checkpoint at intervals
         if block.header.index % CHECKPOINT_INTERVAL == 0 and block.header.index > 0:
             self.db.save_checkpoint(block.header.index, block.hash)
-            logger.info(f"Checkpoint saved at height {block.header.index}")
 
-        logger.info(f"Block #{block.header.index} added | "
-                    f"Supply: {self.total_mined_satoshis()/SATOSHIS_PER_TRC:.2f}/{self.config.max_supply_trc:.0f} TRC")
+        logger.info(f"Reorg complete: now at height {self.height()}")
         return True
 
     def _validate(self, block: Block) -> bool:
@@ -178,6 +226,7 @@ class Blockchain:
 
         # Validate transactions
         expected_reward = self.reward_at_satoshis()
+        miner_reward = int(expected_reward * 0.7)  # Miner gets 70%
         coinbase_count = 0
         block_total_satoshis = 0
 
@@ -193,8 +242,8 @@ class Blockchain:
             if tx.sender_pubkey == "COINBASE":
                 coinbase_count += 1
                 tx_amount_sat = trc_to_satoshis(tx.amount)
-                if tx_amount_sat != expected_reward:
-                    logger.warning(f"Wrong reward: {tx_amount_sat} != {expected_reward}")
+                if tx_amount_sat != miner_reward:
+                    logger.warning(f"Wrong miner reward: {tx_amount_sat} != {miner_reward}")
                     return False
                 block_total_satoshis += tx_amount_sat
             else:
@@ -285,6 +334,33 @@ class Blockchain:
             return False
         self.db.set_balance(addr, current - amount_sat)
         return True
+
+    def cumulative_work(self) -> int:
+        """Calculate total cumulative PoW work (sum of 2^difficulty for each block)."""
+        work = 0
+        for block in self.chain:
+            work += 2 ** block.header.difficulty
+        return work
+
+    def _undo_block(self, block: Block):
+        """Reverse all effects of a block (for chain reorganization)."""
+        for tx_data in reversed(block.transactions):
+            tx = Transaction.from_dict(tx_data)
+            if tx.sender_pubkey == "COINBASE":
+                amount_sat = trc_to_satoshis(tx.amount)
+                self._debit_satoshis(tx.recipient_pubkey, amount_sat)
+                current = self.total_mined_satoshis()
+                self.db.set_metadata("total_mined_satoshis", str(max(0, current - amount_sat)))
+            else:
+                for inp in getattr(tx, 'inputs', []) or []:
+                    self.db.unspend_utxo(inp["tx_hash"])
+
+                amount_sat = trc_to_satoshis(tx.amount)
+                fee_sat = trc_to_satoshis(tx.fee)
+                self._credit_satoshis(tx.sender_pubkey, amount_sat + fee_sat)
+                self._debit_satoshis(tx.recipient_pubkey, amount_sat)
+
+        logger.info(f"Undone block #{block.header.index}")
 
     def _is_past_checkpoint(self, height: int) -> bool:
         """Check if a height has a checkpoint that would be crossed by a reorg."""
