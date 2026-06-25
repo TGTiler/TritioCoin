@@ -32,8 +32,7 @@ Se voce encontrar uma vulnerabilidade:
 | Derivacao de chave | PBKDF2 (600K iteracoes) | Protecao contra bruteforce |
 | Transporte | TLS 1.3 | Conexao P2P criptografada |
 | Assinaturas | ECDSA secp256k1 | Assinatura de transacoes |
-| Quantum | WOTS+ | Protecao contra computacao quantica |
-| Hashing | SHA-256 | Hash de blocos e Merkle trees |
+| Hashing | SHA-256, Blake2b | Hash de blocos e PoW memory-hard |
 
 ### Como sua carteira e protegida
 
