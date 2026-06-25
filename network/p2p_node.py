@@ -117,6 +117,10 @@ class NATTraversal:
 
 class P2PNode:
     CONNECT_COOLDOWN = 60
+    MAX_PEERS = 50
+    MAX_OUTBOUND = 8
+    MAX_INBOUND = 42
+    MAX_PER_IP = 3
 
     def __init__(self, host: str, port: int):
         self.host = host
@@ -130,7 +134,8 @@ class P2PNode:
         self.node_id = self._generate_node_id()
         self.rate_limiter = RateLimiter()
         self.ssl_context = None
-        self.reputation = None
+        from network.reputation import PeerReputation
+        self.reputation = PeerReputation()
         self.nat = NATTraversal()
         self.external_address = None
         self.blockchain_height = 0
@@ -261,6 +266,27 @@ class P2PNode:
     async def _handle_conn(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
         addr = writer.get_extra_info('peername')
         key = f"{addr[0]}:{addr[1]}"
+
+        # Max peers limit
+        if len(self.peers) >= self.MAX_PEERS:
+            logger.debug(f"Max peers reached, rejecting {key}")
+            try:
+                writer.close()
+            except Exception:
+                pass
+            return
+
+        # Per-IP limit
+        ip = addr[0]
+        ip_count = sum(1 for p in self.peers if p.split(':')[0] == ip)
+        if ip_count >= self.MAX_PER_IP:
+            logger.debug(f"Per-IP limit reached for {ip}, rejecting {key}")
+            try:
+                writer.close()
+            except Exception:
+                pass
+            return
+
         if key in self.peers:
             try:
                 writer.close()
