@@ -18,7 +18,7 @@ from core.block import Block
 from core.transaction import Transaction
 from core.database import Database
 from core.network_config import NetworkConfig, MAINNET
-from core.constants import SATOSHIS_PER_TRC
+from core.constants import SATOSHIS_PER_TRC, MAX_FUTURE_DRIFT, MAX_PAST_DRIFT, MTP_WINDOW, CHECKPOINT_INTERVAL, MAX_REORG_DEPTH
 
 logger = logging.getLogger("Blockchain")
 
@@ -112,12 +112,30 @@ class Blockchain:
             logger.debug(f"Block at height {block.header.index} already exists, rejecting duplicate")
             return False
 
+        # Reorg protection: check max depth
+        if block.header.index < self.height():
+            depth = self.height() - block.header.index
+            if depth > MAX_REORG_DEPTH:
+                logger.warning(f"Reorg depth {depth} exceeds max {MAX_REORG_DEPTH}")
+                return False
+
+        # Reorg protection: check checkpoint
+        if self._is_past_checkpoint(block.header.index):
+            logger.warning(f"Cannot reorg past checkpoint at height {block.header.index}")
+            return False
+
         if not self._validate(block):
             return False
         self._apply(block)
         self.chain.append(block)
         self.db.save_block(block.header.index, block.serialize())
         self.db.set_metadata("difficulty", str(self.difficulty))
+
+        # Save checkpoint at intervals
+        if block.header.index % CHECKPOINT_INTERVAL == 0 and block.header.index > 0:
+            self.db.save_checkpoint(block.header.index, block.hash)
+            logger.info(f"Checkpoint saved at height {block.header.index}")
+
         logger.info(f"Block #{block.header.index} added | "
                     f"Supply: {self.total_mined_satoshis()/SATOSHIS_PER_TRC:.2f}/{self.config.max_supply_trc:.0f} TRC")
         return True
@@ -142,9 +160,16 @@ class Blockchain:
             return False
 
         # Check timestamp (not too far in future)
-        if block.header.timestamp > int(time.time()) + 300:
+        if block.header.timestamp > int(time.time()) + MAX_FUTURE_DRIFT:
             logger.warning(f"Block timestamp too far in future: {block.header.timestamp}")
             return False
+
+        # Check timestamp not too far in past (median time past)
+        if self.height() >= MTP_WINDOW:
+            mtp = self._median_time_past()
+            if block.header.timestamp <= mtp - MAX_PAST_DRIFT:
+                logger.warning(f"Block timestamp too far in past: {block.header.timestamp} <= MTP-{MAX_PAST_DRIFT}")
+                return False
 
         # Check block hash matches content
         if block.hash and block.hash != block.content_hash():
@@ -161,6 +186,9 @@ class Blockchain:
             if not tx.is_valid():
                 logger.warning(f"Invalid transaction in block {block.header.index}")
                 return False
+            if tx.sender_pubkey != "COINBASE" and tx.is_expired():
+                logger.warning(f"Expired transaction in block {block.header.index}")
+                return False
 
             if tx.sender_pubkey == "COINBASE":
                 coinbase_count += 1
@@ -171,14 +199,14 @@ class Blockchain:
                 block_total_satoshis += tx_amount_sat
             else:
                 sender_balance = self.balance_satoshis(tx.sender_pubkey)
-                needed = trc_to_satoshis(tx.amount + tx.fee)
+                needed = tx.amount_satoshis + tx.fee_satoshis
                 if sender_balance < needed:
                     logger.warning(f"Insufficient balance in block {block.header.index}")
                     return False
                 if self.db.has_utxo(tx.tx_hash):
                     logger.warning(f"Double-spend in block {block.header.index}")
                     return False
-                block_total_satoshis += trc_to_satoshis(tx.fee)
+                block_total_satoshis += tx.fee_satoshis
 
         # Check coinbase count
         if coinbase_count > 1:
@@ -192,6 +220,14 @@ class Blockchain:
             return False
 
         return True
+
+    def _median_time_past(self) -> int:
+        """Calculate median time past from last MTP_WINDOW blocks."""
+        n = min(MTP_WINDOW, self.height() + 1)
+        timestamps = [self.chain[i].header.timestamp
+                      for i in range(max(0, self.height() - n + 1), self.height() + 1)]
+        timestamps.sort()
+        return timestamps[len(timestamps) // 2]
 
     def _apply(self, block: Block):
         for tx_data in block.transactions:
@@ -233,13 +269,34 @@ class Blockchain:
                 total_burned = self.total_burned_satoshis()
                 self.db.set_metadata("total_burned_satoshis", str(total_burned + burn_sat))
 
+        # Re-verify supply cap after applying all transactions
+        total_mined = self.total_mined_satoshis()
+        if total_mined > self.config.max_supply_satoshis:
+            logger.critical(f"Supply cap exceeded after apply: {total_mined} > {self.config.max_supply_satoshis}")
+
     def _credit_satoshis(self, addr: str, amount_sat: int):
         current = self.db.get_balance(addr)
         self.db.set_balance(addr, current + amount_sat)
 
-    def _debit_satoshis(self, addr: str, amount_sat: int):
+    def _debit_satoshis(self, addr: str, amount_sat: int) -> bool:
         current = self.db.get_balance(addr)
+        if current < amount_sat:
+            logger.warning(f"Debit underflow: {addr[:16]}... {current} < {amount_sat}")
+            return False
         self.db.set_balance(addr, current - amount_sat)
+        return True
+
+    def _is_past_checkpoint(self, height: int) -> bool:
+        """Check if a height has a checkpoint that would be crossed by a reorg."""
+        latest_cp = self.db.get_latest_checkpoint_height()
+        return latest_cp > 0 and height < latest_cp
+
+    def get_confirmations(self, block_hash: str) -> int:
+        """Get number of confirmations for a block hash."""
+        for i in range(len(self.chain) - 1, -1, -1):
+            if self.chain[i].hash == block_hash:
+                return len(self.chain) - 1 - i
+        return 0
 
     def verify_block(self, block: Block) -> bool:
         """Verify a block is valid without adding it to chain."""
@@ -260,18 +317,32 @@ class Blockchain:
         genesis = self.chain[0]
         if genesis.header.index != 0:
             return False
+        if genesis.hash != genesis.content_hash():
+            return False
 
         # Check each block
         for i in range(1, len(self.chain)):
             block = self.chain[i]
             prev = self.chain[i - 1]
 
+            # Structural integrity
             if block.header.previous_hash.hex() != prev.hash:
                 logger.warning(f"Chain broken at height {i}")
                 return False
 
             if block.hash and block.hash != block.content_hash():
                 logger.warning(f"Block hash mismatch at height {i}")
+                return False
+
+            # PoW verification
+            if not block.pow_hash or not block.pow_hash.startswith("0" * block.header.difficulty):
+                logger.warning(f"Invalid PoW at height {i}")
+                return False
+
+            # Checkpoint verification
+            expected_hash = self.db.get_checkpoint(block.header.index)
+            if expected_hash and block.hash != expected_hash:
+                logger.warning(f"Checkpoint mismatch at height {block.header.index}")
                 return False
 
         return True
@@ -324,13 +395,23 @@ class Blockchain:
     def adjust_difficulty(self) -> int:
         if self.height() < 20:
             return self.difficulty
-        ref = self.chain[max(0, self.height() - 10)]
-        dt = self.latest().header.timestamp - ref.header.timestamp
-        target = self.config.block_time * 10
-        if dt < target // 2:
-            self.difficulty += 1
-        elif dt > target * 2:
-            self.difficulty = max(1, self.difficulty - 1)
+
+        window = 20
+        ref = self.chain[max(0, self.height() - window)]
+        actual_time = self.latest().header.timestamp - ref.header.timestamp
+        expected_time = self.config.block_time * window
+
+        if actual_time <= 0:
+            actual_time = 1
+
+        ratio = expected_time / actual_time
+        raw_new = self.difficulty * ratio
+        dampened = 0.8 * self.difficulty + 0.2 * raw_new
+
+        max_jump = self.difficulty * 0.25
+        clamped = max(self.difficulty - max_jump, min(self.difficulty + max_jump, dampened))
+
+        self.difficulty = max(self.config.initial_difficulty, int(round(clamped)))
         return self.difficulty
 
     def history(self, address: str) -> list:
