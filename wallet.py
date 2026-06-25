@@ -32,9 +32,8 @@ def prompt_password(confirm=False) -> str:
     return pw
 
 
-def get_wallet(quantum=False, password=None) -> Wallet:
-    name = "wallet_quantum.json" if quantum else "wallet.json"
-    path = DATA_DIR / name
+def get_wallet(password=None) -> Wallet:
+    path = DATA_DIR / "wallet.json"
     if path.exists():
         try:
             return Wallet.load(str(path), password)
@@ -179,20 +178,17 @@ def atomic_write(path, data):
 
 
 def cmd_create(args):
-    quantum = '--quantum' in sys.argv
     print("Create a password to encrypt your wallet.")
     print("This protects your funds if someone steals the file.")
     print()
     password = prompt_password(confirm=True)
 
-    w = Wallet.create(quantum)
+    w = Wallet.create()
     DATA_DIR.mkdir(exist_ok=True)
-    name = "wallet_quantum.json" if quantum else "wallet.json"
-    w.save(str(DATA_DIR / name), password)
+    w.save(str(DATA_DIR / "wallet.json"), password)
 
-    tag = "QR (quantum-resistant)" if quantum else "TRC (standard)"
     print()
-    print(f"Wallet created [{tag}]")
+    print(f"Wallet created [TRC]")
     print(f"  Address:  {w.address}")
     print()
     print("  IMPORTANT: Save your recovery phrase!")
@@ -201,12 +197,11 @@ def cmd_create(args):
     print(f"  Recovery phrase:")
     print(f"  {w.mnemonic}")
     print()
-    print(f"  Saved to: {DATA_DIR / name}")
+    print(f"  Saved to: {DATA_DIR / 'wallet.json'}")
     print(f"  Encrypted: AES-256-GCM")
 
 
 def cmd_recover(args):
-    quantum = '--quantum' in sys.argv
     print("Recover wallet from recovery phrase.")
     print()
     words = input("Enter 24-word recovery phrase: ").strip()
@@ -215,7 +210,7 @@ def cmd_recover(args):
         return
 
     try:
-        w = Wallet.from_mnemonic(words, quantum)
+        w = Wallet.from_mnemonic(words)
     except ValueError as e:
         print(f"Error: {e}")
         return
@@ -225,20 +220,17 @@ def cmd_recover(args):
     password = prompt_password(confirm=True)
 
     DATA_DIR.mkdir(exist_ok=True)
-    name = "wallet_quantum.json" if quantum else "wallet.json"
-    w.save(str(DATA_DIR / name), password)
+    w.save(str(DATA_DIR / "wallet.json"), password)
 
-    tag = "QR (quantum-resistant)" if quantum else "TRC (standard)"
     print()
-    print(f"Wallet recovered [{tag}]")
+    print(f"Wallet recovered [TRC]")
     print(f"  Address:  {w.address}")
-    print(f"  Saved to: {DATA_DIR / name}")
+    print(f"  Saved to: {DATA_DIR / 'wallet.json'}")
 
 
 def cmd_balance(args):
-    quantum = '--quantum' in sys.argv
     password = prompt_password()
-    w = get_wallet(quantum, password)
+    w = get_wallet(password)
 
     print("  Conectando para obter dados atualizados...")
     connect_to_seed()
@@ -399,9 +391,8 @@ async def _p2p_broadcast(host: str, port: int, tx_dict: dict, ssl_ctx):
 
 
 def cmd_send(args):
-    quantum = '--quantum' in sys.argv
     password = prompt_password()
-    w = get_wallet(quantum, password)
+    w = get_wallet(password)
 
     # Valores interativos
     recipient = input("  Endereco do destinatario: ").strip()
@@ -464,7 +455,6 @@ def cmd_send(args):
     tx_data = bytes.fromhex(tx.compute_hash())
     sigs = w.sign_tx(tx_data)
     tx.signature = sigs["ecdsa_signature"]
-    tx.quantum_signature = sigs.get("quantum_signature")
     tx.signature_mode = sigs["signature_mode"]
     tx.tx_hash = tx.compute_hash()
 
@@ -505,9 +495,8 @@ def cmd_send(args):
 
 
 def cmd_history(args):
-    quantum = '--quantum' in sys.argv
     password = prompt_password()
-    w = get_wallet(quantum, password)
+    w = get_wallet(password)
     bc = load_chain()
     hist = bc.history(w.pubkey_hex()) + bc.history(w.address)
     if not hist:
@@ -549,21 +538,20 @@ def cmd_list(args):
     print("  Carteiras encontradas:")
     print()
     found = False
-    for name in ["wallet.json", "wallet_quantum.json"]:
+    for name in ["wallet.json"]:
         path = DATA_DIR / name
         if path.exists():
             found = True
-            tag = "QR (quantica)" if "quantum" in name else "TRC (padrao)"
             try:
                 with open(path) as f:
                     data = json.load(f)
                 addr = data.get("address", "?")
-                print(f"  [{tag}]")
+                print(f"  [TRC]")
                 print(f"    Arquivo: {name}")
                 print(f"    Endereco: {addr}")
                 print()
             except Exception:
-                print(f"  [{tag}] {name} (erro ao ler)")
+                print(f"  [TRC] {name} (erro ao ler)")
                 print()
 
     if not found:
@@ -607,14 +595,13 @@ def cmd_peers(args):
 
 
 def cmd_mine(args):
-    quantum = '--quantum' in sys.argv
     threads = 1
     for arg in args:
         if arg.startswith('--threads='):
             threads = int(arg.split('=')[1])
 
     password = prompt_password()
-    w = get_wallet(quantum, password)
+    w = get_wallet(password)
     bc = load_chain()
     mempool = Mempool()
 
@@ -688,13 +675,12 @@ def main():
         print("  peers               Show connected peers")
         print()
         print("Options:")
-        print("  --quantum           Use quantum-resistant mode (QR)")
+        print("  (none)")
         return
 
     cmd = sys.argv[1]
     args = sys.argv[2:]
-    filtered = [a for a in args if a != '--quantum']
-    CMDS[cmd](filtered)
+    CMDS[cmd](args)
 
 
 if __name__ == "__main__":
