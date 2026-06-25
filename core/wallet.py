@@ -1,9 +1,7 @@
 """
 TritioCoin Wallet
-- ECDSA secp256k1
-- AES-256-GCM encrypted storage
-- BIP39 mnemonic backup
-- Quantum-resistant hybrid mode
+ECDSA secp256k1 with AES-256-GCM encryption.
+BIP39 mnemonic for key recovery.
 """
 import hashlib
 import json
@@ -17,17 +15,13 @@ from cryptography.hazmat.primitives import hashes
 
 
 class Wallet:
-    __slots__ = ('private_key', 'public_key', 'address', 'quantum_mode',
-                 'hybrid_keys', 'mnemonic')
+    __slots__ = ('private_key', 'public_key', 'address', 'mnemonic')
 
     KDF_ITERATIONS = 600_000
     SALT_SIZE = 32
     NONCE_SIZE = 12
 
-    def __init__(self, private_key_bytes: bytes = None, quantum_mode: bool = False,
-                 mnemonic: str = None):
-        self.quantum_mode = quantum_mode
-        self.hybrid_keys = None
+    def __init__(self, private_key_bytes: bytes = None, mnemonic: str = None):
         self.mnemonic = mnemonic
 
         if private_key_bytes:
@@ -36,46 +30,35 @@ class Wallet:
             self.private_key = ecdsa.SigningKey.generate(curve=ecdsa.SECP256k1)
 
         self.public_key = self.private_key.get_verifying_key()
-
-        if quantum_mode:
-            self._gen_quantum_keys()
-
         self.address = self._make_address()
 
     @classmethod
-    def create(cls, quantum: bool = False) -> 'Wallet':
+    def create(cls) -> 'Wallet':
         """Create new wallet with BIP39 mnemonic."""
         mnemo = Mnemonic("english")
         words = mnemo.generate(strength=256)
         seed = mnemo.to_seed(words)
-        # Use first 32 bytes of seed as private key
         private_key_bytes = seed[:32]
-        w = cls(private_key_bytes, quantum, words)
+        w = cls(private_key_bytes, words)
         return w
 
     @classmethod
-    def from_mnemonic(cls, words: str, quantum: bool = False) -> 'Wallet':
+    def from_mnemonic(cls, words: str) -> 'Wallet':
         """Recover wallet from BIP39 mnemonic."""
         mnemo = Mnemonic("english")
         if not mnemo.check(words):
             raise ValueError("Invalid mnemonic words")
         seed = mnemo.to_seed(words)
         private_key_bytes = seed[:32]
-        return cls(private_key_bytes, quantum, words)
-
-    def _gen_quantum_keys(self):
-        from core.quantum import HybridSignature
-        self.hybrid_keys = HybridSignature().generate()
+        return cls(private_key_bytes, words)
 
     def _make_address(self) -> str:
         pub = self.public_key.to_string()
         h = hashlib.sha256(pub).digest()
         ripemd = hashlib.new('ripemd160', h).digest()
-        ver = b'\x05' if self.quantum_mode else b'\x00'
-        prefix = "Q" if self.quantum_mode else "T"
-        payload = ver + ripemd
+        payload = b'\x00' + ripemd
         chk = hashlib.sha256(hashlib.sha256(payload).digest()).digest()[:4]
-        return prefix + self._b58(payload + chk)
+        return "T" + self._b58(payload + chk)
 
     @staticmethod
     def _b58(data: bytes) -> str:
@@ -99,16 +82,10 @@ class Wallet:
         return self.private_key.to_string().hex()
 
     def sign_tx(self, data: bytes) -> dict:
-        result = {"signature_mode": "hybrid" if self.quantum_mode else "ecdsa"}
-        result["ecdsa_signature"] = self.private_key.sign(data)
-        if self.quantum_mode and self.hybrid_keys:
-            from core.quantum import HybridSignature
-            h = HybridSignature()
-            h.ecdsa_key = self.private_key
-            h.wots_priv = bytes.fromhex(self.hybrid_keys["wots_priv"])
-            h.wots_pub = bytes.fromhex(self.hybrid_keys["wots_pub"])
-            result["quantum_signature"] = h.sign(data)
-        return result
+        return {
+            "signature_mode": "ecdsa",
+            "ecdsa_signature": self.private_key.sign(data)
+        }
 
     @staticmethod
     def _derive_key(password: str, salt: bytes) -> bytes:
@@ -145,12 +122,7 @@ class Wallet:
     def save(self, path: str, password: str):
         """Save wallet encrypted with password."""
         import stat
-        payload = {
-            "private_key": self.privkey_hex(),
-            "quantum_mode": self.quantum_mode
-        }
-        if self.hybrid_keys:
-            payload["hybrid_keys"] = self.hybrid_keys
+        payload = {"private_key": self.privkey_hex()}
 
         plaintext = json.dumps(payload).encode('utf-8')
         encrypted = self._encrypt(plaintext, password)
@@ -176,27 +148,16 @@ class Wallet:
         with open(path, 'r') as f:
             wallet_data = json.load(f)
 
-        # Legacy unencrypted format
         if "private_key" in wallet_data and "encrypted" not in wallet_data:
-            w = cls(bytes.fromhex(wallet_data["private_key"]),
-                    wallet_data.get("quantum_mode", False))
-            if wallet_data.get("hybrid_keys"):
-                w.hybrid_keys = wallet_data["hybrid_keys"]
-            return w
+            return cls(bytes.fromhex(wallet_data["private_key"]))
 
-        # Encrypted format
         if password is None:
             password = getpass.getpass("Password: ")
 
         plaintext = cls._decrypt(wallet_data["encrypted"], password)
         payload = json.loads(plaintext)
 
-        w = cls(bytes.fromhex(payload["private_key"]),
-                payload.get("quantum_mode", False))
-        if payload.get("hybrid_keys"):
-            w.hybrid_keys = payload["hybrid_keys"]
-        return w
+        return cls(bytes.fromhex(payload["private_key"]))
 
     def __repr__(self):
-        tag = "QR" if self.quantum_mode else "TRC"
-        return f"Wallet({tag}:{self.address})"
+        return f"Wallet(TRC:{self.address})"
