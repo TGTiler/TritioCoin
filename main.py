@@ -88,7 +88,6 @@ class TritioNode(GossipNode):
         GossipNode.__init__(self)
         self.config = config
         self.running = False
-        self.quantum = config.get('quantum', False)
         self.mode = config.get('mode', 'passive')
         self.network = config.get('network', 'mainnet')
 
@@ -132,13 +131,11 @@ class TritioNode(GossipNode):
         self.p2p.blockchain_height = self.blockchain.height()
 
         logger.info(f"Node started | Network: {self.network} | Mode: {self.mode} | "
-                    f"Quantum: {'ON' if self.quantum else 'OFF'} | "
                     f"Address: {self.wallet.address} | "
                     f"DHT port: {dht_port}")
 
     def _wallet_path(self) -> Path:
-        name = "wallet_quantum.json" if self.quantum else "wallet.json"
-        return DATA_DIR / name
+        return DATA_DIR / "wallet.json"
 
     def _chain_path(self) -> Path:
         return DATA_DIR / "blockchain.json"
@@ -168,12 +165,13 @@ class TritioNode(GossipNode):
 
         # Only create new wallet if file doesn't exist
         logger.info("Nenhuma carteira encontrada. Criando nova carteira...")
-        w = Wallet.create(self.quantum)
+        w = Wallet.create()
         DATA_DIR.mkdir(exist_ok=True)
         password = os.environ.get("TRC_PASSWORD")
         if not password:
-            logger.warning("TRC_PASSWORD nao definido. Usando senha padrao.")
-            password = "tritiocoin123"
+            logger.error("TRC_PASSWORD nao definido. Defina a variavel de ambiente.")
+            logger.error("Exemplo: set TRC_PASSWORD=sua_senha_segura")
+            sys.exit(1)
         w.save(str(path), password)
         logger.info(f"Nova carteira criada: {w.address}")
         logger.info(f"Arquivo: {path}")
@@ -587,8 +585,6 @@ class TritioNode(GossipNode):
                 w.private_key = None
                 w.public_key = vk
                 w.address = address
-                w.quantum_mode = False
-                w.hybrid_keys = None
                 w.mnemonic = None
 
                 if self.consensus.register_validator(w, stake):
@@ -971,7 +967,6 @@ def parse_args():
     p.add_argument('--mode', choices=['miner', 'validator', 'passive'], default='passive')
     p.add_argument('--network', choices=['mainnet', 'testnet'], default='mainnet')
     p.add_argument('--difficulty', type=int, default=4)
-    p.add_argument('--quantum', action='store_true')
     p.add_argument('--become-seed', action='store_true', help="Promote to seed on startup")
     p.add_argument('--api', action='store_true', default=True)
     p.add_argument('--api-port', type=int, default=8080)
@@ -985,7 +980,7 @@ async def main():
     config = {
         'host': args.host, 'port': args.port, 'seed': args.seed,
         'mode': args.mode, 'difficulty': args.difficulty,
-        'quantum': args.quantum, 'network': args.network,
+        'network': args.network,
         'api': not args.no_api, 'api_port': args.api_port,
         'stake': args.stake
     }
