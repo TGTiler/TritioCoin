@@ -17,19 +17,18 @@ class TestIntegration:
     """End-to-end integration tests."""
 
     def test_full_pipeline(self, db, testnet):
-        """Test complete pipeline: mine -> send -> multi-sig."""
+        """Test full transaction pipeline."""
         bc = Blockchain(testnet, db)
         utxo = UTXOManager(db)
-
-        # Create wallets
         alice = Wallet.create()
         bob = Wallet.create()
         charlie = Wallet.create()
+        miner_reward = int(bc.reward_at() * 0.7)
 
-        # Mine 3 blocks (45 TRC each)
+        # Mine 3 blocks (35 TRC each - 70% of 50)
         for i in range(3):
             time.sleep(0.01)
-            coinbase = Transaction("COINBASE", alice.pubkey_hex(), bc.reward_at())
+            coinbase = Transaction("COINBASE", alice.pubkey_hex(), miner_reward)
             coinbase.timestamp = int(time.time() * 1000) + i
             coinbase.tx_hash = coinbase.compute_hash()
             block = Block(bc.height(), bc.latest().hash, [coinbase.to_dict()], bc.difficulty)
@@ -37,15 +36,15 @@ class TestIntegration:
             block.pow_hash = "0" * bc.difficulty + "test"
             bc.add_block(block)
 
-        # 3 blocks * 50 TRC = 150 TRC
-        assert utxo.get_balance(alice.pubkey_hex()) == 150.0
+        # 3 blocks * 35 TRC = 105 TRC
+        assert utxo.get_balance(alice.pubkey_hex()) == 105.0
 
         # Send from Alice to Bob
-        tx = utxo.create_transaction(alice, bob.pubkey_hex(), 50.0, 0.01)
+        tx = utxo.create_transaction(alice, bob.pubkey_hex(), 30.0, 0.01)
         assert tx.is_valid()
 
         # Mine the transaction
-        coinbase = Transaction("COINBASE", alice.pubkey_hex(), bc.reward_at())
+        coinbase = Transaction("COINBASE", alice.pubkey_hex(), miner_reward)
         coinbase.timestamp = int(time.time() * 1000) + 100
         coinbase.tx_hash = coinbase.compute_hash()
         block = Block(bc.height(), bc.latest().hash, [coinbase.to_dict(), tx.to_dict()], bc.difficulty)
@@ -53,7 +52,7 @@ class TestIntegration:
         block.pow_hash = "0" * bc.difficulty + "test"
         bc.add_block(block)
 
-        assert utxo.get_balance(bob.pubkey_hex()) == 50.0
+        assert utxo.get_balance(bob.pubkey_hex()) == 30.0
 
         # Multi-sig
         msig, signers = create_multisig_wallet(2, 3)
@@ -67,14 +66,15 @@ class TestIntegration:
         """Test multiple users transacting."""
         bc = Blockchain(testnet, db)
         utxo = UTXOManager(db)
+        miner_reward = int(bc.reward_at() * 0.7)
 
         # Create 10 users
         users = [Wallet.create() for _ in range(10)]
 
-        # Fund all users (45 TRC each)
+        # Fund all users (35 TRC each - 70% of 50)
         for i, user in enumerate(users):
             time.sleep(0.01)
-            coinbase = Transaction("COINBASE", user.pubkey_hex(), bc.reward_at())
+            coinbase = Transaction("COINBASE", user.pubkey_hex(), miner_reward)
             coinbase.timestamp = int(time.time() * 1000) + i
             coinbase.tx_hash = coinbase.compute_hash()
             block = Block(bc.height(), bc.latest().hash, [coinbase.to_dict()], bc.difficulty)
