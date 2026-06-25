@@ -88,6 +88,11 @@ class Database:
                 value TEXT NOT NULL
             );
 
+            CREATE TABLE IF NOT EXISTS checkpoints (
+                height INTEGER PRIMARY KEY,
+                block_hash TEXT NOT NULL
+            );
+
             CREATE INDEX IF NOT EXISTS idx_tx_sender ON transactions(sender);
             CREATE INDEX IF NOT EXISTS idx_tx_recipient ON transactions(recipient);
             CREATE INDEX IF NOT EXISTS idx_tx_block ON transactions(block_height);
@@ -400,6 +405,27 @@ class Database:
         """Reclaim disk space after pruning."""
         self.conn.execute("VACUUM")
         logger.info("Database vacuumed")
+
+    def save_checkpoint(self, height: int, block_hash: str):
+        self.conn.execute(
+            "INSERT OR REPLACE INTO checkpoints (height, block_hash) VALUES (?, ?)",
+            (height, block_hash)
+        )
+        self.conn.commit()
+
+    def get_checkpoint(self, height: int) -> Optional[str]:
+        row = self.conn.execute(
+            "SELECT block_hash FROM checkpoints WHERE height = ?", (height,)
+        ).fetchone()
+        return row[0] if row else None
+
+    def get_all_checkpoints(self) -> Dict[int, str]:
+        rows = self.conn.execute("SELECT height, block_hash FROM checkpoints ORDER BY height").fetchall()
+        return {h: h_val for h, h_val in rows}
+
+    def get_latest_checkpoint_height(self) -> int:
+        row = self.conn.execute("SELECT MAX(height) FROM checkpoints").fetchone()
+        return row[0] if row and row[0] else 0
 
     def close(self):
         self.conn.close()
