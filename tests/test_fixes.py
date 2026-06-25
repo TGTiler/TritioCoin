@@ -28,7 +28,8 @@ def test_duplicate_block():
     bc = Blockchain(MAINNET, db)
 
     # Mine first block
-    coinbase = TransactionBuilder.create_coinbase('miner1', bc.reward_at_satoshis(), bc.height())
+    miner_reward = int(bc.reward_at_satoshis() * 0.7)
+    coinbase = TransactionBuilder.create_coinbase('miner1', miner_reward, bc.height())
     block = Block(bc.height(), bc.latest().hash, [coinbase.to_dict()], bc.difficulty)
     block.hash = block.content_hash()
     block.pow_hash = '0' * block.header.difficulty + 'aaa'
@@ -52,7 +53,8 @@ def test_same_height_block():
     bc = Blockchain(MAINNET, db)
 
     # Mine block at height 1
-    coinbase = TransactionBuilder.create_coinbase('miner1', bc.reward_at_satoshis(), bc.height())
+    miner_reward = int(bc.reward_at_satoshis() * 0.7)
+    coinbase = TransactionBuilder.create_coinbase('miner1', miner_reward, bc.height())
     block = Block(bc.height(), bc.latest().hash, [coinbase.to_dict()], bc.difficulty)
     block.hash = block.content_hash()
     block.pow_hash = '0' * block.header.difficulty + 'aaa'
@@ -60,7 +62,7 @@ def test_same_height_block():
     assert bc.height() == 2
 
     # Try block at height 1 again
-    coinbase2 = TransactionBuilder.create_coinbase('miner2', bc.reward_at_satoshis(), 1)
+    coinbase2 = TransactionBuilder.create_coinbase('miner2', miner_reward, 1)
     block2 = Block(1, '0' * 64, [coinbase2.to_dict()], bc.difficulty)
     block2.hash = block2.content_hash()
     block2.pow_hash = '0' * block.header.difficulty + 'ccc'
@@ -77,7 +79,8 @@ def test_has_block_with_hash():
     db = Database(tmpdb)
     bc = Blockchain(MAINNET, db)
 
-    coinbase = TransactionBuilder.create_coinbase('miner1', bc.reward_at_satoshis(), bc.height())
+    miner_reward = int(bc.reward_at_satoshis() * 0.7)
+    coinbase = TransactionBuilder.create_coinbase('miner1', miner_reward, bc.height())
     block = Block(bc.height(), bc.latest().hash, [coinbase.to_dict()], bc.difficulty)
     block.hash = block.content_hash()
     block.pow_hash = '0' * block.header.difficulty + 'aaa'
@@ -105,7 +108,7 @@ def test_wallet_not_found():
     exit_code = None
     try:
         from wallet import get_wallet
-        get_wallet(False, 'any')
+        get_wallet('any')
     except SystemExit as e:
         exit_code = e.code
     finally:
@@ -140,7 +143,7 @@ def test_wallet_wrong_password():
     exit_code = None
     try:
         from wallet import get_wallet
-        get_wallet(False, 'senha_errada')
+        get_wallet('senha_errada')
     except SystemExit as e:
         exit_code = e.code
     finally:
