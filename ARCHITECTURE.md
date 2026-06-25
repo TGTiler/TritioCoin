@@ -1,6 +1,6 @@
-# Arquitetura do TritioVisao Geral
+# Arquitetura da Tritio - Visao Geral
 
-TritioCoin e uma criptomoeda descentralizada com arquitetura modular projetada para seguranca, desempenho e resistencia a computacao quantica.
+TritioCoin e uma criptomoeda descentralizada com arquitetura modular projetada para seguranca e desempenho.
 
 ---
 
@@ -31,8 +31,8 @@ TritioCoin e uma criptomoeda descentralizada com arquitetura modular projetada p
 │  │  └─────────────────────────────────────────────────┘ │  │
 │  │                                                       │  │
 │  │  ┌─────────────┐  ┌─────────────┐  ┌──────────────┐ │  │
-│  │  │   Wallet    │  │  HD Wallet  │  │   Quantum    │ │  │
-│  │  │  ECDSA/AES  │  │  BIP32/44   │  │  WOTS+/Hybrid│ │  │
+│  │  │   Wallet    │  │  HD Wallet  │  │   Multi-Sig  │ │  │
+│  │  │  ECDSA/AES  │  │  BIP32/44   │  │  M-of-N      │ │  │
 │  │  └─────────────┘  └─────────────┘  └──────────────┘ │  │
 │  │                                                       │  │
 │  └───────────────────────────────────────────────────────┘  │
@@ -59,7 +59,7 @@ TritioCoin e uma criptomoeda descentralizada com arquitetura modular projetada p
 
 ```
 1. Usuario cria transacao
-2. Transacao assinada com ECDSA (+ opcional WOTS+)
+2. Transacao assinada com ECDSA
 3. Transacao adicionada a mempool
 4. Transacao transmitida para peers
 5. Minerador seleciona transacoes da mempool
@@ -85,7 +85,7 @@ Minerador pega transacoes do pool
      ↓
 Inclui no bloco que esta minerando
      ↓
-Encontra nonce valido (Argon2id)
+Encontra nonce valido (Blake2b memory-hard)
      ↓
 Transmite bloco para rede
      ↓
