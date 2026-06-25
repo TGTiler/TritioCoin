@@ -60,7 +60,6 @@ class UTXOManager:
         tx_data = bytes.fromhex(tx.compute_hash())
         sigs = sender_wallet.sign_tx(tx_data)
         tx.signature = sigs["ecdsa_signature"]
-        tx.quantum_signature = sigs.get("quantum_signature")
         tx.signature_mode = sigs["signature_mode"]
         tx.tx_hash = tx.compute_hash()
 
