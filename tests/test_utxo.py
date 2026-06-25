@@ -19,10 +19,11 @@ class TestUTXO:
         bc = Blockchain(testnet, db)
         utxo = UTXOManager(db)
         w = Wallet.create()
+        miner_reward = int(bc.reward_at() * 0.7)
 
         for i in range(3):
             time.sleep(0.01)
-            coinbase = Transaction("COINBASE", w.pubkey_hex(), bc.reward_at())
+            coinbase = Transaction("COINBASE", w.pubkey_hex(), miner_reward)
             coinbase.timestamp = int(time.time() * 1000) + i
             coinbase.tx_hash = coinbase.compute_hash()
             block = Block(bc.height(), bc.latest().hash, [coinbase.to_dict()], bc.difficulty)
@@ -30,17 +31,18 @@ class TestUTXO:
             block.pow_hash = "0" * bc.difficulty + "test"
             bc.add_block(block)
 
-        # 3 blocks * 50 TRC = 150 TRC
-        assert utxo.get_balance(w.pubkey_hex()) == 150.0
+        # 3 blocks * 35 TRC (70% of 50) = 105 TRC
+        assert utxo.get_balance(w.pubkey_hex()) == 105.0
 
     def test_utxo_selection(self, db, testnet):
         """Test UTXO selection algorithm."""
         bc = Blockchain(testnet, db)
         w = Wallet.create()
+        miner_reward = int(bc.reward_at() * 0.7)
 
         for i in range(3):
             time.sleep(0.01)
-            coinbase = Transaction("COINBASE", w.pubkey_hex(), bc.reward_at())
+            coinbase = Transaction("COINBASE", w.pubkey_hex(), miner_reward)
             coinbase.timestamp = int(time.time() * 1000) + i
             coinbase.tx_hash = coinbase.compute_hash()
             block = Block(bc.height(), bc.latest().hash, [coinbase.to_dict()], bc.difficulty)
@@ -48,7 +50,7 @@ class TestUTXO:
             block.pow_hash = "0" * bc.difficulty + "test"
             bc.add_block(block)
 
-        # Updated: select 80 TRC worth (in satoshis)
+        # Select 80 TRC worth (in satoshis)
         selected = db.select_utxos(w.pubkey_hex(), 80 * SATOSHIS_PER_TRC)
         assert len(selected) > 0
         assert sum(s["amount"] for s in selected) >= 80 * SATOSHIS_PER_TRC
@@ -59,10 +61,11 @@ class TestUTXO:
         utxo = UTXOManager(db)
         w1 = Wallet.create()
         w2 = Wallet.create()
+        miner_reward = int(bc.reward_at() * 0.7)
 
         for i in range(3):
             time.sleep(0.01)
-            coinbase = Transaction("COINBASE", w1.pubkey_hex(), bc.reward_at())
+            coinbase = Transaction("COINBASE", w1.pubkey_hex(), miner_reward)
             coinbase.timestamp = int(time.time() * 1000) + i
             coinbase.tx_hash = coinbase.compute_hash()
             block = Block(bc.height(), bc.latest().hash, [coinbase.to_dict()], bc.difficulty)
@@ -88,9 +91,9 @@ class TestUTXO:
         """Test getting unspent UTXOs."""
         bc = Blockchain(testnet, db)
         w = Wallet.create()
+        miner_reward = int(bc.reward_at() * 0.7)
 
-        # 50 TRC coinbase
-        coinbase = Transaction("COINBASE", w.pubkey_hex(), 50.0)
+        coinbase = Transaction("COINBASE", w.pubkey_hex(), miner_reward)
         coinbase.timestamp = int(time.time() * 1000)
         coinbase.tx_hash = coinbase.compute_hash()
         block = Block(1, bc.latest().hash, [coinbase.to_dict()], bc.difficulty)
@@ -100,5 +103,4 @@ class TestUTXO:
 
         utxos = db.get_unspent_utxos(w.pubkey_hex())
         assert len(utxos) == 1
-        # 50 TRC = 5,000,000,000 satoshis
-        assert utxos[0]["amount"] == 50 * SATOSHIS_PER_TRC
+        assert utxos[0]["amount"] == miner_reward * SATOSHIS_PER_TRC
