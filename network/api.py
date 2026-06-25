@@ -7,7 +7,7 @@ import asyncio
 import logging
 from aiohttp import web
 from pathlib import Path
-from core.constants import SATOSHIS_PER_TRC
+from core.constants import SATOSHIS_PER_TRC, trc_to_satoshis
 
 logger = logging.getLogger("API")
 
@@ -223,23 +223,16 @@ class TritioAPI:
         try:
             data = await request.json()
             from core.transaction import Transaction
-            tx = Transaction(
-                data["sender"], data["recipient"],
-                data["amount"], data.get("fee", 0.001),
-                data.get("data", "")
-            )
-            if "private_key" in data:
-                from core.wallet import Wallet
-                w = Wallet(bytes.fromhex(data["private_key"]))
-                sigs = w.sign_tx(bytes.fromhex(tx.compute_hash()))
-                tx.signature = sigs["ecdsa_signature"]
-                tx.quantum_signature = sigs.get("quantum_signature")
-                tx.signature_mode = sigs["signature_mode"]
-                tx.tx_hash = tx.compute_hash()
+
+            required = ["sender", "recipient", "amount", "signature", "tx_hash"]
+            for field in required:
+                if field not in data:
+                    return web.json_response({"error": f"Missing field: {field}"}, status=400)
+
+            tx = Transaction.from_dict(data)
 
             if self.node.mempool.add(tx, self.node.blockchain.balance):
                 await self.node.p2p.broadcast({"type": "NEW_TX", "tx": tx.to_dict()})
-                # Broadcast to WebSocket clients
                 await self.broadcast_ws({
                     "type": "new_tx",
                     "tx": tx.to_dict()
@@ -283,8 +276,6 @@ class TritioAPI:
                 w.private_key = None
                 w.public_key = vk
                 w.address = address
-                w.quantum_mode = False
-                w.hybrid_keys = None
                 w.mnemonic = None
                 self.node.consensus.register_validator(w, stake)
 
