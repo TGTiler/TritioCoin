@@ -144,6 +144,7 @@ class Wallet:
 
     def save(self, path: str, password: str):
         """Save wallet encrypted with password."""
+        import stat
         payload = {
             "private_key": self.privkey_hex(),
             "quantum_mode": self.quantum_mode
@@ -163,6 +164,7 @@ class Wallet:
         tmp = path + ".tmp"
         with open(tmp, 'w') as f:
             json.dump(wallet_data, f)
+        os.chmod(tmp, stat.S_IRUSR | stat.S_IWUSR)
         if os.path.exists(path):
             os.replace(tmp, path)
         else:
