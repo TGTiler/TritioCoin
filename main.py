@@ -760,10 +760,15 @@ class TritioNode(GossipNode):
             await asyncio.sleep(2)
 
     async def _mining_loop(self):
-        # Wait for at least one peer connection before mining
-        while self.running and len(self.p2p.peers) == 0:
-            logger.info("Waiting for peer connection before mining...")
+        # Wait for peer connection before mining (with timeout)
+        wait_time = 0
+        while self.running and len(self.p2p.peers) == 0 and wait_time < 30:
+            logger.info(f"Waiting for peer connection... ({wait_time}s)")
             await asyncio.sleep(5)
+            wait_time += 5
+
+        if len(self.p2p.peers) == 0:
+            logger.info("No peers found. Starting solo mining.")
 
         while self.running:
             if self.mode == 'miner':
