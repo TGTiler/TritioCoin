@@ -14,23 +14,24 @@ echo    1. Instalar dependencias
 echo.
 echo   [CARTEIRA]
 echo    2. Criar carteira
-echo    3. Ver saldo
-echo    4. Enviar TRC
-echo    5. Historico
-echo    6. Listar carteiras
+echo    3. Recuperar carteira (24 palavras)
+echo    4. Ver saldo
+echo    5. Enviar TRC
+echo    6. Historico
+echo    7. Listar carteiras
 echo.
 echo   [REDE]
-echo    7. Conectar (automatico)
-echo    8. Iniciar como SEED
-echo    9. Ver info da rede
-echo   10. Ver peers conectados
+echo    8. Conectar (automatico)
+echo    9. Iniciar como SEED
+echo   10. Ver info da rede
+echo   11. Ver peers conectados
 echo.
 echo   [MINERACAO]
-echo   11. Minerar blocos
-echo   12. Minerar e virar SEED
+echo   12. Minerar blocos
+echo   13. Minerar e virar SEED
 echo.
 echo   [UTILITARIOS]
-echo   13. Parar todos os processos
+echo   14. Parar todos os processos
 echo.
 echo   0. Sair
 echo.
@@ -40,17 +41,18 @@ set /p opcao="  Selecione: "
 if "%opcao%"=="" goto MENU
 if "%opcao%"=="1" goto INSTALAR
 if "%opcao%"=="2" goto CRIAR
-if "%opcao%"=="3" goto SALDO
-if "%opcao%"=="4" goto ENVIAR
-if "%opcao%"=="5" goto HISTORICO
-if "%opcao%"=="6" goto LISTAR
-if "%opcao%"=="7" goto CONECTAR
-if "%opcao%"=="8" goto SEED
-if "%opcao%"=="9" goto INFO
-if "%opcao%"=="10" goto PEERS
-if "%opcao%"=="11" goto MINERAR
-if "%opcao%"=="12" goto MINERAR_SEED
-if "%opcao%"=="13" goto PARAR
+if "%opcao%"=="3" goto RECUPERAR
+if "%opcao%"=="4" goto SALDO
+if "%opcao%"=="5" goto ENVIAR
+if "%opcao%"=="6" goto HISTORICO
+if "%opcao%"=="7" goto LISTAR
+if "%opcao%"=="8" goto CONECTAR
+if "%opcao%"=="9" goto SEED
+if "%opcao%"=="10" goto INFO
+if "%opcao%"=="11" goto PEERS
+if "%opcao%"=="12" goto MINERAR
+if "%opcao%"=="13" goto MINERAR_SEED
+if "%opcao%"=="14" goto PARAR
 if "%opcao%"=="0" goto SAIR
 
 echo Opcao invalida!
@@ -75,6 +77,21 @@ echo.
 echo  Criando carteira...
 echo.
 python wallet.py create
+echo.
+pause
+goto MENU
+
+:RECUPERAR
+cls
+echo.
+echo  ============================================
+echo    RECUPERAR CARTEIRA
+echo  ============================================
+echo.
+echo  Voce precisa das 24 palavras de recuperacao.
+echo  Se nao tiver, NAO pode recuperar a carteira.
+echo.
+python wallet.py recover
 echo.
 pause
 goto MENU
