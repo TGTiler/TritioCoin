@@ -20,7 +20,7 @@ class Transaction:
     """
     __slots__ = ('sender_pubkey', 'recipient_pubkey', 'amount_satoshis', 'fee_satoshis',
                  'data', 'timestamp', 'signature', 'tx_hash',
-                 'quantum_signature', 'signature_mode', 'inputs', 'change_satoshis')
+                 'signature_mode', 'inputs', 'change_satoshis')
 
     def __init__(self, sender: str, recipient: str, amount_trc: float,
                  fee_trc: float = 0.0, data: str = ""):
@@ -32,7 +32,6 @@ class Transaction:
         self.timestamp = int(time.time())
         self.signature: Optional[bytes] = None
         self.tx_hash: Optional[str] = None
-        self.quantum_signature: Optional[dict] = None
         self.signature_mode: str = "ecdsa"
         self.inputs: Optional[list] = None
         self.change_satoshis: int = 0
@@ -68,17 +67,11 @@ class Transaction:
         raw = json.dumps(self.payload(), sort_keys=True).encode()
         return hashlib.sha256(hashlib.sha256(raw).digest()).hexdigest()
 
-    def sign(self, private_key, quantum_keys: dict = None):
+    def sign(self, private_key):
         """Sign the transaction."""
         self.tx_hash = self.compute_hash()
         msg = bytes.fromhex(self.tx_hash)
         self.signature = private_key.sign(msg)
-        if quantum_keys:
-            from core.quantum import HybridSignature
-            h = HybridSignature()
-            h.ecdsa_key = private_key
-            self.quantum_signature = h.sign(msg)
-            self.signature_mode = "hybrid"
 
     def verify(self) -> bool:
         """Verify transaction signature."""
@@ -107,6 +100,11 @@ class Transaction:
             return False
         return self.verify()
 
+    def is_expired(self) -> bool:
+        """Check if transaction has expired (too old)."""
+        from core.constants import MAX_TX_AGE
+        return int(time.time()) - self.timestamp > MAX_TX_AGE
+
     def to_dict(self) -> dict:
         """Serialize transaction to dictionary."""
         d = {
@@ -120,8 +118,6 @@ class Transaction:
             "hash": self.tx_hash,
             "signature_mode": self.signature_mode
         }
-        if self.quantum_signature:
-            d["quantum_signature"] = self.quantum_signature
         return d
 
     @classmethod
@@ -141,7 +137,6 @@ class Transaction:
                  data.get("data", ""))
         tx.timestamp = data["timestamp"]
         tx.signature_mode = data.get("signature_mode", "ecdsa")
-        tx.quantum_signature = data.get("quantum_signature")
         tx.tx_hash = data.get("hash") or tx.compute_hash()
         if data.get("signature"):
             try:
@@ -151,9 +146,8 @@ class Transaction:
         return tx
 
     def __repr__(self):
-        tag = "Q+" if self.signature_mode == "hybrid" else ""
         h = self.tx_hash[:8] if self.tx_hash else "????????"
-        return f"Tx({tag}{h} {format_trc(self.amount_satoshis)} TRC)"
+        return f"Tx({h} {format_trc(self.amount_satoshis)} TRC)"
 
 
 class TransactionBuilder:
