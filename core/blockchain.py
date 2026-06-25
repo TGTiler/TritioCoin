@@ -272,9 +272,12 @@ class Blockchain:
 
     def _median_time_past(self) -> int:
         """Calculate median time past from last MTP_WINDOW blocks."""
-        n = min(MTP_WINDOW, self.height() + 1)
+        n = min(MTP_WINDOW, self.height())
+        if n <= 0:
+            return int(time.time())
+        start = max(0, self.height() - n)
         timestamps = [self.chain[i].header.timestamp
-                      for i in range(max(0, self.height() - n + 1), self.height() + 1)]
+                      for i in range(start, self.height())]
         timestamps.sort()
         return timestamps[len(timestamps) // 2]
 
