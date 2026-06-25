@@ -2,6 +2,36 @@
 
 Todas as mudancas notaveis no TritioCoin serao documentadas neste arquivo.
 
+## [1.1.0] - 2026-06-24
+
+### Alterado
+
+#### Seguranca
+- **PoW**: Blake2b puro substituido por Blake2b com memory-hardness (256KB, random reads, chained rounds)
+- **Timestamps**: Validacao MTP (median-time-past) com margem de ±2h
+- **Difficulty**: Algoritmo proporcional com amortecimento 80/20 e cap ±25%
+- **Supply**: Underflow guard em _debit_satoshis(), re-verificacao apos apply
+- **Reorg**: Checkpoints a cada 1000 blocos, max reorg depth 20
+- **Mempool**: Limite 50 txs/sender, fee dinamico, eviction em lote
+- **Conexoes**: MAX_PEERS=50, MAX_PER_IP=3, reputacao inicializada por padrao
+- **Wallet**: Permissoes 0o600 em arquivos de carteira
+- **API**: Chave privada removida do endpoint de envio
+- **Senha**: Fallback hardcoded removido (exige TRC_PASSWORD)
+
+#### Economia
+- Recompensa inicial: 45 TRC → 50 TRC
+
+#### Removido
+- Sistema quantico (WOTS+, hybrid signatures, quantum_mode)
+- Argumento --quantum do CLI
+
+### Corrigido
+- Bare except clauses (18 ocorrencias) substituidas por Exception
+- Float precision em balance check (usa satoshis diretamente)
+- Dead code removido (return duplicado em light_client.py)
+
+---
+
 ## [1.0.1] - 2026-06-21
 
 ### Corrigido
