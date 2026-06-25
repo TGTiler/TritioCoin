@@ -241,7 +241,7 @@ class Miner:
                 time.sleep(0.01)
 
                 elapsed = time.time() - start_time
-                if elapsed > 0 and int(elapsed * 2) % 2 == 0:
+                if elapsed > 0 and int(elapsed) % 10 == 0 and int(elapsed * 2) % 2 == 0:
                     self._print_progress(total_hashes, start_time,
                                          self.current_block.header.difficulty)
         except KeyboardInterrupt:
