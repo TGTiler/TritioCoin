@@ -31,6 +31,20 @@ BURN_RATE = 0.10  # 10%
 # Block time
 TARGET_BLOCK_TIME = 300  # 5 minutes in seconds
 
+# Security: Timestamp validation
+MAX_FUTURE_DRIFT = 120    # 2 minutes ahead
+MAX_PAST_DRIFT = 7200     # 2 hours behind
+MTP_WINDOW = 11           # Median time past window
+
+# Security: Confirmations and reorg
+MIN_CONFIRMATIONS = 6
+CHECKPOINT_INTERVAL = 1000
+MAX_REORG_DEPTH = 20
+
+# Security: Mempool
+MAX_TXS_PER_SENDER = 50
+MAX_TX_AGE = 3600         # 1 hour
+
 
 def trc_to_satoshis(trc: float) -> int:
     """Convert TRC to satoshis."""
