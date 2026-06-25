@@ -490,7 +490,7 @@ class Blockchain:
         max_jump = self.difficulty * 0.25
         clamped = max(self.difficulty - max_jump, min(self.difficulty + max_jump, dampened))
 
-        self.difficulty = max(self.config.initial_difficulty, int(round(clamped)))
+        self.difficulty = max(self.config.difficulty, int(round(clamped)))
         return self.difficulty
 
     def history(self, address: str) -> list:
