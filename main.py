@@ -830,16 +830,6 @@ class TritioNode(GossipNode):
 
         await asyncio.sleep(1)
 
-                if self.api:
-                    await self.api.broadcast_ws({
-                        "type": "new_block",
-                        "height": block.header.index,
-                        "hash": block.hash,
-                        "tx_count": len(block.transactions)
-                    })
-
-        await asyncio.sleep(1)
-
     def _on_peer_found(self, peer_addr: str):
         """Callback when DHT discovers a new peer."""
         logger.info(f"DHT discovered peer: {peer_addr}")
