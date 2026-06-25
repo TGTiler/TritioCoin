@@ -50,6 +50,44 @@ def get_wallet(password=None) -> Wallet:
     sys.exit(1)
 
 
+def is_node_running() -> bool:
+    """Check if a TritioCoin node is running locally."""
+    try:
+        import urllib.request
+        req = urllib.request.Request("http://127.0.0.1:8080/api/sync")
+        resp = urllib.request.urlopen(req, timeout=2)
+        return resp.status == 200
+    except Exception:
+        return False
+
+
+def node_api_get(endpoint: str) -> dict:
+    """Query the local node API. Returns None if node not running."""
+    try:
+        import urllib.request
+        req = urllib.request.Request(f"http://127.0.0.1:8080{endpoint}")
+        resp = urllib.request.urlopen(req, timeout=5)
+        return json.loads(resp.read().decode())
+    except Exception:
+        return None
+
+
+def node_api_post(endpoint: str, data: dict) -> dict:
+    """POST to the local node API. Returns None if node not running."""
+    try:
+        import urllib.request
+        body = json.dumps(data).encode('utf-8')
+        req = urllib.request.Request(
+            f"http://127.0.0.1:8080{endpoint}",
+            data=body,
+            headers={"Content-Type": "application/json"}
+        )
+        resp = urllib.request.urlopen(req, timeout=5)
+        return json.loads(resp.read().decode())
+    except Exception:
+        return None
+
+
 def load_chain() -> Blockchain:
     db = Database(DATA_DIR / "mainnet.db")
     return Blockchain(MAINNET, db)
@@ -232,17 +270,26 @@ def cmd_balance(args):
     password = prompt_password()
     w = get_wallet(password)
 
-    print("  Conectando para obter dados atualizados...")
-    connect_to_seed()
+    print("  Consultando saldo...")
+    wallet_data = node_api_get(f"/api/wallet/{w.address}")
 
-    bc = load_chain()
-    bal = bc.balance(w.pubkey_hex()) + bc.balance(w.address)
-    print()
-    print(f"  Address: {w.address}")
-    print(f"  Balance: {bal:.8f} TRC")
-    print(f"  Chain:   {bc.height()} blocks (local)")
-    print()
-    print("  Nota: Para dados em tempo real, inicie um node (opcao 8 ou 12)")
+    if wallet_data:
+        print()
+        print(f"  Address:     {w.address}")
+        print(f"  Balance:     {wallet_data['balance']:.8f} TRC")
+        print(f"  Transactions: {wallet_data['transaction_count']}")
+        print(f"  UTXOs:       {wallet_data['utxo_count']}")
+        print(f"  Last Block:  #{wallet_data['last_block_height']}")
+        print(f"  Fonte:       Node (dados em tempo real)")
+    else:
+        bc = load_chain()
+        bal = bc.balance(w.pubkey_hex()) + bc.balance(w.address)
+        print()
+        print(f"  Address: {w.address}")
+        print(f"  Balance: {bal:.8f} TRC")
+        print(f"  Chain:   {bc.height()} blocks (local)")
+        print()
+        print("  Nota: Dados locais. Inicie um node para dados em tempo real.")
 
 
 def broadcast_transaction(tx: Transaction) -> bool:
@@ -497,41 +544,68 @@ def cmd_send(args):
 def cmd_history(args):
     password = prompt_password()
     w = get_wallet(password)
-    bc = load_chain()
-    hist = bc.history(w.pubkey_hex()) + bc.history(w.address)
-    if not hist:
-        print("  Nenhuma transacao encontrada")
-        return
-    print(f"  Historico para {w.address[:24]}...")
-    print(f"  {'Bloco':<8} {'De':<20} {'Para':<20} {'Valor':<12} {'Taxa':<8}")
-    print("  " + "-" * 68)
-    for h in sorted(hist, key=lambda x: x['block']):
-        print(f"  {h['block']:<8} {h['from']:<20} {h['to']:<20} "
-              f"{h['amount']:<12.4f} {h['fee']:<8.6f}")
+
+    address_data = node_api_get(f"/api/address/{w.address}")
+
+    if address_data and address_data.get("transactions"):
+        txs = address_data["transactions"]
+        print(f"  Historico para {w.address[:24]}...")
+        print(f"  {'Bloco':<8} {'De':<20} {'Para':<20} {'Valor':<12} {'Taxa':<8}")
+        print("  " + "-" * 68)
+        for tx in txs:
+            sender = tx.get("sender", "?")[:16]
+            recipient = tx.get("recipient", "?")[:16]
+            amount = tx.get("amount", 0)
+            fee = tx.get("fee", 0)
+            block = tx.get("block_height", "?")
+            print(f"  {block:<8} {sender:<20} {recipient:<20} "
+                  f"{amount:<12.4f} {fee:<8.6f}")
+        print(f"  Fonte: Node (dados em tempo real)")
+    else:
+        bc = load_chain()
+        hist = bc.history(w.pubkey_hex()) + bc.history(w.address)
+        if not hist:
+            print("  Nenhuma transacao encontrada")
+            return
+        print(f"  Historico para {w.address[:24]}...")
+        print(f"  {'Bloco':<8} {'De':<20} {'Para':<20} {'Valor':<12} {'Taxa':<8}")
+        print("  " + "-" * 68)
+        for h in sorted(hist, key=lambda x: x['block']):
+            print(f"  {h['block']:<8} {h['from']:<20} {h['to']:<20} "
+                  f"{h['amount']:<12.4f} {h['fee']:<8.6f}")
+        print(f"  Fonte: Dados locais")
 
 
 def cmd_info(args):
-    print("  Conectando a rede...")
-    connect_to_seed()
+    sync_data = node_api_get("/api/sync")
+    status_data = node_api_get("/api/status")
 
-    bc = load_chain()
-    s = bc.stats()
-    mined_pct = (s['circulating_satoshis'] / s['max_supply_satoshis']) * 100 if s['max_supply_satoshis'] > 0 else 0
-    print()
-    print("  TritioCoin Network Info")
-    print(f"  Height:              {s['height']}")
-    print(f"  Transactions:        {s['transactions']}")
-    print(f"  Difficulty:          {s['difficulty']}")
-    print(f"  Reward:              {s['reward_trc']:.8f} TRC")
-    print(f"  Block Time:          ~5 minutes")
-    print(f"  Total Mined:         {s['total_mined_trc']:.2f} / {s['max_supply_trc']:,.0f} TRC")
-    print(f"  Total Burned:        {s['total_burned_trc']:.2f} TRC")
-    print(f"  Circulating Supply:  {s['circulating_trc']:.2f} TRC ({mined_pct:.4f}%)")
-    print(f"  Supply Remaining:    {s['supply_remaining_trc']:.2f} TRC")
-    print(f"  Burn Rate:           {s['burn_rate']*100:.0f}% of fees")
-    print(f"  Next Halving:        Block {s['next_halving']:,}")
-    print(f"  Addresses:           {s['addresses']}")
-    print(f"  Valid:               {'Yes' if s['valid'] else 'No'}")
+    if sync_data and status_data:
+        print()
+        print("  TritioCoin Network Info (via Node)")
+        print(f"  Height:              {sync_data['height']}")
+        print(f"  Peers:               {sync_data['peers']}")
+        print(f"  Mempool:             {sync_data['mempool_size']} txs")
+        print(f"  Difficulty:          {sync_data['difficulty']}")
+        print(f"  Supply Mined:        {sync_data['supply_mined']:.2f} TRC")
+        print(f"  Sync Status:         {sync_data['sync_status']}")
+        print(f"  Active Validators:   {status_data.get('active_validators', 0)}")
+        print(f"  Total Stake:         {status_data.get('total_stake', 0):.2f} TRC")
+        print(f"  Version:             {status_data.get('version', '1.1.0')}")
+        print()
+        print("  Fonte: Node (dados em tempo real)")
+    else:
+        bc = load_chain()
+        s = bc.stats()
+        print()
+        print("  TritioCoin Network Info (local)")
+        print(f"  Height:              {s['height']}")
+        print(f"  Transactions:        {s['transactions']}")
+        print(f"  Difficulty:          {s['difficulty']}")
+        print(f"  Reward:              {s['reward_trc']:.8f} TRC")
+        print(f"  Block Time:          ~5 minutes")
+        print()
+        print("  Fonte: Dados locais. Inicie um node para dados em tempo real.")
 
 
 def cmd_list(args):
@@ -617,6 +691,8 @@ def cmd_mine(args):
 
     import hashlib
 
+    node_running = is_node_running()
+
     def on_block_found(block):
         block_data = f"{block.header.index}{block.hash}".encode()
         sig = w.sign_tx(hashlib.sha256(block_data).digest())
@@ -625,15 +701,28 @@ def cmd_mine(args):
             "signature": sig["ecdsa_signature"].hex(),
             "signature_mode": sig["signature_mode"]
         })
+
         if bc.add_block(block):
             DATA_DIR.mkdir(exist_ok=True)
             atomic_write(DATA_DIR / "blockchain.json", bc.serialize())
-            print(f"\n  Saldo: {bc.balance(w.address):.8f} TRC")
+
+            if node_running:
+                result = node_api_post("/api/block", block.serialize())
+                if result and result.get("status") == "ok":
+                    print(f"\n  Bloco #{block.header.index} mined e transmitido!")
+                else:
+                    print(f"\n  Bloco #{block.header.index} mined (falha ao transmitir)")
+            else:
+                print(f"\n  Bloco #{block.header.index} mined (local apenas)")
+                print(f"  Para transmitir, inicie um node: python main.py --mode passive")
+
+            print(f"  Saldo: {bc.balance(w.address):.8f} TRC")
 
     print(f"\n  Endereco: {w.address}")
     print(f"  Altura da chain: {bc.height()}")
     print(f"  Transacoes pendentes: {mempool.size()}")
     print(f"  Threads: {threads}")
+    print(f"  Node: {'Conectado' if node_running else 'Desconectado ( blocos ficam locais)'}")
 
     try:
         async def async_on_block(block):
@@ -661,7 +750,7 @@ def main():
     if len(sys.argv) < 2 or sys.argv[1] not in CMDS:
         print("TritioCoin Wallet CLI")
         print()
-        print("Usage: python wallet.py <command> [args] [--quantum]")
+        print("Usage: python wallet.py <command> [args]")
         print()
         print("Commands:")
         print("  create              Create a new wallet (shows mnemonic)")
