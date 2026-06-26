@@ -108,7 +108,11 @@ class Block:
     @classmethod
     def deserialize(cls, data: dict) -> 'Block':
         h = data["header"]
-        b = cls(h["index"], h["previous_hash"], data["transactions"], h["difficulty"])
+        # previous_hash is stored as hex string, pass as string to __init__
+        prev_hash = h["previous_hash"]
+        if isinstance(prev_hash, bytes):
+            prev_hash = prev_hash.hex()
+        b = cls(h["index"], prev_hash, data["transactions"], h["difficulty"])
         b.header.timestamp = h["timestamp"]
         b.header.nonce = h["nonce"]
         b.hash = data["hash"]
