@@ -199,12 +199,12 @@ class Blockchain:
 
         # Check previous hash
         if block.header.previous_hash.hex() != prev.hash:
-            logger.warning(f"Invalid previous hash at height {block.header.index}")
+            logger.warning(f"Invalid previous hash at height {block.header.index}: {block.header.previous_hash.hex()[:16]}... != {prev.hash[:16]}...")
             return False
 
         # Check PoW hash
         if not block.pow_hash or not block.pow_hash.startswith("0" * block.header.difficulty):
-            logger.warning(f"Invalid PoW hash at height {block.header.index}")
+            logger.warning(f"Invalid PoW hash at height {block.header.index}: pow_hash={block.pow_hash[:16] if block.pow_hash else 'None'}...")
             return False
 
         # Check timestamp (not too far in future)
