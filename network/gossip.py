@@ -210,12 +210,9 @@ class GossipNode:
         self._sync_in_progress = False
         self._sync_peer = None
         self._pending_blocks: Dict[int, dict] = {}
-        self._tx_cache = None
+        self._tx_cache: Set[str] = set()
 
     def _get_tx_cache(self):
-        if self._tx_cache is None:
-            from network.p2p_node import TransactionCache
-            self._tx_cache = TransactionCache()
         return self._tx_cache
 
     async def gossip_handle_message(self, msg: dict, peer: str, writer):
@@ -244,7 +241,7 @@ class GossipNode:
 
     async def gossip_announce_tx(self, tx_hash: str):
         tx_cache = self._get_tx_cache()
-        if tx_cache.has(tx_hash):
+        if tx_hash in tx_cache:
             return
         tx_cache.add(tx_hash)
         msg = self.gossip.announce_tx(tx_hash)
@@ -299,7 +296,7 @@ class GossipNode:
         if not tx_hash:
             return
         tx_cache = self._get_tx_cache()
-        if tx_cache.has(tx_hash):
+        if tx_hash in tx_cache:
             return
         if self.gossip.should_request_tx(tx_hash):
             logger.debug(f"New tx announced: {tx_hash[:16]}...")
@@ -324,15 +321,23 @@ class GossipNode:
         if not blocks:
             return
         accepted = 0
+        rejected = 0
         for block_data in blocks:
-            from core.block import Block
-            block = Block.deserialize(block_data)
-            if self.blockchain.add_block(block):
-                accepted += 1
-                self.mempool.remove_many(
-                    [tx.get("hash") for tx in block.transactions if tx.get("hash")]
-                )
-        logger.info(f"Sync batch: {accepted}/{count} blocks accepted")
+            try:
+                from core.block import Block
+                block = Block.deserialize(block_data)
+                if self.blockchain.add_block(block):
+                    accepted += 1
+                    self.mempool.remove_many(
+                        [tx.get("hash") for tx in block.transactions if tx.get("hash")]
+                    )
+                else:
+                    rejected += 1
+                    logger.debug(f"Block #{block.header.index} rejected by add_block")
+            except Exception as e:
+                rejected += 1
+                logger.debug(f"Block deserialize failed: {e}")
+        logger.info(f"Sync batch: {accepted}/{count} blocks accepted, {rejected} rejected")
 
     async def _gossip_handle_get_blocks(self, msg: dict, peer: str):
         heights = msg.get("heights", [])
