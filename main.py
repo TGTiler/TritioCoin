@@ -227,10 +227,18 @@ class TritioNode(GossipNode):
                 await self.start_sync(peer, height)
             elif isinstance(height, int) and height < self.blockchain.height():
                 logger.info(f"I have more blocks ({self.blockchain.height()} > {height}), sending to {peer}")
+                # Send blocks in batches of 50
+                blocks_to_send = []
                 for i in range(height, self.blockchain.height()):
                     block_data = self.blockchain.db.get_block(i)
                     if block_data:
-                        await self.p2p.send(peer, {"type": "NEW_BLOCK", "block": block_data})
+                        blocks_to_send.append(block_data)
+                        if len(blocks_to_send) >= 50:
+                            await self.p2p.send(peer, {"type": "CHAIN", "chain": {"blocks": blocks_to_send}})
+                            blocks_to_send = []
+                            await asyncio.sleep(0.1)
+                if blocks_to_send:
+                    await self.p2p.send(peer, {"type": "CHAIN", "chain": {"blocks": blocks_to_send}})
             remote_seeds = msg.get("seeds", [])
             await self._merge_seeds(remote_seeds)
 
@@ -450,40 +458,25 @@ class TritioNode(GossipNode):
             return
         old_height = self.blockchain.height()
 
-        # Handle both full chain and partial sync
         if "blocks" in chain_data:
-            # Partial sync - only new blocks
+            # Partial sync - add blocks one by one with validation
             blocks = chain_data.get("blocks", [])
             added = 0
+            from core.block import Block
             for block_data in blocks:
-                from core.block import Block
-                block = Block.deserialize(block_data)
-                if self.blockchain.add_block(block):
-                    added += 1
-                    self.p2p.blockchain_height = self.blockchain.height()
+                try:
+                    block = Block.deserialize(block_data)
+                    if self.blockchain.add_block(block):
+                        added += 1
+                        self.p2p.blockchain_height = self.blockchain.height()
+                except Exception as e:
+                    logger.warning(f"Sync block rejected: {e}")
+                    continue
             if added > 0:
                 logger.info(f"Synced {added} blocks (height: {self.blockchain.height()})")
         else:
-            # Full chain sync - CAREFUL: only accept if remote is significantly taller
-            try:
-                remote = Blockchain.deserialize(chain_data, self.net_config, self.db)
-
-                # Only replace if remote is at least 5 blocks taller AND valid
-                if remote.height() > old_height + 5 and remote.is_valid():
-                    local_work = sum(2 ** b.header.difficulty for b in self.blockchain.chain)
-                    remote_work = sum(2 ** b.header.difficulty for b in remote.chain)
-
-                    if remote_work > local_work:
-                        logger.warning(f"Chain reorg: remote has more work ({remote.height()} vs {old_height})")
-                        self.blockchain = remote
-                        self.p2p.blockchain_height = self.blockchain.height()
-                        self._save_chain()
-                    else:
-                        logger.info(f"Remote taller but less work, keeping local chain")
-                elif remote.height() <= old_height:
-                    logger.debug(f"Remote chain shorter ({remote.height()} <= {old_height}), keeping local")
-            except Exception as e:
-                logger.warning(f"Chain sync failed: {e}")
+            # Full chain sync - only accept partial sync data (never replace full chain blindly)
+            logger.debug("Full chain sync ignored - use partial sync instead")
 
     async def _handle_seed_announce(self, msg: dict):
         """Another node announced itself as seed. Add to seeds.json and gossip."""
@@ -930,6 +923,8 @@ def parse_args():
     p.add_argument('--api-port', type=int, default=8080)
     p.add_argument('--no-api', action='store_true', help="Disable REST API")
     p.add_argument('--stake', type=float, default=0, help="Stake amount for validator mode (TRC)")
+    p.add_argument('--bootstrap', action='store_true', help="Download mainnet.db from GitHub on first run")
+    p.add_argument('--export-db', action='store_true', help="Export mainnet.db to tritiocoin_data/mainnet_export.db")
     return p.parse_args()
 
 
@@ -942,6 +937,32 @@ async def main():
         'api': not args.no_api, 'api_port': args.api_port,
         'stake': args.stake
     }
+
+    # Bootstrap: download mainnet.db if first run
+    if args.bootstrap:
+        db_path = DATA_DIR / "mainnet.db"
+        if not db_path.exists() or db_path.stat().st_size == 0:
+            logger.info("Baixando mainnet.db do GitHub...")
+            try:
+                import urllib.request
+                url = "https://raw.githubusercontent.com/TGTiler/TritioCoin/refs/heads/main/tritiocoin_data/mainnet.db"
+                DATA_DIR.mkdir(exist_ok=True)
+                urllib.request.urlretrieve(url, str(db_path))
+                logger.info(f"mainnet.db baixado: {db_path.stat().st_size / 1024:.1f} KB")
+            except Exception as e:
+                logger.warning(f"Falha ao baixar mainnet.db: {e}")
+
+    # Export database
+    if args.export_db:
+        src = DATA_DIR / "mainnet.db"
+        dst = DATA_DIR / "mainnet.db"
+        if src.exists():
+            logger.info(f"mainnet.db pronto para upload: {src} ({src.stat().st_size / 1024:.1f} KB)")
+            logger.info("Envie para GitHub: git add tritiocoin_data/mainnet.db && git push")
+        else:
+            logger.warning("mainnet.db nao encontrado")
+        return
+
     node = TritioNode(config)
 
     if args.become_seed:
