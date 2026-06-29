@@ -3,13 +3,18 @@
 ## URL Base
 
 ```
-http://localhost:8080
+http://127.0.0.1:8080
 ```
 
 ## Autenticacao
 
 Nenhuma autenticacao necessaria para endpoints publicos.
-Chave privada necessaria para enviar transacoes.
+Chave privada necessaria para enviar transacoes (assinar client-side).
+
+## Rate Limiting
+
+- **Limite**: 100 requisicoes por minuto por IP
+- **Resposta**: HTTP 429 quando excedido
 
 ---
 
