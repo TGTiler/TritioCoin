@@ -43,8 +43,8 @@ class NetworkConfig:
 MAINNET = NetworkConfig(
     name="mainnet",
     port=8333,
-    difficulty=4,
-    initial_reward_satoshis=INITIAL_REWARD_SATOSHIS,  # 45 TRC = 4,500,000,000 satoshis
+    difficulty=2,  # TritioHash: 32MB memory-hard, lower difficulty
+    initial_reward_satoshis=INITIAL_REWARD_SATOSHIS,
     halving_interval=HALVING_INTERVAL,
     max_supply_satoshis=MAX_SUPPLY_SATOSHIS,
     block_time=TARGET_BLOCK_TIME,
