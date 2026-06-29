@@ -5,8 +5,9 @@
 ### O que voce precisa
 
 - Windows 10/11, Linux ou Mac
-- Python 3.8 ou superior
+- Python 3.12 ou superior
 - Conexao com a internet (para descobrir peers)
+- Senha forte (min 8 caracteres, 1 maiuscula, 1 numero)
 
 ---
 
