@@ -13,7 +13,7 @@ Vá ao GitHub e clique em "Fork" no canto superior direito.
 ### 2. Clone seu fork
 
 ```bash
-git clone https://github.com/SEU-USERNAME/TritioCoin.git
+git clone https://github.com/TGTiler/TritioCoin.git
 cd TritioCoin
 ```
 
