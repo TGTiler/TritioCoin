@@ -475,7 +475,8 @@ class Blockchain:
         if self.height() < 20:
             return self.difficulty
 
-        window = 20
+        # TritioHash: larger window (30 blocks) for stability with slow algorithm
+        window = 30
         ref = self.chain[max(0, self.height() - window)]
         actual_time = self.latest().header.timestamp - ref.header.timestamp
         expected_time = self.config.block_time * window
@@ -485,9 +486,12 @@ class Blockchain:
 
         ratio = expected_time / actual_time
         raw_new = self.difficulty * ratio
-        dampened = 0.8 * self.difficulty + 0.2 * raw_new
 
-        max_jump = self.difficulty * 0.25
+        # TritioHash: more dampening (70/30) for slower algorithm
+        dampened = 0.7 * self.difficulty + 0.3 * raw_new
+
+        # TritioHash: smaller max jump (15%) for stability
+        max_jump = self.difficulty * 0.15
         clamped = max(self.difficulty - max_jump, min(self.difficulty + max_jump, dampened))
 
         self.difficulty = max(self.config.difficulty, int(round(clamped)))
