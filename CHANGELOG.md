@@ -1,6 +1,46 @@
 # Changelog
 
-Todas as mudancas notaveis no TritioCoin serao documentadas neste arquivo.
+## [1.2.0] - 2026-06-25
+
+### Alterado
+
+#### Seguranca
+- **Carteira**: Senha forte obrigatoria (min 8 chars, 1 maiuscula, 1 numero)
+- **Carteira**: Removido fallback de carteira nao-criptografada
+- **Permissoes**: Arquivos criados com 0o600 (sem race condition)
+- **API**: Rate limiting (100 req/min por IP)
+- **API**: Bind em 127.0.0.1 por padrao (nao 0.0.0.0)
+- **API**: Mensagens de erro genericas (nao vaza excecoes internas)
+- **GUI**: Senha nunca armazenada em memoria
+- **privkey_hex()**: Usa bytearray para limpar memoria
+
+#### Privacidade
+- **Transacoes**: Pedersen Commitments para ocultar valores
+- **Novo modulo**: `core/commitment.py` com implementacao Pedersen
+
+#### Conexao
+- **Sync**: Blocos em vez de full chain replacement
+- **Batch**: HANDSHAKE_ACK envia blocos em batches de 50
+- **Broadcast**: Retry 1x antes de marcar peer como dead
+- **Handshake**: Espera HANDSHAKE_ACK com timeout 10s
+- **Timeouts**: connect 10s, recv 30s, DHT 5s
+- **Reputacao**: Score recovery (+1 ponto a cada 5 min conectado)
+- **Rate limit**: Desconecta mas NAO penaliza reputacao
+- **Mining**: Exige pelo menos 1 peer para minerar
+
+#### Bootstrap
+- **Novo comando**: `--export-db` para exportar mainnet.db
+- **Novo comando**: `--bootstrap` para baixar mainnet.db do GitHub
+
+### Corrigido
+- **Sync**: Nao apaga mais blocos locais (sync parcial apenas)
+- **MTP**: IndexError em _median_time_past com poucos blocos
+- **Difficulty**: AttributeError em adjust_difficulty
+- **Block.deserialize()**: Converte previous_hash bytes para hex string
+- **Progress**: Print a cada 10s em vez de 0.5s
+- **Seeds.json**: IPs privados removidos
+
+---
 
 ## [1.1.0] - 2026-06-24
 
