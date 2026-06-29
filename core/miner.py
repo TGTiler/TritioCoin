@@ -134,6 +134,7 @@ class Miner:
         self.stats.threads = self.threads
         self._on_block_found = None
         self._progress_callback = None
+        self._pending_blocks: List = []  # Blocks found but not yet processed
 
     @property
     def mining(self) -> bool:
@@ -252,15 +253,17 @@ class Miner:
                     pass
 
         for p in processes:
-            p.join(timeout=2)
+            p.join(timeout=3)
             if p.is_alive():
                 p.terminate()
 
-        # Drain remaining results
+        # Drain remaining results - capture any blocks found during shutdown
         while not result_queue.empty():
             try:
                 msg = result_queue.get_nowait()
                 total_hashes += msg.get("hashes", 0)
+                if msg.get("nonce") is not None and result is None:
+                    result = msg  # Capture last found block
             except Exception:
                 break
 
@@ -278,6 +281,9 @@ class Miner:
             self.stats.stop_mining()
             self.stats.blocks_found += 1
 
+            # Store block for later processing if we're stopping
+            self._pending_blocks.append(self.current_block)
+
             print(f"\n  Bloco #{self.current_block.header.index} minerado!")
             print(f"  Nonce: {result['nonce']:,}")
             print(f"  Hash: {self.current_block.hash[:32]}...")
@@ -293,6 +299,12 @@ class Miner:
         self.stats.stop_mining()
         print()
         return None
+
+    def get_pending_blocks(self) -> List:
+        """Get blocks found during shutdown that haven't been processed."""
+        blocks = self._pending_blocks.copy()
+        self._pending_blocks.clear()
+        return blocks
 
     def stop(self):
         self.stats.stop_mining()
@@ -312,21 +324,30 @@ class Miner:
 
         blocks_total = 0
 
-        while True:
-            block = await self.mine_async(address)
+        try:
+            while True:
+                block = await self.mine_async(address)
 
-            if block:
+                if block:
+                    blocks_total += 1
+                    print(f"\n  Total de blocos minerados: {blocks_total}")
+                    print(f"  Reiniciando mineracao...")
+
+                    if callback:
+                        await callback(block)
+
+                    import asyncio
+                    await asyncio.sleep(0.5)
+                else:
+                    break
+        except asyncio.CancelledError:
+            # Process any pending blocks found during shutdown
+            pending = self.get_pending_blocks()
+            for block in pending:
                 blocks_total += 1
-                print(f"\n  Total de blocos minerados: {blocks_total}")
-                print(f"  Reiniciando mineracao...")
-
                 if callback:
                     await callback(block)
-
-                import asyncio
-                await asyncio.sleep(0.5)
-            else:
-                break
+                print(f"\n  Bloco #{block.header.index} processado apos shutdown!")
 
         print(f"\n  Mineracao finalizada. {blocks_total} blocos minerados.")
 
