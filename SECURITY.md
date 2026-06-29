@@ -4,7 +4,8 @@
 
 | Versao | Suportada |
 |--------|-----------|
-| 1.0.x  | Sim       |
+| 1.2.x  | Sim       |
+| 1.1.x  | Sim       |
 
 ---
 
@@ -33,24 +34,29 @@ Se voce encontrar uma vulnerabilidade:
 | Transporte | TLS 1.3 | Conexao P2P criptografada |
 | Assinaturas | ECDSA secp256k1 | Assinatura de transacoes |
 | Hashing | SHA-256, Blake2b | Hash de blocos e PoW memory-hard |
+| Privacidade | Pedersen Commitments | Valores de transacoes ocultos |
 
 ### Como sua carteira e protegida
 
 ```
 1. Sua chave privada e criptografada com AES-256-GCM
 2. A senha e processada com PBKDF2 (600.000 iteracoes)
-3. Mesmo se roubarem o arquivo, precisam da senha
-4. Cada carteira tem salt e nonce unicos
+3. Senha forte obrigatoria (min 8 chars, 1 maiuscula, 1 numero)
+4. Arquivo criado com permissoes 0o600 (so owner)
+5. Carteira legacy (sem criptografia) e rejeitada
 ```
 
 ### Rede
 
 | Medida | Descricao |
 |--------|-----------|
-| Rate Limiting | 100 mensagens/10s por peer |
+| Rate Limiting API | 100 req/min por IP |
+| Rate Limiting P2P | 200 msgs/10s por peer |
 | Reputacao | Ban automatico de peers maliciosos |
-| Validacao | Todas as mensagens sao validadas |
-| Tamanho maximo | 10MB por mensagem |
+| Score Recovery | +1 ponto a cada 5 min conectado |
+| Timeouts | connect 10s, recv 30s, DHT 5s |
+| Max Peers | 50 total, 3 por IP |
+| Bind | API em 127.0.0.1 por padrao |
 
 ### Consenso
 
@@ -58,8 +64,22 @@ Se voce encontrar uma vulnerabilidade:
 |----------|---------------|
 | Double-spend | UTXO previne gasto duplo |
 | Validacao | Todos os blocos e transacoes sao validados |
-| Supply cap | Limite de 19M TRC forçado pelo consenso |
+| Supply cap | Limite de 19M TRC forcado pelo consenso |
 | Bloco duplicado | Blocos com mesmo hash ou height sao rejeitados |
+| Sync seguro | Checkpoints a cada 1000 blocos |
+| Reorg limitado | Max 20 blocos de reorganizacao |
+| MTP | Median-time-past previne timestamp manipulation |
+| Dificuldade | Algoritmo proporcional com amortecimento 80/20 |
+
+### Transacoes
+
+| Medida | Descricao |
+|--------|-----------|
+| Commitments | Pedersen Commitments ocultam valores |
+| Validacao | Proof de range verificado |
+| Expiracao | TXs maiores que 1h sao rejeitadas |
+| Limite por sender | Max 50 txs no mempool |
+| Fee dinamico | 5x quando mempool > 80% cheio |
 
 ### Armazenamento
 
@@ -69,69 +89,73 @@ Se voce encontrar uma vulnerabilidade:
 | WAL Mode | SQLite com consistencia garantida |
 | Backup | Recuperacao via BIP39 mnemonico |
 | Pruning | Limpeza de blocos antigos para economizar espaco |
+| Bootstrap | Download do mainnet.db para sync rapida |
 
 ---
 
 ## Por que TritioCoin e Segura
 
-### 1. Contra computacao quantica
-```
-Atualmente:  ECDSA protege suas chaves
-Futuro:      WOTS+ continua protegendo
-Resultado:   Suas moedas estao seguras mesmo com computadores quantonicos
-```
-
-### 2. Contra hackers
+### 1. Contra hackers
 ```
 Carteira criptografada com AES-256-GCM
-Senha processada com 600.000 iteracoes
-Precisariam de bilhoes de anos para quebrar
+Senha forte obrigatoria (min 8 chars)
+600.000 iteracoes PBKDF2
+Permissoes 0o600 nos arquivos
 ```
 
-### 3. Contra censura
+### 2. Contra censura
 ```
 Rede descentralizada - sem autoridade central
 Ninguem pode bloquear transacoes
 Ninguem pode confiscar moedas
 ```
 
-### 4. Contra inflacao
+### 3. Contra inflacao
 ```
-Supply maximo: 19.000.000 TRC (para sempre)
-Halving: Recompensa diminui pela metade a cada 190K blocos
-Queima: 10% das taxas sao destruidas
+Supply maximo de 19M TRC
+10% das taxas sao queimadas
+Halving a cada 190.000 blocos
+```
+
+### 4. Contra ataques de rede
+```
+Rate limiting em todos os niveis
+Reputacao com ban automatico
+Timeouts para prevenir DoS
+Sync com checkpoints
+```
+
+### 5. Contra analise de transacoes
+```
+Pedersen Commitments ocultam valores
+Transacoes publicas mas valores privados
 ```
 
 ---
 
-## Seus Dereitos
+## Auditorias
 
-- **Sua chave = suas moedas** - Ninguem pode tomar
-- **Privacidade** - Transacoes nao precisam de dados pessoais
-- **Portabilidade** - Use em qualquer computador com as 24 palavras
-- **Verificacao** - Qualquer pessoa pode verificar a blockchain
-
----
-
-## Limitacoes Conhecidas
-
-1. Certificados TLS auto-assinados (nao verificados por CA)
-2. Sem hardware wallet ainda
-3. Sem auditoria de seguranca formal
+| Data | Auditor | Status |
+|------|---------|--------|
+| 2026-06-25 | Interna | 31 vulnerabilidades encontradas e corrigidas |
 
 ---
 
-## Politica de Atualizacao
+## Historico de Seguranca
 
-Atualizacoes de seguranca serao lancadas o mais rapido possivel apos a divulgacao de vulnerabilidades.
+### v1.2.0 (2026-06-25)
+- Corrigidas 31 vulnerabilidades (4 criticas, 12 altas, 11 medias, 4 baixas)
+- Adicionado Pedersen Commitments para privacidade
+- Senha forte obrigatoria
+- Rate limiting na API
+- Timeouts em conexoes
+- Permissoes de arquivo restritas
+- Score recovery na reputacao
+- Sync parcial (nao substitui chain local)
 
----
-
-## Dicas de Seguranca para Usuarios
-
-1. **Nunca compartilhe suas 24 palavras**
-2. **Use senha forte na carteira**
-3. **Mantenha backup das 24 palavras em local seguro**
-4. **Nao use o mesmo PC para tudo**
-5. **Verifique sempre o endereco do destinatario**
-6. **Nao clique em links suspeitos**
+### v1.1.0 (2026-06-24)
+- Blake2b com memory-hardness
+- Checkpoints a cada 1000 blocos
+- Reorg limitado a 20 blocos
+- MTP para validacao de timestamps
+- Dificuldade proporcional com amortecimento
