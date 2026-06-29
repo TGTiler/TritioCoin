@@ -14,7 +14,7 @@ from core.blockchain import Blockchain
 from core.mempool import Mempool
 from core.transaction import Transaction, TransactionBuilder
 from core.constants import SATOSHIS_PER_TRC
-from core.pow import memory_hard_hash
+from core.pow import tritio_hash
 
 logger = logging.getLogger("Miner")
 
@@ -90,7 +90,7 @@ def _mine_worker(header_base: bytes, target: str, start_nonce: int, step: int,
 
     while True:
         data = header_base + struct.pack('>I', nonce)
-        pow_hash = memory_hard_hash(data)
+        pow_hash = tritio_hash(data)
 
         if pow_hash.startswith(target):
             result_queue.put({"nonce": nonce, "pow_hash": pow_hash, "hashes": local_hashes})
@@ -148,7 +148,7 @@ class Miner:
 
     @staticmethod
     def _pow_hash(data: bytes) -> str:
-        return memory_hard_hash(data)
+        return tritio_hash(data)
 
     def create_block_template(self, address: str) -> Block:
         prev = self.blockchain.latest()
