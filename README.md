@@ -2,11 +2,11 @@
 
 # TritioCoin
 
-**Criptomoeda para uso do dia a dia com mineracao memory-hard**
+**Criptomoeda para uso do dia a dia com mineracao memory-hard e transacoes criptografadas**
 
 [![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-v1.1%20Production-brightgreen.svg)]()
+[![Status](https://img.shields.io/badge/Status-v1.2%20Production-brightgreen.svg)]()
 
 </div>
 
@@ -14,14 +14,16 @@
 
 ## O que e TritioCoin?
 
-TritioCoin e uma criptomoeda descentralizada criada para funcionar em computadores antigos e dispositivos leves (Intel Celeron, ESP32, ARM). Utiliza Blake2b com memory-hardness para resistencia a ASICs.
+TritioCoin e uma criptomoeda descentralizada criada para funcionar em computadores antigos e dispositivos leves. Utiliza Blake2b com memory-hardness para resistencia a ASICs e Pedersen Commitments para privacidade de transacoes.
 
 ### Por que TritioCoin?
 
 - **Funciona em qualquer PC** - Nao precisa de placa de video cara
 - **Mineracao memory-hard** - Blake2b com 256KB de memoria por hash
+- **Transacoes criptografadas** - Valores ocultos com Pedersen Commitments
 - **Rede descentralizada** - Sem autoridade central, sem censura
 - **Deflacionaria** - 10% das taxas sao queimadas, valorizacao natural
+- **Seguranca reforcada** - Senha forte obrigatoria, permissoes restritas, rate limiting
 
 ---
 
@@ -33,9 +35,9 @@ TritioCoin e uma criptomoeda descentralizada criada para funcionar em computador
 1. Clique duas vezes em "instalar.bat" (instala dependencias)
 2. Clique duas vezes em "TritioCoin.bat"
 3. Selecione: 2 (Criar carteira)
-4. Digite uma senha forte
+4. Digite uma senha forte (min 8 chars, 1 maiuscula, 1 numero)
 5. ANOTE as 24 palavras de recuperacao (MUITO IMPORTANTE!)
-6. Selecione: 7 (Conectar automatico)
+6. Selecione: 8 (Conectar automatico)
 7. Aguarde sincronizar com a rede
 ```
 
@@ -52,7 +54,7 @@ pip install -r requirements.txt
 # 3. Crie uma carteira
 python wallet.py create
 
-# 4. Conecte a rede
+# 4. Conecte a rede (node precisa estar rodando)
 python main.py --mode passive
 ```
 
@@ -75,64 +77,68 @@ chmod +x deploy.sh
 
 [CARTEIRA]
  2. Criar carteira
- 3. Ver saldo
- 4. Enviar TRC
- 5. Historico
- 6. Listar carteiras
+ 3. Recuperar carteira (24 palavras)
+ 4. Ver saldo
+ 5. Enviar TRC
+ 6. Historico
+ 7. Listar carteiras
 
 [REDE]
- 7. Conectar (automatico)
- 8. Iniciar como SEED (primeiro no da rede)
- 9. Ver info da rede
-10. Ver peers conectados
+ 8. Conectar (automatico)
+ 9. Iniciar como SEED (primeiro no da rede)
+ 10. Ver info da rede
+ 11. Ver peers conectados
 
 [MINERACAO]
-11. Minerar blocos
-12. Minerar e virar SEED
+12. Minerar blocos
+13. Minerar e virar SEED
 
 [UTILITARIOS]
-13. Parar todos os processos
+14. Parar todos os processos
 ```
 
 ---
 
 ## Como Minerar
 
-```
-1. Abra TritioCoin.bat
-2. Selecione: 11 (Minerar blocos)
-3. Aguarde - seu PC vai trabalhar encontrando blocos
-4. Quando encontrar um bloco, voce ganha 50 TRC!
-5. Ctrl+C para parar
+**IMPORTANTE:** Mineracao so funciona com node rodando e peers conectados.
+
+```bash
+# Terminal 1: Iniciar node
+python main.py --mode passive
+
+# Terminal 2: Minerar
+python wallet.py mine
 ```
 
-**Dica:** Mineracao funciona melhor em PCs ligados 24h.
+Ou via TritioCoin.bat (opcao 12).
 
 ---
 
 ## Como Enviar TRC
 
-```
-1. Abra TritioCoin.bat
-2. Selecione: 4 (Enviar TRC)
-3. Digite o endereco do destinatario (comeca com T)
-4. Digite o valor em TRC
-5. Digite a taxa (padrao: 0.001)
-6. Confirme
+```bash
+# Usando CLI
+python wallet.py send
+
+# Usando GUI
+python gui_wallet.py
 ```
 
 ---
 
-## Recuperar Carteira
-
-Se perdeu acesso ao arquivo da carteira, use as 24 palavras:
+## GUI Wallet
 
 ```bash
-python wallet.py recover
-# Digite as 24 palavras quando solicitado
+python gui_wallet.py
 ```
 
-**IMPORTANTE:** Sem as 24 palavras, voce PERDE suas moedas para sempre!
+Interface grafica com:
+- Dashboard (altura, saldo, peers)
+- Carteira (criar, abrir, recuperar, historico)
+- Envio de TRC
+- Mineracao integrada
+- Status da rede
 
 ---
 
@@ -141,15 +147,16 @@ python wallet.py recover
 | Recurso | Descricao |
 |---------|-----------|
 | **Supply Maximo** | 19.000.000 TRC |
-| **Recompensa** | 50 TRC por bloco |
+| **Recompensa** | 50 TRC por bloco (70% minerador, 30% validadores) |
 | **Halving** | A cada 190.000 blocos |
 | **Tempo de Bloco** | ~5 minutos |
 | **Taxa Minima** | 0.0001 TRC |
 | **Queima** | 10% das taxas |
 | **Consenso** | PoW (Blake2b memory-hard) + PoS |
 | **Assinaturas** | ECDSA secp256k1 |
-| **Carteiras** | BIP32/BIP44 HD, Multi-sig |
-| **Rede** | DHT, NAT traversal, TLS 1.3 |
+| **Privacidade** | Pedersen Commitments (valores ocultos) |
+| **Carteiras** | BIP32/BIP44 HD, Multi-sig, AES-256-GCM |
+| **Rede** | DHT, NAT traversal, TLS 1.3, Rate Limiting |
 
 ---
 
@@ -158,33 +165,36 @@ python wallet.py recover
 ```
 TritioCoin/
 ├── core/
-│   ├── blockchain.py      # Gerenciamento da chain
+│   ├── blockchain.py      # Gerenciamento da chain + reorg
 │   ├── block.py           # Estrutura do bloco
 │   ├── pow.py             # PoW Blake2b memory-hard
-│   ├── miner.py           # Mineracao
-│   ├── mempool.py         # Pool de transacoes
-│   ├── transaction.py     # Transacoes baseadas em satoshis
+│   ├── miner.py           # Mineracao com multiprocessing
+│   ├── mempool.py         # Pool de transacoes com fee dinamico
+│   ├── transaction.py     # Transacoes com commitments
+│   ├── commitment.py      # Pedersen Commitments (privacidade)
 │   ├── utxo.py            # Gerenciamento UTXO
-│   ├── wallet.py          # Carteiras criptografadas
+│   ├── wallet.py          # Carteiras com senha forte
 │   ├── hdwallet.py        # Carteiras HD BIP32/BIP44
 │   ├── multisig.py        # Carteiras multi-assinatura
-│   ├── consensus.py       # Motor PoS
+│   ├── consensus.py       # Motor PoS (70/30 split)
 │   ├── pool.py            # Mining pool
 │   ├── dao.py             # Governanca DAO
 │   ├── staking.py         # Staking publico
-│   ├── micropay.py        # Micropagamentos
+│   ├── micropay.py        # Micropagamentos com settlement
 │   ├── light_client.py    # Cliente leve SPV
 │   ├── constants.py       # Constantes em satoshis
 │   ├── database.py        # Persistencia SQLite
 │   └── network_config.py  # Configs Mainnet/Testnet
 ├── network/
-│   ├── p2p_node.py        # P2P com TLS
-│   ├── api.py             # REST + WebSocket API
+│   ├── p2p_node.py        # P2P com TLS + timeouts
+│   ├── api.py             # REST + WebSocket API (rate limited)
+│   ├── gossip.py          # Protocolo gossip (sync, announce)
 │   ├── dht.py             # Kademlia DHT
 │   ├── discovery.py       # Descoberta de peers
 │   └── reputation.py      # Reputacao de peers
 ├── main.py                # Ponto de entrada do no
 ├── wallet.py              # Carteira CLI
+├── gui_wallet.py          # Carteira GUI com mineracao
 ├── explorer.html          # Explorador web
 ├── tests/                 # Testes automatizados
 └── requirements.txt       # Dependencias
@@ -197,13 +207,17 @@ TritioCoin/
 | Endpoint | Descricao |
 |----------|-----------|
 | `GET /api/status` | Status da rede |
+| `GET /api/sync` | Status de sincronizacao |
 | `GET /api/block/{height}` | Dados do bloco |
 | `GET /api/balance/{address}` | Saldo do endereco |
+| `GET /api/wallet/{address}` | Dados completos da carteira |
 | `GET /api/tx/{hash}` | Dados da transacao |
+| `GET /api/address/{address}` | Detalhes do endereco + historico |
 | `GET /api/mempool` | Transacoes pendentes |
 | `GET /api/peers` | Peers conectados |
 | `GET /api/validators` | Validadores ativos |
-| `POST /api/tx` | Enviar transacao |
+| `POST /api/tx` | Enviar transacao (assinar client-side) |
+| `POST /api/block` | Enviar bloco minerado |
 | `WS /ws` | WebSocket em tempo real |
 | `GET /explorer` | Explorador de blocos |
 
@@ -214,12 +228,26 @@ TritioCoin/
 | Parametro | Valor |
 |-----------|-------|
 | Supply Maximo | 19.000.000 TRC |
-| Recompensa Inicial | 50 TRC |
+| Recompensa Inicial | 50 TRC (70% minerador, 30% validadores) |
 | Intervalo de Halving | 190.000 blocos |
 | Tempo de Bloco | ~5 minutos |
 | Taxa Minima | 0.0001 TRC |
 | Taxa de Queima | 10% das taxas |
 | Satoshis | 1 TRC = 100.000.000 sat |
+
+---
+
+## Seguranca
+
+| Medida | Descricao |
+|--------|-----------|
+| **Senha forte** | Min 8 chars, 1 maiuscula, 1 numero |
+| **Criptografia** | AES-256-GCM + PBKDF2 600K iteracoes |
+| **Permissoes** | Arquivos com 0o600 (so owner) |
+| **Rate limiting** | 100 req/min por IP na API |
+| **Reputacao** | Ban automatico de peers maliciosos |
+| **Timeouts** | Conexao 10s, recv 30s |
+| **Sync seguro** | Checkpoints a cada 1000 blocos |
 
 ---
 
@@ -239,6 +267,18 @@ docker-compose up -d
 sudo cp tritiocoin.service /etc/systemd/system/
 sudo systemctl enable tritiocoin
 sudo systemctl start tritiocoin
+```
+
+---
+
+## Bootstrap (Download do mainnet.db)
+
+```bash
+# Exportar (no seed):
+python main.py --export-db
+
+# Importar (em outro computador):
+python main.py --bootstrap --mode miner --seed <IP>:8333
 ```
 
 ---
@@ -274,4 +314,4 @@ MIT License - Veja [LICENSE](LICENSE)
 
 ---
 
-**TritioCoin v1.1 - Producao**
+**TritioCoin v1.2 - Producao**
