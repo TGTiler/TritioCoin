@@ -1,4 +1,4 @@
-# Arquitetura da Tritio - Visao Geral
+# Arquitetura do TritioVisao Geral
 
 TritioCoin e uma criptomoeda descentralizada com arquitetura modular projetada para seguranca e desempenho.
 
@@ -58,15 +58,15 @@ TritioCoin e uma criptomoeda descentralizada com arquitetura modular projetada p
 ### Passo a passo
 
 ```
-1. Usuario cria transacao
+1. Usuario cria transacao (valores ocultos com Pedersen Commitments)
 2. Transacao assinada com ECDSA
-3. Transacao adicionada a mempool
-4. Transacao transmitida para peers
+3. Transacao adicionada a mempool (com fee dinamico)
+4. Transacao transmitida via gossip
 5. Minerador seleciona transacoes da mempool
-6. Minerador cria bloco com transacoes
-7. Bloco transmitido para a rede
-8. Validadores assinam o bloco (PoS)
-9. Bloco adicionado a blockchain
+6. Minerador cria bloco com transacoes (70% recompensa)
+7. Bloco transmitido para a rede (batch de 50)
+8. Validadores assinam o bloco (30% recompensa)
+9. Bloco adicionado a blockchain (com checkpoint)
 10. UTXOs atualizados
 ```
 
