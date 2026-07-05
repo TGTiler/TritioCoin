@@ -2,7 +2,7 @@
 
 ## Requisitos
 
-- Python 3.8+
+- Python 3.12+
 - 2GB RAM minimo
 - 20GB de espaco em disco
 - Portas 8333 (P2P) e 8080 (API) abertas
@@ -277,6 +277,9 @@ git pull
 
 # Reinstale dependencias
 pip install -r requirements.txt
+
+# Execute testes (64 testes)
+python -m pytest tests/ -v
 
 # Reinicie o no
 python main.py --mode passive
