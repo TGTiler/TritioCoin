@@ -13,7 +13,7 @@ Vá ao GitHub e clique em "Fork" no canto superior direito.
 ### 2. Clone seu fork
 
 ```bash
-git clone https://github.com/TGTiler/TritioCoin.git
+git clone https://github.com/SEU-USERNAME/TritioCoin.git
 cd TritioCoin
 ```
 
@@ -23,7 +23,7 @@ cd TritioCoin
 git checkout -b minha-nova-funcionalidade
 ```
 
-### 4. Faca suas mudancas
+### 4. Faca suas mudanças
 
 ### 5. Envie um Pull Request
 
@@ -40,12 +40,13 @@ pip install -r requirements.txt
 ### Executar testes
 
 ```bash
-# Todos os testes
+# Todos os testes (64 testes)
 python -m pytest tests/ -v
 
 # Testes especificos
-python -m pytest tests/test_wallet.py -v
-python -m pytest tests/test_blockchain.py -v
+python -m pytest tests/test_wallet.py -v       # Carteira + anti-colisao
+python -m pytest tests/test_p2p_protocol.py -v # Wire protocol P2P
+python -m pytest tests/test_blockchain.py -v   # Blockchain
 ```
 
 ### Rodar o no localmente
@@ -67,17 +68,18 @@ TritioCoin/
 ├── core/               # Logica principal
 │   ├── blockchain.py   # Gerenciamento da chain
 │   ├── block.py        # Estrutura do bloco
-│   ├── miner.py        # Mineracao Argon2id
-│   ├── wallet.py       # Carteiras criptografadas
+│   ├── miner.py        # Mineracao Blake2b memory-hard
+│   ├── wallet.py       # Carteiras com anti-colisao
 │   ├── transaction.py  # Transacoes
 │   └── ...
 ├── network/            # Rede P2P
-│   ├── p2p_node.py     # No P2P
+│   ├── p2p_node.py     # No P2P com wire protocol binario
+│   ├── gossip.py       # Gossip com inv/getdata binario
 │   ├── api.py          # API REST
 │   └── dht.py          # Descoberta de peers
 ├── main.py             # Ponto de entrada
 ├── wallet.py           # CLI da carteira
-└── tests/              # Testes
+└── tests/              # 64 testes automatizados
 ```
 
 ---
