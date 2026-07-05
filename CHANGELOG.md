@@ -1,5 +1,63 @@
 # Changelog
 
+Todas as mudancas notaveis no TritioCoin serao documentadas neste arquivo.
+
+## [1.3.0] - 2026-07-05
+
+### Alterado
+
+#### Rede (P2P) — Wire Protocol Binario
+- **Wire Protocol**: Substituido JSON+length-prefix por header binario de 24 bytes (`<4s12sII`):
+  - Magic Bytes: `\xF9\xBE\xB4\xD9` (4 bytes, rejeita se diferente)
+  - Command: ASCII null-padded para 12 bytes
+  - Payload Length: uint32 LE
+  - Checksum: primeiros 4 bytes de SHA256d(payload)
+- **Handshake**: Maquina de estados rigida `version`/`verack` (formato binario `<IQQQI>`)
+  - Protocol Version (4B), Services (8B), Timestamp (8B), Nonce (8B), Block Height (4B)
+  - Rejeita versoes abaixo de 70001
+- **PeerSession**: Cada conexao encapsulada em classe com state machine, write lock, known_inventory, ban_score
+- **Keep-alive**: Ping a cada 30s de inatividade, pong deve ecoar nonce em 10s
+- **Anti-DoS**: Ban score: +10 pacote malformado, +50 dado invalido, threshold 100 → ban + blacklist
+- **Protecao de memoria**: Payload > 2MB → desconexao imediata (antes de ler bytes)
+- **Self-connection**: Nonce no version — se igual ao local, rejeita
+- **INV/GETDATA**: Protocolo binario `<I32s>` com dedup por `known_inventory` por sessao
+- **Gossip**: Atualizado para usar inv/getdata binario ao inves de BLOCK_ANNOUNCE/TX_ANNOUNCE JSON
+
+#### Carteira — Defesas Anti-Colisao
+- **Validacao de range**: Chave privada deve estar em [1, n-1] onde n = ordem da curva secp256k1
+- **Validacao de entropia**: Verifica bytes nao-zero, diversidade >= 8 valores, retry 3x se fraco
+- **Validacao Base58Check**: `validate_address()` verifica checksum ao carregar carteira
+- **Registro de colisao local**: `AddressRegistry` salva SHA-256 de enderecos gerados (detecta auto-colisao)
+- **Passphrase BIP39**: `Wallet.create(passphrase="...")` adiciona 256 bits extras de entropia
+- **Fallback CSPRNG**: Se `os.urandom()` falhar, usa `secrets.token_bytes()` como backup
+- **Versao da carteira**: Arquivo criptografado agora usa versao 3 (compativel com v2)
+
+### Adicionado
+
+#### Testes
+- **test_p2p_protocol.py**: 38 testes do protocolo P2P
+  - TestWireProtocol (11): header, magic, command, checksum, roundtrip
+  - TestHandshake (3): handshake completo, troca de versoes, rejeicao de versao antiga
+  - TestSelfConnectionPrevention (1): nonce identico → rejeicao
+  - TestTxPropagation (1): TX via 3 nos reais (Node1 → Node2 → Node3)
+  - TestBadChecksumBan (1): checksum errado → ban → desconexao
+  - TestOversizedPayload (1): payload 3MiB → desconexao imediata
+  - TestPingPong (1): nonce ecoado no pong
+  - TestRateLimiter (5): budget, reset, independentes, cleanup
+  - TestBanScore (3): malformed, invalid, abaixo do threshold
+  - TestGossipProtocol (8): inventory, eviction, sync ranges
+  - TestUnknownCommand (1): comando desconhecido → ban
+  - TestInvGetdata (2): formato binario `<I32s>`
+- **test_wallet.py**: 17 testes novos de seguranca da carteira
+  - TestKeyRangeValidation (4): chave zero, > ordem, tamanho errado, valida
+  - TestEntropyQuality (2): 100 carteiras unicas, chave nunca zero
+  - TestAddressValidation (5): valido, adulterado, prefixo errado, curto, vazio
+  - TestMnemonicPassphrase (3): passphrase diferente = endereco diferente
+  - TestAddressRegistry (3): registro, duplicado, contagem
+- **Total**: 64 testes (26 wallet + 38 P2P)
+
+---
+
 ## [1.2.0] - 2026-06-25
 
 ### Alterado
