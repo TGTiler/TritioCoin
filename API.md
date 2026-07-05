@@ -1,5 +1,7 @@
 # Documentacao da API TritioCoin
 
+**Versao do Protocolo:** 1.3.0
+
 ## URL Base
 
 ```
