@@ -60,9 +60,10 @@ python wallet.py create
 ```
 1. Programa busca peers na lista do GitHub
 2. Programa busca peers no arquivo seeds.json local
-3. Conecta aos peers encontrados
-4. Baixa a blockchain
-5. Sincroniza em tempo real
+3. Conecta via TLS 1.3 e realiza handshake binario (version/verack)
+4. Verifica versao do protocolo (minimo 70001)
+5. Baixa a blockchain
+6. Sincroniza em tempo real via gossip (inv/getdata)
 ```
 
 ---
