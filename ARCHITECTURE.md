@@ -1,4 +1,4 @@
-# Arquitetura do TritioVisao Geral
+# Arquitetura do TritioCoin — Visao Geral
 
 TritioCoin e uma criptomoeda descentralizada com arquitetura modular projetada para seguranca e desempenho.
 
@@ -39,8 +39,9 @@ TritioCoin e uma criptomoeda descentralizada com arquitetura modular projetada p
 ├─────────────────────────────────────────────────────────────┤
 │                    Camada de Rede                            │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
-│  │   P2P Node  │  │   TLS 1.3   │  │  Peer Reputation   │ │
-│  │  TCP/Gossip │  │  Criptografia │  │  Score/Banning     │ │
+│  │   P2P Node  │  │ Wire Proto  │  │  Peer Reputation   │ │
+│  │  PeerSession│  │ 24B Header  │  │  Score/Banning     │ │
+│  │  TLS 1.3    │  │ SHA256d CRC │  │  +10/+50/threshold │ │
 │  └─────────────┘  └─────────────┘  └─────────────────────┘ │
 ├─────────────────────────────────────────────────────────────┤
 │                    Camada de Armazenamento                    │
@@ -53,6 +54,80 @@ TritioCoin e uma criptomoeda descentralizada com arquitetura modular projetada p
 
 ---
 
+## Wire Protocol (P2P Binario)
+
+### Header — 24 bytes, Little-Endian
+
+```
+┌──────────────┬──────────────┬───────────────┬──────────────┐
+│ Magic (4B)   │ Cmd (12B)    │ Length (4B)   │ Checksum(4B) │
+└──────────────┴──────────────┴───────────────┴──────────────┘
+```
+
+Struct: `<4s12sII`
+
+| Campo | Tamanho | Descricao |
+|-------|---------|-----------|
+| Magic | 4 bytes | `\xF9\xBE\xBE\xB4\xD9` — rejeita se diferente |
+| Command | 12 bytes | ASCII null-padded (ex: `version\x00\x00\x00\x00\x00`) |
+| Payload Length | 4 bytes (uint32) | Tamanho do payload em bytes |
+| Checksum | 4 bytes (uint32) | Primeiros 4 bytes de SHA256d(payload) |
+
+### Handshake — Maquina de Estados
+
+```
+TCP conectado
+    ↓
+Envia version (binario <IQQQI>)
+    ↓
+Recebe version do par
+    ↓
+Valida: versao >= 70001, nonce != local
+    ↓
+Envia verack (payload vazio)
+    ↓
+Recebe verack do par
+    ↓
+Estado: CONEXAO_ESTABELECIDA
+```
+
+### Payload do Version (`<IQQQI`)
+
+| Campo | Tamanho | Descricao |
+|-------|---------|-----------|
+| Protocol Version | 4 bytes (uint32) | Versao do protocolo (ex: 70015) |
+| Services | 8 bytes (uint64) | Bitmask de servicos (1 = Full Node) |
+| Timestamp | 8 bytes (uint64) | Unix epoch atual |
+| Nonce | 8 bytes (uint64) | Numero aleatorio (prevencao de loopback) |
+| Block Height | 4 bytes (uint32) | Altura atual da blockchain |
+
+### Ping/Pong
+
+```
+ping: 8 bytes nonce (<Q>)
+pong: mesmo nonce ecoado (<Q>)
+```
+
+- Heartbeat: 30s de inatividade → envia ping
+- Timeout: 10s sem pong → fecha conexao
+
+### INV/GETDATA (Gossip Binario)
+
+```
+Payload: <I32s> (36 bytes total)
+├── Inventory Type (4 bytes): 1=TX, 2=Block
+└── Hash (32 bytes): SHA-256 do dado
+```
+
+Fluxo:
+1. No recebe nova TX/Bloco → valida
+2. Envia `inv` com hash para todos os peers
+3. Peer receptor verifica se possui o hash
+4. Se NAO possuir → responde com `getdata`
+5. No original envia mensagem com payload completo
+
+---
+
 ## Fluxo de uma Transacao
 
 ### Passo a passo
@@ -61,55 +136,45 @@ TritioCoin e uma criptomoeda descentralizada com arquitetura modular projetada p
 1. Usuario cria transacao (valores ocultos com Pedersen Commitments)
 2. Transacao assinada com ECDSA
 3. Transacao adicionada a mempool (com fee dinamico)
-4. Transacao transmitida via gossip
-5. Minerador seleciona transacoes da mempool
-6. Minerador cria bloco com transacoes (70% recompensa)
-7. Bloco transmitido para a rede (batch de 50)
-8. Validadores assinam o bloco (30% recompensa)
-9. Bloco adicionado a blockchain (com checkpoint)
-10. UTXOs atualizados
-```
-
-### Como funciona na pratica
-
-```
-Usuario clica "Enviar"
-     ↓
-Carteira cria transacao
-     ↓
-Assina com chave privada (ECDSA)
-     ↓
-Envia para mempool (pool de pendentes)
-     ↓
-Minerador pega transacoes do pool
-     ↓
-Inclui no bloco que esta minerando
-     ↓
-Encontra nonce valido (Blake2b memory-hard)
-     ↓
-Transmite bloco para rede
-     ↓
-Validadores verificam e assinam
-     ↓
-Bloco confirmado na chain
-     ↓
-Saldo atualizado
+4. Transacao transmitida via inv (hash binario)
+5. Peer responde com getdata se nao possui
+6. Transacao completa enviada (JSON sobre wire protocol)
+7. Minerador seleciona transacoes da mempool
+8. Minerador cria bloco com transacoes (70% recompensa)
+9. Bloco transmitido via inv para a rede
+10. Validadores assinam o bloco (30% recompensa)
+11. Bloco adicionado a blockchain (com checkpoint)
+12. UTXOs atualizados
 ```
 
 ---
 
-## Fluxo de Mineracao
+## Anti-DoS e Seguranca de Rede
+
+### Ban Score
+
+| Acao | Pontos | Descricao |
+|------|--------|-----------|
+| Pacote malformado | +10 | Checksum invalido, magic errado, comando desconhecido |
+| Dado invalido | +50 | Bloco/tx corrompido ou com dados invalidos |
+| **Threshold** | **100** | **Desconexao + blacklist em memoria** |
+
+### Limites
+
+| Limite | Valor | Acao |
+|--------|-------|------|
+| Payload maximo | 2 MB | Desconecta IMEDIATAMENTE (antes de ler) |
+| Peers totais | 50 | Rejeita novas conexoes |
+| Peers por IP | 3 | Rejeita novas conexoes do mesmo IP |
+| Mensagens/10s | 200 | Rate limit por peer |
+| Cooldown reconexao | 60s | Entre tentativas ao mesmo peer |
+
+### Keep-Alive
 
 ```
-1. Minerador seleciona transacoes da mempool
-2. Cria transacao coinbase (recompensa)
-3. Monta bloco com header + transacoes
-4. Calcula Merkle root
-5. Inicia loop de mineracao (Argon2id)
-6. Encontra nonce valido (hash com N zeros)
-7. Transmite bloco compacto
-8. Espera assinaturas de validadores
-9. Adiciona bloco a chain
+30s sem atividade → envia ping (8 bytes nonce)
+10s sem pong     → fecha conexao
+Nonce echo       → valida que pong corresponde ao ping enviado
 ```
 
 ---
@@ -121,35 +186,39 @@ Saldo atualizado
 | Componente | Algoritmo | Finalidade |
 |------------|-----------|------------|
 | Assinaturas | ECDSA (secp256k1) | Autenticacao de transacoes |
-| Quantum | WOTS+ (SHA-256) | Assinaturas futuras |
-| Hashing | SHA-256 | Hash de blocos, Merkle trees |
-| Mineracao | Argon2id | PoW resistente a ASIC |
+| Hashing | SHA-256 | Hash de blocos, Merkle trees, checksums |
+| Mineracao | Blake2b memory-hard | PoW resistente a ASIC |
 | Criptografia | AES-256-GCM | Criptografia de carteira |
 | KDF | PBKDF2 (600K) | Derivacao de senha |
 | P2P | TLS 1.3 | Criptografia de rede |
+| Wire Protocol | SHA256d checksum | Integridade de mensagens |
+
+### Protecao de Carteira (Anti-Colisao)
+
+| Defesa | Descricao |
+|--------|-----------|
+| Validacao de range | Chave em [1, n-1] (ordem da curva secp256k1) |
+| Validacao de entropia | Bytes nao-zero, diversidade >= 8, retry 3x |
+| Base58Check | Checksum do endereco verificado ao carregar |
+| Registro local | SHA-256 de enderecos gerados (detecta auto-colisao) |
+| Passphrase BIP39 | 256 bits extras de entropia opcional |
+| Fallback CSPRNG | `secrets.token_bytes()` se `os.urandom()` falhar |
 
 ### Como suas chaves funcionam
 
 ```
-Chave Privada (secreta)
+Chave Privada (256-bit, secp256k1)
      ↓
-Assina transacoes
+Validada: 1 ≤ k < n (ordem da curva)
      ↓
-Gera Chave Publica
+Assina transacoes (ECDSA)
      ↓
-Gera Endereco (T1ABC...)
+Gera Chave Publica (64 bytes)
      ↓
-Other people enviam TRC para este endereco
+SHA-256 → RIPEMD-160 → Base58Check
+     ↓
+Endereco (T1ABC...)
 ```
-
----
-
-## Modelo de Confiabilidade
-
-- Sem autoridade central
-- Consenso via PoW + PoS
-- Prevencao de double-spend via UTXO
-- Stake dos validadores como seguranca economica
 
 ---
 
@@ -157,10 +226,7 @@ Other people enviam TRC para este endereco
 
 ### PoW (Proof of Work)
 
-- **Algoritmo:** Argon2id
-- **Memoria:** 64 MB
-- **Custo de tempo:** 1 iteracao
-- **Paralelismo:** 1
+- **Algoritmo:** Blake2b com memory-hardness (256KB)
 - **Multi-threading:** Usa todas as CPUs
 - **Proposito:** Mineracao resistente a ASIC
 
@@ -176,26 +242,27 @@ Other people enviam TRC para este endereco
 - **Stake minimo para delegar:** 1 TRC
 - **Comissao do validador:** 10%
 - **Periodo de unbonding:** 7 dias
-- **Max delegacoes:** 100 por endereco
-
-### Ajuste de Dificuldade
-
-- **Intervalo:** A cada 10 blocos
-- **Alvo:** 5 minutos por bloco
-- **Ajuste:** ±1 baseado na diferenca do tempo
 
 ---
 
-## Protocolo de Rede
+## Protocolo de Rede — Tipos de Mensagem
 
-### Tipos de Mensagem
+### Wire Protocol (Binario)
+
+| Comando | Payload | Descricao |
+|---------|---------|-----------|
+| `version` | `<IQQQI>` (28B) | Handshake: versao, services, timestamp, nonce, height |
+| `verack` | vazio (0B) | Confirmacao do handshake |
+| `ping` | `<Q>` (8B) | Keep-alive com nonce |
+| `pong` | `<Q>` (8B) | Resposta com mesmo nonce |
+| `inv` | `<I32s>` (36B) | Anuncio de inventario (TX ou Block) |
+| `getdata` | `<I32s>` (36B) | Solicitacao de item de inventario |
+
+### JSON sobre Wire Protocol (Backward-Compatible)
 
 | Tipo | Direcao | Descricao |
 |------|---------|-----------|
-| HANDSHAKE | Ambos | Conexao inicial com negociacao de versao |
-| HANDSHAKE_ACK | Ambos | Conexao confirmada |
-| BLOCK_ANNOUNCE | Broadcast | Anuncio de bloco (hash + height) |
-| TX_ANNOUNCE | Broadcast | Anuncio de transacao (hash) |
+| `json` | Ambos | Mensagem JSON genérica (blocos, txs, sync) |
 | NEW_BLOCK | Broadcast | Bloco completo |
 | COMPACT_BLOCK | Broadcast | Header + hashes de tx |
 | NEW_TX | Broadcast | Nova transacao |
@@ -209,14 +276,6 @@ Other people enviam TRC para este endereco
 | BLOCK_SIGNATURE | Response | Assinatura do validador |
 | REGISTER_VALIDATOR | Broadcast | Registro de validador |
 | DELEGATE | Broadcast | Delegacao de stake |
-| PING/PONG | Ambos | Keepalive |
-
-### Rate Limiting
-
-- 200 mensagens por 10 segundos por peer
-- Ban automatico em score de reputacao -50
-- Duracao do ban: 1 hora (configuravel)
-- Cooldown de reconexao: 60 segundos
 
 ---
 
@@ -233,54 +292,11 @@ mempool (tx_hash, sender, recipient, amount, fee, timestamp)
 metadata (key, value)
 ```
 
-### Indices
-
-```sql
-idx_tx_sender ON transactions(sender)
-idx_tx_recipient ON transactions(recipient)
-idx_tx_block ON transactions(block_height)
-idx_utxo_sender ON utxos(sender, spent)
-```
-
----
-
-## Fluxo de Dados
-
-### Transacao
-
-```
-1. Usuario cria transacao
-2. Transacao assinada com ECDSA (+ opcional WOTS+)
-3. Transacao adicionada a mempool
-4. Transacao transmitida para peers
-5. Minerador seleciona transacoes da mempool
-6. Minerador cria bloco com transacoes
-7. Bloco transmitido para a rede
-8. Validadores assinam bloco (PoS)
-9. Bloco adicionado a blockchain
-10. UTXOs atualizados
-```
-
-### Mineracao
-
-```
-1. Minerador seleciona transacoes da mempool
-2. Cria transacao coinbase (recompensa)
-3. Monta bloco com header + transacoes
-4. Calcula Merkle root
-5. Inicia loop de mineracao (Argon2id)
-6. Encontra nonce valido (hash com N zeros)
-7. Transmite bloco compacto
-8. Espera assinaturas de validadores
-9. Adiciona bloco a chain
-```
-
 ---
 
 ## Prevencao de Problemas
 
 ### Double-spend (Gasto duplo)
-
 ```
 - UTXO rastreia cada saida de transacao
 - Se um UTXO ja foi gasto, nao pode ser gasto novamente
@@ -288,7 +304,6 @@ idx_utxo_sender ON utxos(sender, spent)
 ```
 
 ### Blocos duplicados
-
 ```
 - Verificacao de hash duplicado
 - Verificacao de height duplicado
@@ -296,10 +311,12 @@ idx_utxo_sender ON utxos(sender, spent)
 ```
 
 ### Ataques a rede
-
 ```
-- Rate limiting previne DoS
-- Reputacao previne Sybil
-- DHT descentralizado previne Eclipse
-- TLS previne MitM
+- Wire protocol com checksum SHA256d → previne corrupcao
+- Magic bytes → previne processamento de dados errados
+- Ban score → Remove peers maliciosos
+- Rate limiting → Previne DoS
+- Keep-alive com nonce → Detecta peers mortos
+- Payload limit (2MB) → Previne estouro de memoria
+- Self-connection prevention → Evita loops
 ```
