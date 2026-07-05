@@ -156,7 +156,8 @@ Interface grafica com:
 | **Assinaturas** | ECDSA secp256k1 |
 | **Privacidade** | Pedersen Commitments (valores ocultos) |
 | **Carteiras** | BIP32/BIP44 HD, Multi-sig, AES-256-GCM |
-| **Rede** | DHT, NAT traversal, TLS 1.3, Rate Limiting |
+| **Rede** | Wire Protocol binario 24B, DHT, NAT traversal, TLS 1.3, Ban Score anti-DoS |
+| **Anti-Colisao** | Validacao de range, entropia, Base58Check, registro local, passphrase BIP39 |
 
 ---
 
@@ -186,9 +187,9 @@ TritioCoin/
 │   ├── database.py        # Persistencia SQLite
 │   └── network_config.py  # Configs Mainnet/Testnet
 ├── network/
-│   ├── p2p_node.py        # P2P com TLS + timeouts
+│   ├── p2p_node.py        # P2P com wire protocol binario 24B
 │   ├── api.py             # REST + WebSocket API (rate limited)
-│   ├── gossip.py          # Protocolo gossip (sync, announce)
+│   ├── gossip.py          # Protocolo gossip (inv/getdata binario)
 │   ├── dht.py             # Kademlia DHT
 │   ├── discovery.py       # Descoberta de peers
 │   └── reputation.py      # Reputacao de peers
@@ -245,8 +246,13 @@ TritioCoin/
 | **Criptografia** | AES-256-GCM + PBKDF2 600K iteracoes |
 | **Permissoes** | Arquivos com 0o600 (so owner) |
 | **Rate limiting** | 100 req/min por IP na API |
+| **Wire Protocol** | Header 24B binario, checksum SHA256d, magic bytes |
+| **Ban Score** | +10 malformado, +50 invalido, threshold 100 → ban |
+| **Keep-alive** | Ping/pong nonce echo a cada 30s |
+| **Payload Limit** | 2MB max — desconnecta antes de ler |
 | **Reputacao** | Ban automatico de peers maliciosos |
 | **Timeouts** | Conexao 10s, recv 30s |
+| **Anti-Colisao** | Validacao de chave, entropia, registro local |
 | **Sync seguro** | Checkpoints a cada 1000 blocos |
 
 ---
@@ -286,11 +292,12 @@ python main.py --bootstrap --mode miner --seed <IP>:8333
 ## Testes
 
 ```bash
-# Executar todos os testes
+# Executar todos os testes (64 testes)
 python -m pytest tests/ -v
 
-# Teste especifico
-python -m pytest tests/test_wallet.py -v
+# Testes especificos
+python -m pytest tests/test_wallet.py -v       # 26 testes (inclui anti-colisao)
+python -m pytest tests/test_p2p_protocol.py -v # 38 testes (wire protocol)
 ```
 
 ---
@@ -314,4 +321,4 @@ MIT License - Veja [LICENSE](LICENSE)
 
 ---
 
-**TritioCoin v1.2 - Producao**
+**TritioCoin v1.3 - Producao**
