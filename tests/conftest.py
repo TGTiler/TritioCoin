@@ -17,11 +17,39 @@ from core.miner import Miner
 from core.wallet import Wallet
 from core.transaction import Transaction
 from core.block import Block
+from core.pow import tritio_hash
 from core.utxo import UTXOManager
 from core.multisig import MultiSigWallet, create_multisig_wallet
 from core.hdwallet import HDWallet
 from core.consensus import ConsensusEngine
-from core.network_config import TESTNET, MAINNET
+from core.network_config import TESTNET, MAINNET, NetworkConfig
+
+
+# Test-specific config with difficulty 1 for faster mining
+TESTNET_EASY = NetworkConfig(
+    name="testnet",
+    port=18333,
+    difficulty=1,  # Easier for tests
+    initial_reward_satoshis=TESTNET.initial_reward_satoshis,
+    halving_interval=TESTNET.halving_interval,
+    max_supply_satoshis=TESTNET.max_supply_satoshis,
+    block_time=TESTNET.block_time,
+    min_fee_satoshis=TESTNET.min_fee_satoshis,
+    max_block_size=TESTNET.max_block_size,
+    mempool_max=TESTNET.mempool_max,
+    burn_rate=TESTNET.burn_rate,
+)
+
+
+def mine_block_for_test(block, difficulty, max_nonces=100):
+    """Find a valid nonce for testing (limited search for speed)."""
+    for nonce in range(max_nonces):
+        block.header.nonce = nonce
+        pow_hash = tritio_hash(block.header.to_bytes())
+        if pow_hash.startswith("0" * difficulty):
+            block.pow_hash = pow_hash
+            return True
+    return False
 
 
 @pytest.fixture
@@ -40,8 +68,8 @@ def db(tmp_dir):
 
 @pytest.fixture
 def testnet():
-    """Return testnet config."""
-    return TESTNET
+    """Return testnet config (with difficulty 1 for faster tests)."""
+    return TESTNET_EASY
 
 
 @pytest.fixture
@@ -81,12 +109,6 @@ def wallet():
 
 
 @pytest.fixture
-def quantum_wallet():
-    """Create a quantum-resistant wallet."""
-    return Wallet.create(quantum=True)
-
-
-@pytest.fixture
 def funded_blockchain(db, testnet):
     """Create a blockchain with funded wallets."""
     bc = Blockchain(testnet, db)
@@ -101,7 +123,7 @@ def funded_blockchain(db, testnet):
         coinbase.tx_hash = coinbase.compute_hash()
         block = Block(bc.height(), bc.latest().hash, [coinbase.to_dict()], bc.difficulty)
         block.hash = block.content_hash()
-        block.pow_hash = "0" * bc.difficulty + "test"
+        assert mine_block_for_test(block, bc.difficulty), f"Failed to mine block {i}"
         bc.add_block(block)
 
     return bc, wallets
