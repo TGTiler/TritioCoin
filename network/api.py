@@ -5,21 +5,48 @@ Real-time updates for blocks, transactions, and network status.
 import json
 import asyncio
 import logging
+import time
+from collections import defaultdict
 from aiohttp import web
 from pathlib import Path
 from core.constants import SATOSHIS_PER_TRC, trc_to_satoshis
+from core.mining_validation import MiningValidator
 
 logger = logging.getLogger("API")
 
 
+class RateLimiter:
+    """Simple rate limiter for API endpoints."""
+    def __init__(self, max_requests: int = 100, window: int = 60):
+        self.max_requests = max_requests
+        self.window = window
+        self.requests: Dict[str, list] = defaultdict(list)
+
+    def check(self, client_ip: str) -> bool:
+        now = time.time()
+        self.requests[client_ip] = [t for t in self.requests[client_ip] if now - t < self.window]
+        if len(self.requests[client_ip]) >= self.max_requests:
+            return False
+        self.requests[client_ip].append(now)
+        return True
+
+
 class TritioAPI:
-    def __init__(self, node, host: str = "0.0.0.0", port: int = 8080):
+    def __init__(self, node, host: str = "127.0.0.1", port: int = 8080):
         self.node = node
         self.host = host
         self.port = port
-        self.app = web.Application()
+        self.rate_limiter = RateLimiter()
+        self.app = web.Application(middlewares=[self._rate_limit_middleware])
         self.ws_clients: list = []
         self._setup_routes()
+
+    @web.middleware
+    async def _rate_limit_middleware(self, request, handler):
+        client_ip = request.remote or "unknown"
+        if not self.rate_limiter.check(client_ip):
+            return web.json_response({"error": "Rate limit exceeded"}, status=429)
+        return await handler(request)
 
     def _setup_routes(self):
         # Static files
@@ -48,6 +75,9 @@ class TritioAPI:
         self.app.router.add_post("/api/claim", self.handle_claim_rewards)
         self.app.router.add_get("/api/delegations/{address}", self.handle_get_delegations)
         self.app.router.add_get("/api/delegation/stats", self.handle_delegation_stats)
+
+        # Mining validation endpoints
+        self.app.router.add_get("/api/audit/{height}", self.handle_audit_block)
 
         # WebSocket endpoint
         self.app.router.add_get("/ws", self.handle_websocket)
@@ -292,7 +322,7 @@ class TritioAPI:
                 })
             return web.json_response({"error": "Block rejected"}, status=400)
         except Exception as e:
-            return web.json_response({"error": str(e)}, status=500)
+            return web.json_response({"error": "Internal server error"}, status=500)
 
     async def handle_send_tx(self, request):
         try:
@@ -315,7 +345,7 @@ class TritioAPI:
                 return web.json_response({"status": "ok", "hash": tx.tx_hash})
             return web.json_response({"error": "Invalid transaction"}, status=400)
         except Exception as e:
-            return web.json_response({"error": str(e)}, status=500)
+            return web.json_response({"error": "Internal server error"}, status=500)
 
     async def handle_register_validator(self, request):
         try:
@@ -368,7 +398,7 @@ class TritioAPI:
                 "remaining_balance": (balance - needed) / SATOSHIS_PER_TRC
             })
         except Exception as e:
-            return web.json_response({"error": str(e)}, status=500)
+            return web.json_response({"error": "Internal server error"}, status=500)
 
     # ========== Delegation Endpoints ==========
 
@@ -422,7 +452,7 @@ class TritioAPI:
                 "remaining_balance": (balance - needed) / SATOSHIS_PER_TRC
             })
         except Exception as e:
-            return web.json_response({"error": str(e)}, status=500)
+            return web.json_response({"error": "Internal server error"}, status=500)
 
     async def handle_undelegate(self, request):
         """Start undelegation process."""
@@ -445,7 +475,7 @@ class TritioAPI:
                 "message": "Undelegation started. Tokens available after 7 days."
             })
         except Exception as e:
-            return web.json_response({"error": str(e)}, status=500)
+            return web.json_response({"error": "Internal server error"}, status=500)
 
     async def handle_claim_rewards(self, request):
         """Claim delegation rewards."""
@@ -468,7 +498,7 @@ class TritioAPI:
                 "rewards_claimed": rewards
             })
         except Exception as e:
-            return web.json_response({"error": str(e)}, status=500)
+            return web.json_response({"error": "Internal server error"}, status=500)
 
     async def handle_get_delegations(self, request):
         """Get delegations for an address."""
@@ -489,6 +519,28 @@ class TritioAPI:
         stats = self.node.delegation_pool.get_stats()
         return web.json_response(stats)
 
+    async def handle_audit_block(self, request):
+        """Audit a block for mining integrity."""
+        try:
+            height = int(request.match_info['height'])
+        except (ValueError, KeyError):
+            return web.json_response({"error": "Invalid height"}, status=400)
+
+        # Get block from database
+        block_data = self.node.blockchain.db.get_block(height)
+        if not block_data:
+            return web.json_response({"error": "Block not found"}, status=404)
+
+        # Deserialize block
+        from core.block import Block
+        block = Block.deserialize(block_data)
+
+        # Run full audit
+        validator = MiningValidator(self.node.net_config)
+        audit = validator.full_audit(block, height)
+
+        return web.json_response(audit)
+
     async def handle_index(self, request):
         return web.Response(
             text="TritioCoin API v1.0.0\n\nEndpoints:\n"
@@ -503,6 +555,7 @@ class TritioAPI:
                  "  GET  /api/mempool\n"
                  "  GET  /api/peers\n"
                  "  GET  /api/validators\n"
+                 "  GET  /api/audit/{height} (mining validation)\n"
                  "  POST /api/tx\n"
                  "  POST /api/block\n"
                  "  POST /api/validator/register\n"
