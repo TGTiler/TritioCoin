@@ -19,6 +19,7 @@ from core.transaction import Transaction
 from core.database import Database
 from core.network_config import NetworkConfig, MAINNET
 from core.constants import SATOSHIS_PER_TRC, MAX_FUTURE_DRIFT, MAX_PAST_DRIFT, MTP_WINDOW, CHECKPOINT_INTERVAL, MAX_REORG_DEPTH
+from core.pow import tritio_hash
 
 logger = logging.getLogger("Blockchain")
 
@@ -73,8 +74,14 @@ class Blockchain:
             logger.warning(f"Block chain broken at height {block.header.index}")
             return False
 
-        # Check PoW hash
-        if block.pow_hash and not block.pow_hash.startswith("0" * block.header.difficulty):
+        # Check PoW hash - RECOMPUTE to detect forged pow_hash
+        expected_pow_hash = tritio_hash(block.header.to_bytes())
+        if block.pow_hash != expected_pow_hash:
+            logger.warning(f"PoW hash mismatch at height {block.header.index}: "
+                          f"stored={block.pow_hash[:16]}... recomputed={expected_pow_hash[:16]}...")
+            return False
+
+        if not expected_pow_hash.startswith("0" * block.header.difficulty):
             logger.warning(f"Invalid PoW at height {block.header.index}")
             return False
 
@@ -202,9 +209,24 @@ class Blockchain:
             logger.warning(f"Invalid previous hash at height {block.header.index}: {block.header.previous_hash.hex()[:16]}... != {prev.hash[:16]}...")
             return False
 
-        # Check PoW hash
-        if not block.pow_hash or not block.pow_hash.startswith("0" * block.header.difficulty):
-            logger.warning(f"Invalid PoW hash at height {block.header.index}: pow_hash={block.pow_hash[:16] if block.pow_hash else 'None'}...")
+        # Check PoW hash - RECOMPUTE to detect forged pow_hash
+        expected_pow_hash = tritio_hash(block.header.to_bytes())
+        if block.pow_hash != expected_pow_hash:
+            logger.warning(f"PoW hash mismatch at height {block.header.index}: "
+                          f"submitted={block.pow_hash[:16] if block.pow_hash else 'None'}... "
+                          f"recomputed={expected_pow_hash[:16]}...")
+            return False
+
+        if not expected_pow_hash.startswith("0" * block.header.difficulty):
+            logger.warning(f"PoW does not meet difficulty {block.header.difficulty}")
+            return False
+
+        # Check merkle root matches transactions
+        expected_merkle = Block._merkle_root(block.transactions)
+        if block.header.merkle_root != expected_merkle:
+            logger.warning(f"Merkle root mismatch at height {block.header.index}: "
+                          f"header={block.header.merkle_root.hex()[:16]}... "
+                          f"computed={expected_merkle.hex()[:16]}...")
             return False
 
         # Check timestamp (not too far in future)
@@ -413,9 +435,22 @@ class Blockchain:
                 logger.warning(f"Block hash mismatch at height {i}")
                 return False
 
-            # PoW verification
-            if not block.pow_hash or not block.pow_hash.startswith("0" * block.header.difficulty):
+            # PoW verification - RECOMPUTE to detect forged pow_hash
+            expected_pow_hash = tritio_hash(block.header.to_bytes())
+            if block.pow_hash != expected_pow_hash:
+                logger.warning(f"PoW hash mismatch at height {i}: "
+                              f"stored={block.pow_hash[:16] if block.pow_hash else 'None'}... "
+                              f"recomputed={expected_pow_hash[:16]}...")
+                return False
+
+            if not expected_pow_hash.startswith("0" * block.header.difficulty):
                 logger.warning(f"Invalid PoW at height {i}")
+                return False
+
+            # Merkle root verification
+            expected_merkle = Block._merkle_root(block.transactions)
+            if block.header.merkle_root != expected_merkle:
+                logger.warning(f"Merkle root mismatch at height {i}")
                 return False
 
             # Checkpoint verification
@@ -520,9 +555,17 @@ class Blockchain:
             prev = self.chain[i - 1]
             if cur.header.previous_hash.hex() != prev.hash:
                 return False
-            if not cur.pow_hash or not cur.pow_hash.startswith("0" * cur.header.difficulty):
+            # RECOMPUTE PoW to detect forged pow_hash
+            expected_pow_hash = tritio_hash(cur.header.to_bytes())
+            if cur.pow_hash != expected_pow_hash:
+                return False
+            if not expected_pow_hash.startswith("0" * cur.header.difficulty):
                 return False
             if cur.hash != cur.content_hash():
+                return False
+            # Verify merkle root
+            expected_merkle = Block._merkle_root(cur.transactions)
+            if cur.header.merkle_root != expected_merkle:
                 return False
         return True
 
